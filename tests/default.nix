@@ -31,9 +31,6 @@ let
             ./k8s/order.nix
             ./k8s/submodule.nix
             ./k8s/imports.nix
-            #./legacy/k8s.nix
-            #./legacy/crd.nix
-            #./legacy/modules.nix
             # ./helm/simple.nix
             #  ./istio/bookinfo.nix # infinite recursion
             ./submodules/simple.nix
