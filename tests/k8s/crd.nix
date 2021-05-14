@@ -15,11 +15,25 @@ in
       message = "Custom resource should have correct version set";
       assertion = latestCrontab.apiVersion == "stable.example.com/v2";
     }];
-    testScript = ''
-      kube.wait_until_succeeds("kubectl apply -f ${config.kubernetes.result}")
-      kube.succeed("kubectl get crds | grep -i crontabs")
-      kube.succeed("kubectl get crontabs | grep -i versioned")
-      kube.succeed("kubectl get crontabs | grep -i latest")
+    script = ''
+      @pytest.mark.applymanifest('${config.kubernetes.resultYAML}')
+      def test_testing_module(kube):
+          """Tests whether deployment gets successfully created"""
+
+          kube.wait_for_registered(timeout=30)
+
+          kube.get_crds()
+          crds = kube.get_crds()
+          crontabs_crd = crds.get('crontabs')
+          assert contrabs_crd is not None
+
+          # TODO: verify
+          # kubectl get crontabs | grep -i versioned
+          crontabs_crd_versioned = crontabs_crd.get('versioned')
+          assert crontabs_crd_versioned is not None
+          # kubectl get crontabs | grep -i latest
+          crontabs_crd_latest = crontabs_crd.get('latest')
+          assert crontabs_crd_latest is not None
     '';
   };
 

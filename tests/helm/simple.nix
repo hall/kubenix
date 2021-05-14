@@ -32,7 +32,13 @@ let
   };
 in
 {
-  imports = [ kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s ];
+  imports = [ kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s kubenix.modules.docker ];
+
+  docker.images = {
+    postgresql.image = inherit postgresql;
+    postgresqlExporter.image = inherit postgresqlExporter;
+    bitnamiShell.image = inherit bitnamiShell;
+  };
 
   test = {
     name = "helm-simple";
@@ -54,19 +60,21 @@ in
         assertion =
           appsv1.StatefulSet.app-psql-postgresql-primary.metadata.namespace == "test";
       }];
-    testScript = ''
-      kube.wait_until_succeeds("docker load < ${postgresql}")
-      kube.wait_until_succeeds("docker load < ${postgresqlExporter}")
-      kube.wait_until_succeeds("docker load < ${bitnamiShell}")
-      kube.wait_until_succeeds("kubectl apply -f ${config.kubernetes.result}")
-      kube.wait_until_succeeds("PGPASSWORD=postgres ${pkgs.postgresql}/bin/psql -h app-psql-postgresql.test.svc.cluster.local -U postgres -l")
+    script = ''
+      @pytest.mark.applymanifest('${config.kubernetes.resultYAML}')
+      def test_helm_deployment(kube):
+          """Tests whether helm deployment gets successfully created"""
+
+          kube.wait_for_registered(timeout=30)
+
+          # TODO: implement those kind of checks from the host machine into the cluster
+          # via port forwarding, prepare all runtimes accordingly
+          # PGPASSWORD=postgres ${pkgs.postgresql}/bin/psql -h app-psql-postgresql.test.svc.cluster.local -U postgres -l
     '';
   };
 
-  kubernetes.resources.namespaces.test = { };
-
   kubernetes.helm.instances.app-psql = {
-    namespace = "test";
+    namespace = "some-overridden-by-kubetest";
     chart = helm.fetch {
       repo = "https://charts.bitnami.com/bitnami";
       chart = "postgresql";
