@@ -6,7 +6,6 @@ with lib;
   imports = [ kubenix.modules.test ./module.nix ];
 
   test = {
-    distro = "k3s";
     name = "nginx-deployment";
     description = "Test testing nginx deployment";
     testScript = ''

@@ -23,6 +23,7 @@ in
     ./docker.nix
     ./driver/kubetest.nix
     ./runtime/local.nix
+    ./runtime/nixos-k8s.nix
   ];
 
   options.testing = {

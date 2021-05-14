@@ -4,28 +4,34 @@
 , config
 , pkgs
 , lib
-, system ? "x86_64-linux"
 , ...
 }:
 
 with lib;
 let
   testing = config.testing;
-  kubeconfig = "/etc/${config.services.kubernetes.pki.etcClusterAdminKubeconfig}";
+  # kubeconfig = "/etc/${config.services.kubernetes.pki.etcClusterAdminKubeconfig}";
+  kubeconfig = "/etc/kubernetes/cluster-admin.kubeconfig";
+  kubecerts = "/var/lib/kubernetes/secrets";
 
   # how we differ from the standard configuration of mkKubernetesBaseTest
   extraConfiguration = { config, pkgs, lib, nodes, ... }: {
-    virtualisation.memorySize = mkDefault 2048;
+
+    virtualisation = {
+      memorySize = 2048;
+    };
+
     networking = {
       nameservers = [ "10.0.0.254" ];
       firewall = {
         trustedInterfaces = [ "docker0" "cni0" ];
       };
     };
+
     services.kubernetes = {
-      seedDockerImages = mkIf (elem "docker" config._m.features) config.docker.export;
       flannel.enable = false;
       kubelet = {
+        seedDockerImages = testing.docker.images;
         networkPlugin = "cni";
         cni.config = [{
           name = "mynet";
@@ -44,10 +50,14 @@ let
           };
         }];
       };
-      systemd.extraConfig = "DefaultLimitNOFILE=1048576";
-      systemd.services.copy-certs = {
+    };
+
+    systemd = {
+      extraConfig = "DefaultLimitNOFILE=1048576";
+      # Host tools should have a chance to access guest's kube api
+      services.copy-certs = {
         description = "Share k8s certificates with host";
-        script = "cp -rf /var/lib/kubernetes/secrets /tmp/xchg/";
+        script = "cp -rf ${kubecerts} /tmp/xchg/; cp -f ${kubeconfig} /tmp/xchg/;";
         after = [ "kubernetes.target" ];
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
@@ -56,6 +66,7 @@ let
         };
       };
     };
+
   };
 
   script = ''
@@ -63,25 +74,23 @@ let
   '';
 
   test =
-    with import "${nixosPath}/tests/kubernetes/base.nix" { inherit pkgs system; };
+    with import "${nixosPath}/tests/kubernetes/base.nix" { inherit pkgs; inherit (pkgs) system; };
     mkKubernetesSingleNodeTest {
       inherit extraConfiguration;
-      inherit (config) name;
+      inherit (config.testing) name;
       test = script;
     };
 
 
 in
 {
-  options = {
-    runtime.nixos-k8s = {
-      driver = mkOption {
-        description = "Test driver";
-        type = types.package;
-        internal = true;
-      };
+  options.testing.runtime.nixos-k8s = {
+    driver = mkOption {
+      description = "Test driver";
+      type = types.package;
+      internal = true;
     };
   };
 
-  runtime.nixos-k8s.driver = test.driver;
+  config.testing.runtime.nixos-k8s.driver = test.driver;
 }
