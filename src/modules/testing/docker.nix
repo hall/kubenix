@@ -5,7 +5,7 @@ with import ../../lib/docker { inherit lib pkgs; };
 let
   testing = config.testing;
 
-  allImages = unique ( flatten (map (t: t.evaled.config.docker.export or [ ]) testing.tests));
+  allImages = unique (flatten (map (t: t.evaled.config.docker.export or [ ]) testing.tests));
 
   cfg = config.testing.docker;
 

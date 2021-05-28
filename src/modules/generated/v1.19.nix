@@ -5,11 +5,13 @@ with lib;
 
 let
   getDefaults = resource: group: version: kind:
-    catAttrs "default" (filter (default:
-      (default.resource == null || default.resource == resource)
-      && (default.group == null || default.group == group)
-      && (default.version == null || default.version == version)
-      && (default.kind == null || default.kind == kind)) config.defaults);
+    catAttrs "default" (filter
+      (default:
+        (default.resource == null || default.resource == resource)
+        && (default.group == null || default.group == group)
+        && (default.version == null || default.version == version)
+        && (default.kind == null || default.kind == kind))
+      config.defaults);
 
   types = lib.types // rec {
     str = mkOptionType {
@@ -34,7 +36,8 @@ let
               else
                 let coerced = coerceFunc val; in assert finalType.check coerced; coerced;
 
-          in finalType.merge loc (map (def: def // { value = coerceVal def.value; }) defs);
+          in
+          finalType.merge loc (map (def: def // { value = coerceVal def.value; }) defs);
         getSubOptions = finalType.getSubOptions;
         getSubModules = finalType.getSubModules;
         substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
@@ -46,11 +49,15 @@ let
   mkOptionDefault = mkOverride 1001;
 
   mergeValuesByKey = mergeKey: values:
-    listToAttrs (map (value:
-      nameValuePair (if isAttrs value.${mergeKey} then
-        toString value.${mergeKey}.content
-      else
-        (toString value.${mergeKey})) value) values);
+    listToAttrs (map
+      (value:
+        nameValuePair
+          (if isAttrs value.${mergeKey} then
+            toString value.${mergeKey}.content
+          else
+            (toString value.${mergeKey}))
+          value)
+      values);
 
   submoduleOf = ref:
     types.submodule ({ name, ... }: {
@@ -63,7 +70,8 @@ let
       let
         convertName = name:
           if definitions."${ref}".options.${mergeKey}.type == types.int then toInt name else name;
-      in {
+      in
+      {
         options = definitions."${ref}".options;
         config = definitions."${ref}".config // {
           ${mergeKey} = mkOverride 1002 (convertName name);
@@ -72,7 +80,8 @@ let
 
   submoduleForDefinition = ref: resource: kind: group: version:
     let apiVersion = if group == "core" then version else "${group}/${version}";
-    in types.submodule ({ name, ... }: {
+    in
+    types.submodule ({ name, ... }: {
       imports = getDefaults resource group version kind;
       options = definitions."${ref}".options;
       config = mkMerge [
@@ -12772,8 +12781,8 @@ let
             Host is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the "host" part of the URI as defined in RFC 3986: 1. IPs are not allowed. Currently an IngressRuleValue can only apply to
                the IP in the Spec of the parent Ingress.
             2. The `:` delimiter is not respected because ports are not allowed.
-            	  Currently the port of an Ingress is implicitly :80 for http and
-            	  :443 for https.
+                Currently the port of an Ingress is implicitly :80 for http and
+                :443 for https.
             Both these may change in the future. Incoming requests are matched against the host before the IngressRuleValue. If the host is unspecified, the Ingress routes all traffic based on the specified IngressRuleValue.
 
             Host can be "precise" which is a domain name without the terminating dot of a network host (e.g. "foo.bar.com") or "wildcard", which is a domain name prefixed with a single wildcard label (e.g. "*.foo.com"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == "*"). Requests will be matched against the Host field in the following way: 1. If Host is precise, the request matches this rule if the http host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if the http host header is to equal to the suffix (removing the first label) of the wildcard rule.'';
@@ -13665,8 +13674,8 @@ let
             Host is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the "host" part of the URI as defined in RFC 3986: 1. IPs are not allowed. Currently an IngressRuleValue can only apply to
                the IP in the Spec of the parent Ingress.
             2. The `:` delimiter is not respected because ports are not allowed.
-            	  Currently the port of an Ingress is implicitly :80 for http and
-            	  :443 for https.
+                Currently the port of an Ingress is implicitly :80 for http and
+                :443 for https.
             Both these may change in the future. Incoming requests are matched against the host before the IngressRuleValue. If the host is unspecified, the Ingress routes all traffic based on the specified IngressRuleValue.
 
             Host can be "precise" which is a domain name without the terminating dot of a network host (e.g. "foo.bar.com") or "wildcard", which is a domain name prefixed with a single wildcard label (e.g. "*.foo.com"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == "*"). Requests will be matched against the Host field in the following way: 1. If Host is precise, the request matches this rule if the http host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if the http host header is to equal to the suffix (removing the first label) of the wildcard rule.'';
@@ -14219,8 +14228,8 @@ let
             Host is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the "host" part of the URI as defined in RFC 3986: 1. IPs are not allowed. Currently an IngressRuleValue can only apply to
                the IP in the Spec of the parent Ingress.
             2. The `:` delimiter is not respected because ports are not allowed.
-            	  Currently the port of an Ingress is implicitly :80 for http and
-            	  :443 for https.
+                Currently the port of an Ingress is implicitly :80 for http and
+                :443 for https.
             Both these may change in the future. Incoming requests are matched against the host before the IngressRuleValue. If the host is unspecified, the Ingress routes all traffic based on the specified IngressRuleValue.
 
             Host can be "precise" which is a domain name without the terminating dot of a network host (e.g. "foo.bar.com") or "wildcard", which is a domain name prefixed with a single wildcard label (e.g. "*.foo.com"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == "*"). Requests will be matched against the Host field in the following way: 1. If Host is precise, the request matches this rule if the http host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if the http host header is to equal to the suffix (removing the first label) of the wildcard rule.'';
@@ -18038,9 +18047,7 @@ let
       config = { "labelSelectorPath" = mkOverride 1002 null; };
 
     };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceSubresourceStatus" = {
-
-    };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceSubresourceStatus" = { };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceSubresources" = {
 
       options = {
@@ -18097,9 +18104,7 @@ let
       };
 
     };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSON" = {
-
-    };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSON" = { };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps" = {
 
       options = {
@@ -18378,15 +18383,9 @@ let
       };
 
     };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrArray" = {
-
-    };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrBool" = {
-
-    };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrStringArray" = {
-
-    };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrArray" = { };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrBool" = { };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrStringArray" = { };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.ServiceReference" = {
 
       options = {
@@ -18875,9 +18874,7 @@ let
 
       };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceSubresourceStatus" =
-      {
-
-      };
+      { };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceSubresources" = {
 
       options = {
@@ -18934,9 +18931,7 @@ let
       };
 
     };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSON" = {
-
-    };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSON" = { };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaProps" = {
 
       options = {
@@ -19215,15 +19210,9 @@ let
       };
 
     };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrArray" = {
-
-    };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrBool" = {
-
-    };
-    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrStringArray" = {
-
-    };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrArray" = { };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrBool" = { };
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrStringArray" = { };
     "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.ServiceReference" = {
 
       options = {
@@ -19292,9 +19281,7 @@ let
       };
 
     };
-    "io.k8s.apimachinery.pkg.api.resource.Quantity" = {
-
-    };
+    "io.k8s.apimachinery.pkg.api.resource.Quantity" = { };
     "io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup" = {
 
       options = {
@@ -19536,9 +19523,7 @@ let
       };
 
     };
-    "io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1" = {
-
-    };
+    "io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1" = { };
     "io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionForDiscovery" = {
 
       options = {
@@ -19680,9 +19665,7 @@ let
       };
 
     };
-    "io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime" = {
-
-    };
+    "io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime" = { };
     "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta" = {
 
       options = {
@@ -19846,9 +19829,7 @@ let
       };
 
     };
-    "io.k8s.apimachinery.pkg.apis.meta.v1.Patch" = {
-
-    };
+    "io.k8s.apimachinery.pkg.apis.meta.v1.Patch" = { };
     "io.k8s.apimachinery.pkg.apis.meta.v1.Preconditions" = {
 
       options = {
@@ -20018,9 +19999,7 @@ let
       };
 
     };
-    "io.k8s.apimachinery.pkg.apis.meta.v1.Time" = {
-
-    };
+    "io.k8s.apimachinery.pkg.apis.meta.v1.Time" = { };
     "io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent" = {
 
       options = {
@@ -20042,12 +20021,8 @@ let
       config = { };
 
     };
-    "io.k8s.apimachinery.pkg.runtime.RawExtension" = {
-
-    };
-    "io.k8s.apimachinery.pkg.util.intstr.IntOrString" = {
-
-    };
+    "io.k8s.apimachinery.pkg.runtime.RawExtension" = { };
+    "io.k8s.apimachinery.pkg.util.intstr.IntOrString" = { };
     "io.k8s.apimachinery.pkg.version.Info" = {
 
       options = {
@@ -20470,7 +20445,8 @@ let
     };
 
   };
-in {
+in
+{
   # all resource versions
   options = {
     resources = {

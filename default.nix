@@ -1,6 +1,7 @@
 { system ? builtins.currentSystem }:
 let
-in (
+in
+(
   (import ./compat.nix).flake-compat {
     src = ./.;
     inherit system;
