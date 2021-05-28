@@ -49,7 +49,7 @@
     ) //
     {
       overlay = final: prev: {
-        kubenix = prev.callPackage ./default.nix { };
+        kubenix = prev.callPackage ./kubenix.nix { };
         # up to date versions of their nixpkgs equivalents
         kubernetes = prev.callPackage ./pkgs/applications/networking/cluster/kubernetes
           { };
