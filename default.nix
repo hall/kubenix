@@ -5,4 +5,4 @@ in (
     src = ./.;
     inherit system;
   }
-).shellNix
+).defaultNix

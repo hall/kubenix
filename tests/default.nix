@@ -1,6 +1,6 @@
 { pkgs ? import <nixpkgs> { }
 , lib ? pkgs.lib
-, kubenix ? import ../. { inherit pkgs lib; }
+, kubenix ? (import ../. { }).default
 
 , nixosPath ? toString <nixpkgs/nixos>
 

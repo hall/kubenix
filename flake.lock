@@ -2,42 +2,26 @@
   "nodes": {
     "devshell-flake": {
       "locked": {
-        "lastModified": 1620641550,
-        "narHash": "sha256-o359KdI/LNiPL6EbirONff2MOvZHtZr9MgYx3R9oVFk=",
+        "lastModified": 1622013274,
+        "narHash": "sha256-mK/Lv0lCbl07dI5s7tR/7nb79HunKnJik3KyR6yeI2k=",
         "owner": "numtide",
         "repo": "devshell",
-        "rev": "a47493423092f6c4c0a7eb605a7cd515a77db4a8",
+        "rev": "e7faf69e6bf8546517cc936c7f6d31c7eb3abcb2",
         "type": "github"
       },
       "original": {
         "owner": "numtide",
         "repo": "devshell",
-        "type": "github"
-      }
-    },
-    "flake-compat": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1606424373,
-        "narHash": "sha256-oq8d4//CJOrVj+EcOaSXvMebvuTkmBJuT5tzlfewUnQ=",
-        "owner": "edolstra",
-        "repo": "flake-compat",
-        "rev": "99f1c2157fba4bfe6211a321fd0ee43199025dbf",
-        "type": "github"
-      },
-      "original": {
-        "owner": "edolstra",
-        "repo": "flake-compat",
         "type": "github"
       }
     },
     "flake-utils": {
       "locked": {
-        "lastModified": 1605370193,
-        "narHash": "sha256-YyMTf3URDL/otKdKgtoMChu4vfVL3vCMkRqpGifhUn0=",
+        "lastModified": 1620759905,
+        "narHash": "sha256-WiyWawrgmyN0EdmiHyG2V+fqReiVi8bM9cRdMaKQOFg=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "5021eac20303a61fafe17224c087f5519baed54d",
+        "rev": "b543720b25df6ffdfcf9227afafc5b8c1fabfae8",
         "type": "github"
       },
       "original": {
@@ -48,11 +32,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1609233094,
-        "narHash": "sha256-Ltzng3h4LDNjYAvmoX0kQ3023TvdupwuMvm1D7hZkyY=",
+        "lastModified": 1622230509,
+        "narHash": "sha256-ybr8ufMIE1OVIG+S7cMihx1HlrJgTV3lLr/oW/LplTM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2b556ea6712cd4fa76a433093df0cb375a267e3d",
+        "rev": "190d0579fbb13e83756dc2e6df49a3b9221fbfa9",
         "type": "github"
       },
       "original": {
@@ -64,7 +48,6 @@
     "root": {
       "inputs": {
         "devshell-flake": "devshell-flake",
-        "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"
       }

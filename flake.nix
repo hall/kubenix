@@ -5,12 +5,9 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:NixOS/nixpkgs";
     devshell-flake.url = "github:numtide/devshell";
-    flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, devshell-flake, flake-compat }:
-    { modules = import ./modules; }
-    //
+  outputs = { self, nixpkgs, flake-utils, devshell-flake }:
     (flake-utils.lib.eachDefaultSystem
       (system:
         let
@@ -27,29 +24,23 @@
         in
         rec {
           devShell = with pkgs; devshell.mkShell
-            {
-              imports = [
-                (devshell.importTOML ./devshell.toml)
-              ];
-            };
+            { imports = [ (devshell.importTOML ./devshell.toml) ]; };
 
           packages = flake-utils.lib.flattenTree {
             inherit (pkgs)
-              kubenix
               kubernetes
               kubectl
               ;
           };
 
-          hydraJobs = {
-            inherit packages;
-          };
+          defaultPackage = pkgs.kubenix;
         }
       )
     ) //
     {
+      modules = import ./src/modules;
       overlay = final: prev: {
-        kubenix = prev.callPackage ./kubenix.nix { };
+        kubenix = prev.callPackage ./src/kubenix.nix { };
         # up to date versions of their nixpkgs equivalents
         kubernetes = prev.callPackage ./pkgs/applications/networking/cluster/kubernetes
           { };
