@@ -1,4 +1,4 @@
-{ nixosPath, config, pkgs, lib, kubenix, ... }:
+{ config, pkgs, lib, kubenix, ... }:
 
 with lib;
 let

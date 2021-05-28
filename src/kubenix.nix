@@ -10,7 +10,6 @@ let
 
   defaultSpecialArgs = {
     inherit kubenix;
-    nixosPath = pkgs.path + "/nixos";
   };
 
   # evalModules with same interface as lib.evalModules and kubenix as

@@ -2,8 +2,6 @@
 , lib ? pkgs.lib
 , kubenix ? (import ../. { }).default
 
-, nixosPath ? toString <nixpkgs/nixos>
-
 , k8sVersion ? "1.21"
 , registryUrl ? throw "Registry url not defined"
 , throwError ? true # whether any testing error should throw an error
@@ -58,7 +56,7 @@ let
       inherit pkgs;
     };
     specialArgs = {
-      inherit kubenix nixosPath;
+      inherit kubenix;
     };
   }).config;
 in

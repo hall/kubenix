@@ -1,7 +1,6 @@
 # nixos-k8s implements nixos kubernetes testing runtime
 
-{ nixosPath
-, config
+{ config
 , pkgs
 , lib
 , ...
@@ -74,7 +73,7 @@ let
   '';
 
   test =
-    with import "${nixosPath}/tests/kubernetes/base.nix" { inherit pkgs; inherit (pkgs) system; };
+    with import "${pkgs.path}/nixos/tests/kubernetes/base.nix" { inherit pkgs; inherit (pkgs) system; };
     mkKubernetesSingleNodeTest {
       inherit extraConfiguration;
       inherit (config.testing) name;
