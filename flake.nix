@@ -36,6 +36,8 @@
           packages = flake-utils.lib.flattenTree {
             inherit (pkgs)
               kubenix
+              kubernetes
+              kubectl
               ;
           };
 
