@@ -1,18 +1,16 @@
-let
-  fetch = import ./lib/compat.nix;
-in
-{ pkgs ? import (fetch "nixpkgs") { }
-, nixosPath ? toString (fetch "nixpkgs") + "/nixos"
-, lib ? pkgs.lib
-}:
+{ pkgs, lib }:
 
-with lib;
 let
-  kubenixLib = import ./lib { inherit lib pkgs; };
-  lib' = lib.extend (lib: self: import ./lib/extra.nix { inherit lib pkgs; });
+
+  kubenix = {
+    inherit evalModules;
+    lib = import ./lib { inherit lib pkgs; };
+    modules = import ./modules;
+  };
 
   defaultSpecialArgs = {
-    inherit kubenix nixosPath;
+    inherit kubenix;
+    nixosPath = pkgs.path + "/nixos";
   };
 
   # evalModules with same interface as lib.evalModules and kubenix as
@@ -24,9 +22,10 @@ let
     , ...
     }@attrs:
     let
-      attrs' = filterAttrs (n: _: n != "module") attrs;
+      lib' = lib.extend (lib: self: import ./lib/extra.nix { inherit lib pkgs; });
+      attrs' = lib.filterAttrs (n: _: n != "module") attrs;
     in
-    lib'.evalModules (recursiveUpdate
+    lib'.evalModules (lib.recursiveUpdate
       {
         inherit specialArgs modules;
         args = {
@@ -35,13 +34,5 @@ let
         };
       }
       attrs');
-
-  modules = import ./modules;
-
-  kubenix = {
-    inherit evalModules modules;
-
-    lib = kubenixLib;
-  };
 in
 kubenix

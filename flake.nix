@@ -47,9 +47,7 @@
     ) //
     {
       overlay = final: prev: {
-        kubenix = prev.callPackage ./default.nix {
-          nixosPath = "${nixpkgs}/nixos";
-        };
+        kubenix = prev.callPackage ./default.nix { };
         # up to date versions of their nixpkgs equivalents
         kubernetes = prev.callPackage ./pkgs/applications/networking/cluster/kubernetes
           { };
