@@ -374,7 +374,7 @@ in
       }];
 
     # expose k8s helper methods as module argument
-    _module.args.k8s = import ../lib/k8s.nix { inherit lib; };
+    _module.args.k8s = import ../lib/k8s { inherit lib; };
 
     kubernetes.api = mkMerge ([{
       # register custom types

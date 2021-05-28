@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 with lib;
-with import ../../lib/docker.nix { inherit lib pkgs; };
+with import ../../lib/docker { inherit lib pkgs; };
 let
   testing = config.testing;
 

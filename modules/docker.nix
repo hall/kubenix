@@ -85,7 +85,7 @@ in
     }];
 
     # pass docker library as param
-    _module.args.docker = import ../lib/docker.nix { inherit lib pkgs; };
+    _module.args.docker = import ../lib/docker { inherit lib pkgs; };
 
     # list of exported docker images
     docker.export = mapAttrsToList (_: i: i.image)
