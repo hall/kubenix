@@ -38,31 +38,8 @@ let
 
   modules = import ./modules;
 
-  # legacy support for buildResources
-  buildResources =
-    { configuration ? { }
-    , writeJSON ? true
-    , writeHash ? true
-    }:
-    let
-      evaled = evalModules {
-        modules = [
-          configuration
-          modules.legacy
-        ];
-      };
-
-      generated = evaled.config.kubernetes.generated;
-
-      result =
-        if writeJSON
-        then pkgs.writeText "resources.json" (builtins.toJSON generated)
-        else generated;
-    in
-    result;
-
   kubenix = {
-    inherit evalModules buildResources modules;
+    inherit evalModules modules;
 
     lib = kubenixLib;
   };
