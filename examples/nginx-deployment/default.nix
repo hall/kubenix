@@ -1,30 +1,36 @@
-{ kubenix ? import ../.. { }, registry ? "docker.io/gatehub" }:
+{ evalModules, registry }:
 
-with kubenix.lib;
-
-rec {
+let
   # evaluated configuration
-  config = (kubenix.evalModules {
+  config = (evalModules {
     modules = [
+
+      ({ kubenix, ... }: { imports = [ kubenix.modules.testing ]; })
+
       ./module.nix
+
       { docker.registry.url = registry; }
 
-      kubenix.modules.testing
       {
         testing.tests = [ ./test.nix ];
-        testing.defaults = ({ lib, ... }: with lib; {
-          docker.registry.url = mkForce "";
-          kubernetes.version = config.kubernetes.version;
-        });
+        testing.docker.registryUrl = "";
       }
+
     ];
   }).config;
 
-  # e2e test
-  test = config.testing.result;
+in
+{
+  inherit config;
+
+  # config checks
+  checks = config.testing.success;
+
+  # TODO: e2e test
+  # test = config.testing.result;
 
   # nixos test script for running the test
-  test-script = config.testing.testsByName.nginx-deployment.test;
+  test-script = config.testing.testsByName.nginx-deployment.script;
 
   # genreated kubernetes List object
   generated = config.kubernetes.generated;

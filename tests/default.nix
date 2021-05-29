@@ -1,22 +1,21 @@
-{ pkgs ? import <nixpkgs> { }
-, lib ? pkgs.lib
-, kubenix ? (import ../. { }).default
+{ system ? builtins.currentSystem
+, evalModules ? (import ../. { }).evalModules.${system}
+}:
 
-, k8sVersion ? "1.21"
-, registryUrl ? throw "Registry url not defined"
+{ k8sVersion ? "1.21"
+, registry ? throw "Registry url not defined"
 , throwError ? true # whether any testing error should throw an error
 , enabledTests ? null
 }:
 
-with lib;
 let
-  images = pkgs.callPackage ./images.nix { };
+  config = (evalModules {
 
-  config = (kubenix.evalModules {
     modules = [
-      kubenix.modules.testing
 
-      {
+      ({ kubenix, ... }: { imports = [ kubenix.modules.testing ]; })
+
+      ({ pkgs, ... }: {
         testing = {
           name = "kubenix-${k8sVersion}";
           throwError = throwError;
@@ -38,9 +37,9 @@ let
             ./submodules/passthru.nix
           ];
           args = {
-            inherit images;
+            images = pkgs.callPackage ./images.nix { };
           };
-          docker.registryUrl = registryUrl;
+          docker.registryUrl = registry;
           defaults = [
             {
               features = [ "k8s" ];
@@ -50,14 +49,10 @@ let
             }
           ];
         };
-      }
+      })
+
     ];
-    args = {
-      inherit pkgs;
-    };
-    specialArgs = {
-      inherit kubenix;
-    };
+
   }).config;
 in
-pkgs.recurseIntoAttrs config.testing
+config.testing // { recurseForDerivations = true; }
