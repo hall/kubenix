@@ -8,35 +8,38 @@
   };
 
   outputs = { self, nixpkgs, flake-utils, devshell-flake }:
-    (flake-utils.lib.eachDefaultSystem
-      (system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              devshell-flake.overlay
-            ];
-            config = {
-              allowUnsupportedSystem = true;
-            };
-          };
-        in
-        rec {
-          devShell = with pkgs; devshell.mkShell
-            { imports = [ (devshell.importTOML ./devshell.toml) ]; };
 
-          packages = flake-utils.lib.flattenTree {
-            inherit (pkgs)
-              kubernetes
-              kubectl
-              ;
-          };
+    (flake-utils.lib.eachDefaultSystem (system:
+      let
 
-          defaultPackage = pkgs.kubenix;
-        }
-      )
-    ) //
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            self.overlay
+            devshell-flake.overlay
+          ];
+          config = { allowUnsupportedSystem = true; };
+        };
+
+      in
+      {
+
+        devShell = with pkgs; devshell.mkShell
+          { imports = [ (devshell.importTOML ./devshell.toml) ]; };
+
+        packages = flake-utils.lib.flattenTree {
+          inherit (pkgs) kubernetes kubectl;
+        };
+
+        defaultPackage = pkgs.kubenix;
+
+        jobs = import ./jobs { inherit pkgs; };
+
+      }
+    ))
+
+    //
+
     {
       modules = import ./src/modules;
       overlay = final: prev: {

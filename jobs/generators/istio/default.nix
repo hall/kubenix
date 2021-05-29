@@ -231,28 +231,28 @@ values}]'';
   swagger = fetchSpecs spec;
 
   definitions = genDefinitions swagger;
-in
-pkgs.writeText "gen.nix" ''
+
+  generated = ''
   # This file was generated with kubenix k8s generator, do not edit
   {lib, config, ... }:
-  
+
   with lib;
-  
+
   let
     types = lib.types // rec {
       str = mkOptionType {
-        name = \"str\";
-        description = \"string\";
+        name = "str";
+        description = "string";
         check = isString;
         merge = mergeEqualOption;
       };
-  
+
       # Either value of type `finalType` or `coercedType`, the latter is
       # converted to `finalType` using `coerceFunc`.
       coercedTo = coercedType: coerceFunc: finalType:
       mkOptionType rec {
-        name = \"coercedTo\";
-        description = \"\${finalType.description} or \${coercedType.description}\";
+        name = "coercedTo";
+        description = "''${finalType.description} or ''${coercedType.description}";
         check = x: finalType.check x || coercedType.check x;
         merge = loc: defs:
           let
@@ -261,7 +261,7 @@ pkgs.writeText "gen.nix" ''
               else let
                 coerced = coerceFunc val;
               in assert finalType.check coerced; coerced;
-  
+
           in finalType.merge loc (map (def: def // { value = coerceVal def.value; }) defs);
         getSubOptions = finalType.getSubOptions;
         getSubModules = finalType.getSubModules;
@@ -270,79 +270,76 @@ pkgs.writeText "gen.nix" ''
         functor = (defaultFunctor name) // { wrapped = finalType; };
       };
     };
-  
+
     mkOptionDefault = mkOverride 1001;
-  
+
     extraOptions = {
       kubenix = {};
     };
-  
+
     mergeValuesByKey = mergeKey: values:
       listToAttrs (map
         (value: nameValuePair (
-          if isAttrs value.\${mergeKey}
-          then toString value.\${mergeKey}.content
-          else (toString value.\${mergeKey})
+          if isAttrs value.''${mergeKey}
+          then toString value.''${mergeKey}.content
+          else (toString value.''${mergeKey})
         ) value)
       values);
-  
+
     submoduleOf = ref: types.submodule ({name, ...}: {
-      options = definitions.\"\${ref}\".options;
-      config = definitions.\"\${ref}\".config;
+      options = definitions."''${ref}".options;
+      config = definitions."''${ref}".config;
     });
-  
+
     submoduleWithMergeOf = ref: mergeKey: types.submodule ({name, ...}: let
       convertName = name:
-        if definitions.\"\${ref}\".options.\${mergeKey}.type == types.int
+        if definitions."''${ref}".options.''${mergeKey}.type == types.int
         then toInt name
         else name;
     in {
-      options = definitions.\"\${ref}\".options;
-      config = definitions.\"\${ref}\".config // {
-        \${mergeKey} = mkOverride 1002 (convertName name);
+      options = definitions."''${ref}".options;
+      config = definitions."''${ref}".config // {
+        ''${mergeKey} = mkOverride 1002 (convertName name);
       };
     });
-  
+
     submoduleForDefinition = ref: resource: kind: group: version:
       types.submodule ({name, ...}: {
-        options = definitions.\"\${ref}\".options // extraOptions;
+        options = definitions."''${ref}".options // extraOptions;
         config = mkMerge ([
-          definitions.\"\${ref}\".config
+          definitions."''${ref}".config
           {
             kind = mkOptionDefault kind;
             apiVersion = mkOptionDefault version;
-  
+
             # metdata.name cannot use option default, due deep config
             metadata.name = mkOptionDefault name;
           }
-        ] ++ (config.defaults.\${resource} or [])
+        ] ++ (config.defaults.''${resource} or [])
           ++ (config.defaults.all or []));
       });
-  
+
     coerceAttrsOfSubmodulesToListByKey = ref: mergeKey: (types.coercedTo
       (types.listOf (submoduleOf ref))
       (mergeValuesByKey mergeKey)
       (types.attrsOf (submoduleWithMergeOf ref mergeKey))
     );
-  
+
     definitions = {
-      ${concatStrings (mapAttrsToList
-  (name: value: "
-      \"${name}\" = {${optionalString (hasAttr "options" value) "
-        options = {${concatStrings (mapAttrsToList
-  (name: value: "
-          \"${name}\" = ${value};
-        ")
-  value.options)}};
-      "}${optionalString (hasAttr "config" value) "
-        config = {${concatStrings (mapAttrsToList
-  (name: value: "
-          \"${name}\" = ${value};
-        ")
-  value.config)}};
-      "}};
-      ")
-  definitions)}
+      ${concatStrings (mapAttrsToList (name: value: ''
+        "${name}" = {${optionalString (hasAttr "options" value) "
+          options = {${concatStrings (mapAttrsToList (name: value: ''
+            "${name}" = ${value};
+          '') value.options)}};
+          "}
+
+          ${optionalString (hasAttr "config" value) ''
+            config = {${concatStrings (mapAttrsToList (name: value: ''
+              "${name}" = ${value};
+            '') value.config)}};
+          ''}
+        };
+      '') definitions)}
     } // (import ./overrides.nix {inheirt definitions lib;}));
   in {
     kubernetes.customResources = [
@@ -357,4 +354,16 @@ pkgs.writeText "gen.nix" ''
   (genResources swagger)}
     ];
   }
+'';
+in
+pkgs.runCommand "istio-gen.nix"
+{
+  buildInputs = [ pkgs.nixpkgs-fmt ];
+} ''
+  cat << 'GENERATED' > ./raw
+  "${generated}"
+  GENERATED
+
+  nixpkgs-fmt ./raw
+  cp ./raw $out
 ''

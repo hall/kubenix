@@ -1,8 +1,7 @@
-{ name ? "k8s"
-, pkgs ? import <nixpkgs> { }
-, lib ? pkgs.lib
-, spec ? ./specs/1.21/swagger.json
-, ...
+{ name
+, pkgs
+, lib
+, spec
 }:
 
 with lib;
@@ -456,8 +455,12 @@ values}]'';
 in
 pkgs.runCommand "k8s-${name}-gen.nix"
 {
-  buildInputs = [ pkgs.haskellPackages.nixfmt ];
+  buildInputs = [ pkgs.nixpkgs-fmt ];
 } ''
-  cp ${builtins.toFile "k8s-${name}-gen-raw.nix" generated} $out
-  nixfmt -w 100 $out
+  cat << 'GENERATED' > ./raw
+  "${generated}"
+  GENERATED
+
+  nixpkgs-fmt ./raw
+  cp ./raw $out
 ''
