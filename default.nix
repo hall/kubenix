@@ -22,8 +22,8 @@ let
     , ...
     }@attrs:
     let
-      lib' = lib.extend (lib: self: import ./lib/extra.nix { inherit lib pkgs; });
-      attrs' = lib.filterAttrs (n: _: n != "module") attrs;
+      lib' = lib.extend (lib: self: import ./lib/upstreamables.nix { inherit lib pkgs; });
+      attrs' = builtins.removeAttrs attrs [ "module" ];
     in
     lib'.evalModules (lib.recursiveUpdate
       {

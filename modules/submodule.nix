@@ -1,7 +1,6 @@
 { config, lib, ... }:
 
 with lib;
-
 {
   imports = [ ./base.nix ];
 

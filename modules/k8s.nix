@@ -214,6 +214,44 @@ let
       })
     latestCustomResourceTypes);
 
+  coerceListOfSubmodulesToAttrs = submodule: keyFn:
+    let
+      mergeValuesByFn = keyFn: values:
+        listToAttrs (map
+          (value:
+            nameValuePair (toString (keyFn value)) value
+          )
+          values);
+
+      # Either value of type `finalType` or `coercedType`, the latter is
+      # converted to `finalType` using `coerceFunc`.
+      coercedTo = coercedType: coerceFunc: finalType:
+        mkOptionType rec {
+          name = "coercedTo";
+          description = "${finalType.description} or ${coercedType.description}";
+          check = x: finalType.check x || coercedType.check x;
+          merge = loc: defs:
+            let
+              coerceVal = val:
+                if finalType.check val then
+                  val
+                else
+                  let coerced = coerceFunc val; in assert finalType.check coerced; coerced;
+
+            in
+            finalType.merge loc (map (def: def // { value = coerceVal def.value; }) defs);
+          getSubOptions = finalType.getSubOptions;
+          getSubModules = finalType.getSubModules;
+          substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
+          typeMerge = t1: t2: null;
+          functor = (defaultFunctor name) // { wrapped = finalType; };
+        };
+    in
+    coercedTo
+      (types.listOf (types.submodule submodule))
+      (mergeValuesByFn keyFn)
+      (types.attrsOf (types.submodule submodule));
+
 in
 {
   imports = [ ./base.nix ];
@@ -404,7 +442,7 @@ in
       (i:
         let
           # load yaml file
-          object = loadYAML i;
+          object = importYAML i;
           groupVersion = splitString "/" object.apiVersion;
           name = object.metadata.name;
           version = last groupVersion;
