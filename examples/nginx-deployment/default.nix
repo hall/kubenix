@@ -3,20 +3,32 @@
 let
   # evaluated configuration
   config = (evalModules {
-    modules = [
+    module =
+      { kubenix, ... }: {
+        imports = [
+          kubenix.modules.testing
+          ./module.nix
+        ];
 
-      ({ kubenix, ... }: { imports = [ kubenix.modules.testing ]; })
+        # commonalities
+        kubenix.project = "nginx-deployment-example";
+        docker.registry.url = registry;
+        kubernetes.version = "1.21";
 
-      ./module.nix
-
-      { docker.registry.url = registry; }
-
-      {
-        testing.tests = [ ./test.nix ];
-        testing.docker.registryUrl = "";
-      }
-
-    ];
+        testing = {
+          tests = [ ./test.nix ];
+          docker.registryUrl = "";
+          # testing commonalities for tests that exhibit the respective feature
+          defaults = [
+            {
+              features = [ "k8s" ];
+              default = {
+                kubernetes.version = "1.20";
+              };
+            }
+          ];
+        };
+      };
   }).config;
 
 in

@@ -11,11 +11,11 @@
 let
   config = (evalModules {
 
-    modules = [
+    module =
+      { kubenix, pkgs, ... }: {
 
-      ({ kubenix, ... }: { imports = [ kubenix.modules.testing ]; })
+        imports = [ kubenix.modules.testing ];
 
-      ({ pkgs, ... }: {
         testing = {
           name = "kubenix-${k8sVersion}";
           throwError = throwError;
@@ -36,10 +36,10 @@ let
             ./submodules/exports.nix
             ./submodules/passthru.nix
           ];
-          args = {
-            images = pkgs.callPackage ./images.nix { };
-          };
+
+          args = { images = pkgs.callPackage ./images.nix { }; };
           docker.registryUrl = registry;
+
           defaults = [
             {
               features = [ "k8s" ];
@@ -49,9 +49,8 @@ let
             }
           ];
         };
-      })
 
-    ];
+      };
 
   }).config;
 in
