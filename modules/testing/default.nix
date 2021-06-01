@@ -53,6 +53,7 @@ in
             description = "Default to apply to test";
             type = types.unspecified;
             default = { };
+            apply = default: { _file = "testing.defaults"; } // default;
           };
         };
       }));

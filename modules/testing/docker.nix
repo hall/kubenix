@@ -40,6 +40,7 @@ in
   config.testing.defaults = [{
     features = [ "docker" ];
     default = {
+      _file = "testing.docker.registryUrl";
       docker.registry.url = cfg.registryUrl;
     };
   }];
