@@ -52,7 +52,7 @@ let
         modules = modulesWithCommonOptions;
       };
     in
-    if testing.throwError then evaled'
+    if testing.doThrowError then evaled'
     else if (builtins.tryEval evaled'.config.test.assertions).success
     then evaled' else null;
 

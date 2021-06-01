@@ -33,7 +33,7 @@ in
       default = "default";
     };
 
-    throwError = mkOption {
+    doThrowError = mkOption {
       description = "Whether to throw error";
       type = types.bool;
       default = true;

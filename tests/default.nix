@@ -4,7 +4,7 @@
 
 { k8sVersion ? "1.21"
 , registry ? throw "Registry url not defined"
-, throwError ? true # whether any testing error should throw an error
+, doThrowError ? true # whether any testing error should throw an error
 , enabledTests ? null
 }:
 
@@ -17,9 +17,8 @@ let
         imports = [ kubenix.modules.testing ];
 
         testing = {
+          inherit doThrowError enabledTests;
           name = "kubenix-${k8sVersion}";
-          throwError = throwError;
-          enabledTests = enabledTests;
           tests = [
             ./k8s/simple.nix
             ./k8s/deployment.nix
