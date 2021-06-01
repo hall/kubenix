@@ -39,21 +39,21 @@ in
       default = true;
     };
 
-    defaults = mkOption {
-      description = "List of defaults to apply to tests";
+    common = mkOption {
+      description = "List of common options to apply to tests";
       type = types.listOf (types.submodule ({ config, ... }: {
         options = {
           features = mkOption {
-            description = "List of features that test has to have to apply defaults";
+            description = "List of features that test has to have to apply options";
             type = types.listOf types.str;
             default = [ ];
           };
 
-          default = mkOption {
-            description = "Default to apply to test";
+          options = mkOption {
+            description = "Options to apply to test";
             type = types.unspecified;
             default = { };
-            apply = default: { _file = "testing.defaults"; } // default;
+            apply = default: { _file = "testing.common"; } // default;
           };
         };
       }));

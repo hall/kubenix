@@ -40,10 +40,10 @@ let
           args = { images = pkgs.callPackage ./images.nix { }; };
           docker.registryUrl = registry;
 
-          defaults = [
+          common = [
             {
               features = [ "k8s" ];
-              default = {
+              options = {
                 kubernetes.version = k8sVersion;
               };
             }

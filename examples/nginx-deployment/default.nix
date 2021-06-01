@@ -19,10 +19,10 @@ let
           tests = [ ./test.nix ];
           docker.registryUrl = "";
           # testing commonalities for tests that exhibit the respective feature
-          defaults = [
+          common = [
             {
               features = [ "k8s" ];
-              default = {
+              options = {
                 kubernetes.version = "1.20";
               };
             }

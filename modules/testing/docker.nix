@@ -37,9 +37,9 @@ in
     };
   };
 
-  config.testing.defaults = [{
+  config.testing.common = [{
     features = [ "docker" ];
-    default = {
+    options = {
       _file = "testing.docker.registryUrl";
       docker.registry.url = cfg.registryUrl;
     };

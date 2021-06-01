@@ -33,23 +33,23 @@ let
   # test features
   testFeatures = evaled'.config._m.features;
 
-  # defaults that can be applied on tests
-  defaults =
+  # common options that can be applied on this test
+  commonOpts =
     filter
       (d:
         (intersectLists d.features testFeatures) == d.features ||
         (length d.features) == 0
       )
-      testing.defaults;
+      testing.common;
 
-  # add default modules to all modules
-  modulesWithDefaults = modules ++ (map (d: d.default) defaults);
+  # add common options modules to all modules
+  modulesWithCommonOptions = modules ++ (map (d: d.options) commonOpts);
 
   # evaled test
   evaled =
     let
       evaled' = kubenix.evalModules {
-        modules = modulesWithDefaults;
+        modules = modulesWithCommonOptions;
       };
     in
     if testing.throwError then evaled'
