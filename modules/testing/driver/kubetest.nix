@@ -22,13 +22,25 @@ let
       ''
     else t.script;
 
-  tests = pkgs.linkFarm "${testing.name}-tests" (
-    map
-      (t: {
-        path = toTestScript t;
-        name = "${t.name}_test.py";
-      })
-      (filter (t: t.script != null) testing.tests)
+  tests = let
+   # make sure tests are prefixed so that alphanumerical
+   # sorting reproduces them in the same order as they
+   # have been declared in the list.
+   seive = t: t.script != null && t.enabled;
+   allEligibleTests = filter seive testing.tests;
+   listLengthPadding = builtins.length (
+     lib.stringToCharacters (
+       builtins.toString (
+         builtins.length allEligibleTests)));
+   op =
+     (i: t: {
+       path = toTestScript t;
+       name = let
+         prefix = lib.fixedWidthNumber listLengthPadding i;
+       in "${prefix}_${t.name}_test.py";
+     });
+  in pkgs.linkFarm "${testing.name}-tests" (
+    lib.imap0 op allEligibleTests;
   );
 
   testScript = pkgs.writeScript "test-${testing.name}.sh" ''
