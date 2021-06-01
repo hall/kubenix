@@ -15,7 +15,7 @@ let
         kubenix.project = mkDefault config.name;
         _module.args = {
           inherit kubenix;
-          test = config;
+          test = evaled.config;
         } // testing.args;
       };
     }

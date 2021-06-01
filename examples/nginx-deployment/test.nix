@@ -1,4 +1,4 @@
-{ config, lib, pkgs, kubenix, ... }:
+{ config, lib, pkgs, kubenix, test, ... }:
 
 with lib;
 
@@ -9,7 +9,7 @@ with lib;
     name = "nginx-deployment";
     description = "Test testing nginx deployment";
     script = ''
-      @pytest.mark.applymanifest('${config.kubernetes.resultYAML}')
+      @pytest.mark.applymanifest('${test.kubernetes.resultYAML}')
       def test_nginx_deployment(kube):
           """Tests whether nginx deployment gets successfully created"""
 

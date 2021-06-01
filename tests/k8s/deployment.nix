@@ -1,4 +1,4 @@
-{ config, lib, pkgs, kubenix, images, ... }:
+{ config, lib, pkgs, kubenix, images, test, ... }:
 
 with lib;
 let
@@ -47,7 +47,7 @@ in
     script = ''
       import time
 
-      @pytest.mark.applymanifest('${config.kubernetes.resultYAML}')
+      @pytest.mark.applymanifest('${test.kubernetes.resultYAML}')
       def test_deployment(kube):
           """Tests whether deployment gets successfully created"""
 
