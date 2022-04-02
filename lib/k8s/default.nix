@@ -80,6 +80,6 @@ with lib; rec {
         // labels;
     };
 
-  toBase64 = lib.toBase64;
-  octalToDecimal = lib.octalToDecimal;
+  inherit (lib) toBase64;
+  inherit (lib) octalToDecimal;
 }

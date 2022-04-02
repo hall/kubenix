@@ -25,9 +25,9 @@ with lib; let
 
   moduleToAttrs = value:
     if isAttrs value
-    then mapAttrs (_n: v: moduleToAttrs v) (filterAttrs (n: v: v != null && !(hasPrefix "_" n)) value)
+    then mapAttrs (_n: moduleToAttrs) (filterAttrs (n: v: v != null && !(hasPrefix "_" n)) value)
     else if isList value
-    then map (v: moduleToAttrs v) value
+    then map moduleToAttrs value
     else value;
 
   apiOptions = {config, ...}: {
@@ -38,7 +38,7 @@ with lib; let
 
       defaults = mkOption {
         description = "Kubernetes defaults to apply to resources";
-        type = types.listOf (types.submodule ({ ...}: {
+        type = types.listOf (types.submodule (_: {
           options = {
             group = mkOption {
               description = "Group to apply default to (all by default)";
@@ -132,7 +132,7 @@ with lib; let
     lst));
 
   compareVersions = ver1: ver2: let
-    getVersion = v: substring 1 10 v;
+    getVersion = substring 1 10;
     splittedVer1 = builtins.splitVersion (getVersion ver1);
     splittedVer2 = builtins.splitVersion (getVersion ver2);
 
@@ -167,7 +167,7 @@ with lib; let
     customResourceTypesByAttrName;
 
   latestCustomResourceTypes =
-    mapAttrsToList (_: resources: last resources) customResourceTypesByAttrNameSortByVersion;
+    mapAttrsToList (_: last) customResourceTypesByAttrNameSortByVersion;
 
   customResourceModuleForType = config: ct: {name, ...}: {
     imports = getDefaults ct.name ct.group ct.version ct.kind;
@@ -207,7 +207,7 @@ with lib; let
         module = customResourceModuleForType config ct;
       in {
         options.resources.${ct.group}.${ct.version}.${ct.kind} = mkOption {
-          description = ct.description;
+          inherit (ct) description;
           type = types.attrsOf (types.submodule module);
           default = {};
         };
@@ -222,7 +222,7 @@ with lib; let
         module = customResourceModuleForType config ct;
       in {
         options.resources.${ct.attrName} = mkOption {
-          description = ct.description;
+          inherit (ct) description;
           type = types.attrsOf (types.submodule module);
           default = {};
         };
@@ -255,8 +255,8 @@ with lib; let
             else let coerced = coerceFunc val; in assert finalType.check coerced; coerced;
         in
           finalType.merge loc (map (def: def // {value = coerceVal def.value;}) defs);
-        getSubOptions = finalType.getSubOptions;
-        getSubModules = finalType.getSubModules;
+        inherit (finalType) getSubOptions;
+        inherit (finalType) getSubModules;
         substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
         typeMerge = _t1: _t2: null;
         functor = (defaultFunctor name) // {wrapped = finalType;};
@@ -405,7 +405,7 @@ in {
     _m.propagate = [
       {
         features = ["k8s"];
-        module = { ...}: {
+        module = _: {
           # propagate kubernetes version and namespace
           kubernetes.version = mkDefault cfg.version;
           kubernetes.namespace = mkDefault cfg.namespace;
@@ -415,9 +415,7 @@ in {
         features = ["k8s" "submodule"];
         module = {config, ...}: {
           # set module defaults
-          kubernetes.api.defaults = (
-            # propagate defaults if default propagation is enabled
-            (filter (default: default.propagate) cfg.api.defaults)
+          kubernetes.api.defaults = (filter (default: default.propagate) cfg.api.defaults)
             ++ [
               # set module name and version for all kuberentes resources
               {
@@ -426,8 +424,7 @@ in {
                   "kubenix/module-version" = config.submodule.version;
                 };
               }
-            ]
-          );
+            ];
         };
       }
     ];
@@ -470,13 +467,13 @@ in {
           # load yaml file
           object = importYAML i;
           groupVersion = splitString "/" object.apiVersion;
-          name = object.metadata.name;
+          inherit (object.metadata) name;
           version = last groupVersion;
           group =
             if version == (head groupVersion)
             then "core"
             else head groupVersion;
-          kind = object.kind;
+          inherit (object) kind;
         in {
           resources.${group}.${version}.${kind}.${name} = object;
         })
@@ -485,7 +482,7 @@ in {
     kubernetes.objects = flatten (mapAttrsToList
       (
         _: type:
-          mapAttrsToList (_name: resource: moduleToAttrs resource)
+          mapAttrsToList (_name: moduleToAttrs)
           cfg.api.resources.${type.group}.${type.version}.${type.kind}
       )
       cfg.api.types);
@@ -500,6 +497,6 @@ in {
       pkgs.writeText "${config.kubenix.project}-generated.json" (builtins.toJSON cfg.generated);
 
     kubernetes.resultYAML =
-      toMultiDocumentYaml "${config.kubenix.project}-generated.yaml" (config.kubernetes.objects);
+      toMultiDocumentYaml "${config.kubenix.project}-generated.yaml" config.kubernetes.objects;
   };
 }

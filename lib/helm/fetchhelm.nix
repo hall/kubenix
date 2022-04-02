@@ -4,7 +4,7 @@
   kubernetes-helm,
   cacert,
 }: let
-  cleanName = name: lib.replaceStrings ["/"] ["-"] name;
+  cleanName = lib.replaceStrings ["/"] ["-"];
 in
   {
     # name of the chart

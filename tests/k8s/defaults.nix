@@ -5,8 +5,8 @@
   ...
 }:
 with lib; let
-  pod1 = config.kubernetes.api.resources.pods.pod1;
-  pod2 = config.kubernetes.api.resources.pods.pod2;
+  inherit (config.kubernetes.api.resources.pods) pod1;
+  inherit (config.kubernetes.api.resources.pods) pod2;
 in {
   imports = with kubenix.modules; [test k8s];
 

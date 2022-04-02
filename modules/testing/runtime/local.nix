@@ -5,7 +5,7 @@
   ...
 }:
 with lib; let
-  testing = config.testing;
+  inherit (config) testing;
 
   script = pkgs.writeScript "run-local-k8s-tests-${testing.name}.sh" ''
     #!${pkgs.runtimeShell}

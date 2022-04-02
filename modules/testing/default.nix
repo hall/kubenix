@@ -43,7 +43,7 @@ in {
 
     common = mkOption {
       description = "List of common options to apply to tests";
-      type = types.listOf (types.submodule ({ ...}: {
+      type = types.listOf (types.submodule (_: {
         options = {
           features = mkOption {
             description = "List of features that test has to have to apply options";
@@ -70,7 +70,7 @@ in {
           inherit module;
         })
         (types.submodule testModule));
-      apply = tests: filter isTestEnabled tests;
+      apply = filter isTestEnabled;
     };
 
     testsByName = mkOption {

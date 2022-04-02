@@ -86,9 +86,7 @@ in {
     _m.propagate = [
       {
         features = ["docker"];
-        module = {
-          ...
-        }: {
+        module = _: {
           # propagate registry options
           docker.registry = cfg.registry;
         };

@@ -14,7 +14,7 @@ with lib; let
     apiVersion = "v1";
     kind = "Pod";
     metadata = {
-      namespace = config.kubernetes.namespace;
+      inherit (config.kubernetes) namespace;
       name = "curl";
     };
     spec.containers = [

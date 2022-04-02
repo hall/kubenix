@@ -5,7 +5,7 @@
   ...
 }:
 with lib; let
-  testing = config.testing;
+  inherit (config) testing;
   cfg = testing.driver.kubetest;
 
   kubetest = import ./kubetestdrv.nix {inherit pkgs;};

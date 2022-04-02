@@ -84,7 +84,7 @@ with lib; let
     refDefinition = attr: head (tail (tail (splitString "/" attr."$ref")));
   };
 
-  fixJSON = content: replaceStrings ["\\u"] ["u"] content;
+  fixJSON = replaceStrings ["\\u"] ["u"];
 
   fetchSpecs = path: builtins.fromJSON (fixJSON (builtins.readFile path));
 

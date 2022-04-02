@@ -39,8 +39,8 @@ with lib; let
               else let coerced = coerceFunc val; in assert finalType.check coerced; coerced;
           in
             finalType.merge loc (map (def: def // {value = coerceVal def.value;}) defs);
-          getSubOptions = finalType.getSubOptions;
-          getSubModules = finalType.getSubModules;
+          inherit (finalType) getSubOptions;
+          inherit (finalType) getSubModules;
           substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
           typeMerge = _t1: _t2: null;
           functor = (defaultFunctor name) // {wrapped = finalType;};
@@ -62,7 +62,7 @@ with lib; let
       values);
 
   submoduleOf = ref:
-    types.submodule ({ ...}: {
+    types.submodule (_: {
       options = definitions."${ref}".options or {};
       config = definitions."${ref}".config or {};
     });
@@ -74,7 +74,7 @@ with lib; let
         then toInt name
         else name;
     in {
-      options = definitions."${ref}".options;
+      inherit (definitions."${ref}") options;
       config =
         definitions."${ref}".config
         // {
@@ -90,7 +90,7 @@ with lib; let
   in
     types.submodule ({name, ...}: {
       imports = getDefaults resource group version kind;
-      options = definitions."${ref}".options;
+      inherit (definitions."${ref}") options;
       config = mkMerge [
         definitions."${ref}".config
         {

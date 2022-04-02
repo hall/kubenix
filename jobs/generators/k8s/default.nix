@@ -88,7 +88,7 @@ with lib; let
   refType = attr: head (tail (tail (splitString "/" attr."$ref")));
 
   compareVersions = ver1: ver2: let
-    getVersion = v: substring 1 10 v;
+    getVersion = substring 1 10;
     splitVersion = v: builtins.splitVersion (getVersion v);
     isAlpha = v: elem "alpha" (splitVersion v);
     patchVersion = v:
@@ -103,7 +103,7 @@ with lib; let
   in
     builtins.compareVersions v1 v2;
 
-  fixJSON = content: replaceStrings ["\\u"] ["u"] content;
+  fixJSON = replaceStrings ["\\u"] ["u"];
 
   fetchSpecs = path: builtins.fromJSON (fixJSON (builtins.readFile path));
 
@@ -266,7 +266,7 @@ with lib; let
           else group';
         version = version';
         kind = kind';
-        description = swagger.definitions.${ref}.description;
+        inherit (swagger.definitions.${ref}) description;
         defintion = refDefinition (head path.post.parameters).schema;
       })
     (filterAttrs
@@ -301,7 +301,7 @@ with lib; let
     resourceTypesByKind;
 
   latestResourceTypesByKind =
-    mapAttrs (_kind: resources: last resources) resourcesTypesByKindSortByVersion;
+    mapAttrs (_kind: last) resourcesTypesByKindSortByVersion;
 
   genResourceOptions = resource:
     with gen; let
@@ -313,7 +313,7 @@ with lib; let
         definition.version;
     in
       mkOption {
-        description = resource.description;
+        inherit (resource) description;
         type = types.attrsOf (submoduleForDefinition' resource);
         default = {};
       };

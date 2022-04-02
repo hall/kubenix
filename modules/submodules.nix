@@ -177,7 +177,7 @@ in {
 
     submodules.defaults = mkOption {
       description = "List of defaults to apply to submodule instances";
-      type = types.listOf (types.submodule ({ ...}: {
+      type = types.listOf (types.submodule (_: {
         options = {
           name = mkOption {
             description = "Name of the submodule to apply defaults for";
@@ -279,7 +279,7 @@ in {
                 inherit (evaledSubmodule.config.submodule) name description version tags exports;
               };
 
-              features = evaledSubmodule.config._m.features;
+              inherit (evaledSubmodule.config._m) features;
             };
           })
         )
@@ -299,7 +299,7 @@ in {
         # submodule associated with
         submodule = findSubmodule {
           name = config.submodule;
-          version = config.version;
+          inherit (config) version;
         };
 
         # definition of a submodule
@@ -307,10 +307,10 @@ in {
 
         # submodule defaults
         defaults = getDefaults {
-          name = submoduleDefinition.name;
-          version = submoduleDefinition.version;
-          tags = submoduleDefinition.tags;
-          features = submodule.features;
+          inherit (submoduleDefinition) name;
+          inherit (submoduleDefinition) version;
+          inherit (submoduleDefinition) tags;
+          inherit (submodule) features;
         };
       in {
         options = {
@@ -390,7 +390,7 @@ in {
 
           (map
             (propagate: {
-              features = propagate.features;
+              inherit (propagate) features;
               default = propagate.module;
             })
             config._m.propagate)
@@ -404,8 +404,8 @@ in {
             features = ["submodules"];
             default = {
               submodules = {
-                defaults = cfg.defaults;
-                imports = cfg.imports;
+                inherit (cfg) defaults;
+                inherit (cfg) imports;
               };
             };
           }

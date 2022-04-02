@@ -3,8 +3,7 @@
   registry,
 }: let
   # evaluated configuration
-  config =
-    (evalModules {
+  inherit ((evalModules {
       module = {kubenix, ...}: {
         imports = [
           kubenix.modules.testing
@@ -30,8 +29,7 @@
           ];
         };
       };
-    })
-    .config;
+    })) config;
 in {
   inherit config;
 
@@ -45,10 +43,10 @@ in {
   test-script = config.testing.testsByName.nginx-deployment.script;
 
   # genreated kubernetes List object
-  generated = config.kubernetes.generated;
+  inherit (config.kubernetes) generated;
 
   # JSON file you can deploy to kubernetes
-  result = config.kubernetes.result;
+  inherit (config.kubernetes) result;
 
   # Exported docker images
   images = config.docker.export;

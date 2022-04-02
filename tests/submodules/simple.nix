@@ -7,7 +7,7 @@
 }:
 with lib; let
   cfg = config.submodules.instances.instance;
-  args = cfg.config.submodule.args;
+  inherit (cfg.config.submodule) args;
 in {
   imports = with kubenix.modules; [test submodules];
 
@@ -37,7 +37,7 @@ in {
       }
       {
         message = "should have tag set";
-        assertion = elem "tag" (cfg.config.submodule.tags);
+        assertion = elem "tag" cfg.config.submodule.tags;
       }
     ];
   };

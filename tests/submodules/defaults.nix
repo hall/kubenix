@@ -6,12 +6,12 @@
   ...
 }:
 with lib; let
-  instance1 = config.submodules.instances.instance1;
-  instance2 = config.submodules.instances.instance2;
-  instance3 = config.submodules.instances.instance3;
-  instance4 = config.submodules.instances.instance4;
-  instance5 = config.submodules.instances.instance5;
-  versioned-submodule = config.submodules.instances.versioned-submodule;
+  inherit (config.submodules.instances) instance1;
+  inherit (config.submodules.instances) instance2;
+  inherit (config.submodules.instances) instance3;
+  inherit (config.submodules.instances) instance4;
+  inherit (config.submodules.instances) instance5;
+  inherit (config.submodules.instances) versioned-submodule;
 
   submodule = { ...}: {
     imports = [kubenix.modules.submodule];

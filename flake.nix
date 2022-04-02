@@ -23,7 +23,7 @@
           inherit system;
         };
 
-        lib = pkgs.lib;
+        inherit (pkgs) lib;
 
         kubenix = {
           lib = import ./lib {inherit lib pkgs;};
@@ -71,7 +71,7 @@
 
         checks = let
           wasSuccess = suite:
-            if suite.success == true
+            if suite.success
             then pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-succeeded" {} "echo success > $out"
             else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" {} "exit 1";
           mkExamples = attrs:

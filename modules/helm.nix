@@ -112,7 +112,7 @@ in {
           map
           (object: let
             apiVersion = parseApiVersion object.apiVersion;
-            name = object.metadata.name;
+            inherit (object.metadata) name;
           in {
             "${apiVersion.group}"."${apiVersion.version}".${object.kind}."${name}" = mkMerge ([
                 object

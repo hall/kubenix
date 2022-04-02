@@ -6,7 +6,7 @@
   ...
 }:
 with lib; let
-  testing = config.testing;
+  inherit (config) testing;
   # kubeconfig = "/etc/${config.services.kubernetes.pki.etcClusterAdminKubeconfig}";
   kubeconfig = "/etc/kubernetes/cluster-admin.kubeconfig";
   kubecerts = "/var/lib/kubernetes/secrets";
