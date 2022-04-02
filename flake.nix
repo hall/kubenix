@@ -12,7 +12,8 @@
     nixpkgs,
     ...
   } @ inputs:
-    (inputs.flake-utils.lib.eachDefaultSystem (
+    (inputs.flake-utils.lib.eachSystem ["x86_64-linux"](
+      #inputs.flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import inputs.nixpkgs {
           overlays = [
@@ -57,7 +58,7 @@
             }
             attrs');
       in {
-        inherit evalModules;
+        inherit evalModules pkgs;
 
         jobs = import ./jobs {inherit pkgs;};
 

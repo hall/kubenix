@@ -10,7 +10,9 @@ jobs:
     - uses: cachix/install-nix-action@v16
       with:
         install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.8.0pre20220311_d532269/install
-        extra_nix_config: experimental-features = nix-command flakes
+        extra_nix_config: |
+          experimental-features = nix-command flakes
+          allow-import-from-derivation = true
 
     - name: Run Nix Flake Check
       run: nix -Lv flake check
