@@ -39,12 +39,17 @@
         in
           lib'.evalModules (lib.recursiveUpdate
             {
-              inherit modules;
+              modules =
+                modules
+                ++ [
+                  {
+                    _module.args = {
+                      inherit pkgs;
+                      name = "default";
+                    };
+                  }
+                ];
               specialArgs = {inherit kubenix;};
-              args = {
-                inherit pkgs;
-                name = "default";
-              };
             }
             attrs');
       in {
@@ -74,9 +79,9 @@
         in {
           # TODO: access "success" derivation with nice testing utils for nice output
           nginx-example = wasSuccess (mkExamples {}).nginx-deployment.config.testing;
-          tests-k8s-1_19 = wasSuccess (mkK8STests {k8sVersion = "1.19";});
-          tests-k8s-1_20 = wasSuccess (mkK8STests {k8sVersion = "1.20";});
-          tests-k8s-1_21 = wasSuccess (mkK8STests {k8sVersion = "1.21";});
+          #tests-k8s-1_19 = wasSuccess (mkK8STests {k8sVersion = "1.19";});
+          # tests-k8s-1_20 = wasSuccess (mkK8STests {k8sVersion = "1.20";});
+          # tests-k8s-1_21 = wasSuccess (mkK8STests {k8sVersion = "1.21";});
         };
       }
     ))

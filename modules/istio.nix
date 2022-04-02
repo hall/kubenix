@@ -64,19 +64,20 @@ with lib; let
       config = definitions."${ref}".config;
     });
 
-  submoduleWithMergeOf = ref: mergeKey: types.submodule ({name, ...}: let
-    convertName = name:
-      if definitions."${ref}".options.${mergeKey}.type == types.int
-      then toInt name
-      else name;
-  in {
-    options = definitions."${ref}".options;
-    config =
-      definitions."${ref}".config
-      // {
-        ${mergeKey} = mkOverride 1002 (convertName name);
-      };
-  });
+  submoduleWithMergeOf = ref: mergeKey:
+    types.submodule ({name, ...}: let
+      convertName = name:
+        if definitions."${ref}".options.${mergeKey}.type == types.int
+        then toInt name
+        else name;
+    in {
+      options = definitions."${ref}".options;
+      config =
+        definitions."${ref}".config
+        // {
+          ${mergeKey} = mkOverride 1002 (convertName name);
+        };
+    });
 
   submoduleForDefinition = ref: resource: kind: group: version:
     types.submodule ({name, ...}: {

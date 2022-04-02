@@ -29,8 +29,13 @@ with lib; let
 
   # eval without checking
   evaled' = kubenix.evalModules {
-    check = false;
-    inherit modules;
+    modules =
+      modules
+      ++ [
+        {
+          _module.args.check = false;
+        }
+      ];
   };
 
   # test configuration
