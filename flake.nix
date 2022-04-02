@@ -55,13 +55,15 @@
                 modules
                 ++ [
                   {
-                    _module.args = {
+                    config._module.args = {
                       inherit pkgs;
                       name = "default";
                     };
                   }
                 ];
-              specialArgs = {inherit kubenix;};
+              specialArgs = {inherit kubenix;
+                             inherit pkgs;
+                            };
             }
             attrs');
       in {

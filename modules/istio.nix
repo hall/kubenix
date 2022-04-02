@@ -32,19 +32,76 @@ with lib; let
                 assert finalType.check coerced; coerced;
           in
             finalType.merge loc (map (def: def // {value = coerceVal def.value;}) defs);
-          inherit (finalType) getSubOptions;
-          inherit (finalType) getSubModules;
+          getSubOptions = finalType.getSubOptions;
+          getSubModules = finalType.getSubModules;
           substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
-          typeMerge = _t1: _t2: null;
+          typeMerge = t1: t2: null;
           functor = (defaultFunctor name) // {wrapped = finalType;};
         };
     };
 
+  mkOptionDefault = mkOverride 1001;
+
+  extraOptions = {
+    kubenix = {};
+  };
+
+  mergeValuesByKey = mergeKey: values:
+    listToAttrs (map
+      (value:
+        nameValuePair
+        (
+          if isAttrs value.${mergeKey}
+          then toString value.${mergeKey}.content
+          else (toString value.${mergeKey})
+        )
+        value)
+      values);
+
   submoduleOf = ref:
-    types.submodule (_: {
-      inherit (definitions."${ref}") options;
-      inherit (definitions."${ref}") config;
+    types.submodule ({name, ...}: {
+      options = definitions."${ref}".options;
+      config = definitions."${ref}".config;
     });
+
+  submoduleWithMergeOf = ref: mergeKey:
+    types.submodule ({name, ...}: let
+      convertName = name:
+        if definitions."${ref}".options.${mergeKey}.type == types.int
+        then toInt name
+        else name;
+    in {
+      options = definitions."${ref}".options;
+      config =
+        definitions."${ref}".config
+        // {
+          ${mergeKey} = mkOverride 1002 (convertName name);
+        };
+    });
+
+  submoduleForDefinition = ref: resource: kind: group: version:
+    types.submodule ({name, ...}: {
+      options = definitions."${ref}".options // extraOptions;
+      config = mkMerge ([
+          definitions."${ref}".config
+          {
+            kind = mkOptionDefault kind;
+            apiVersion = mkOptionDefault version;
+
+            # metdata.name cannot use option default, due deep config
+            metadata.name = mkOptionDefault name;
+          }
+        ]
+        ++ (config.defaults.${resource} or [])
+        ++ (config.defaults.all or []));
+    });
+
+  coerceAttrsOfSubmodulesToListByKey = ref: mergeKey: (
+    types.coercedTo
+    (types.listOf (submoduleOf ref))
+    (mergeValuesByKey mergeKey)
+    (types.attrsOf (submoduleWithMergeOf ref mergeKey))
+  );
 
   definitions =
     {

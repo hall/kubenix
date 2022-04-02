@@ -2,7 +2,7 @@
   system ? builtins.currentSystem,
   evalModules ? (import ../. {}).evalModules.${system},
 }: {
-  k8sVersion ? "1.21",
+  k8sVersion ? "1.23",
   registry ? throw "Registry url not defined",
   doThrowError ? true, # whether any testing error should throw an error
   enabledTests ? null,
@@ -22,13 +22,13 @@
           tests = [
             ./k8s/simple.nix
             ./k8s/deployment.nix
-            #  ./k8s/crd.nix # flaky
+            ./k8s/crd.nix # flaky
             ./k8s/defaults.nix
             ./k8s/order.nix
             ./k8s/submodule.nix
             ./k8s/imports.nix
-            # ./helm/simple.nix
-            #  ./istio/bookinfo.nix # infinite recursion
+            #./helm/simple.nix
+            ./istio/bookinfo.nix
             ./submodules/simple.nix
             ./submodules/defaults.nix
             ./submodules/versioning.nix

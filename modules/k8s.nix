@@ -282,6 +282,13 @@ in {
       default = null;
     };
 
+
+    customResources = mkOption {
+      description = "Setup custom resources";
+      type = types.listOf types.attrs;
+      default = [];
+    };
+
     resourceOrder = mkOption {
       description = "Preffered resource order";
       type = types.listOf types.str;
