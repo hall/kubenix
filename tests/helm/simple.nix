@@ -35,9 +35,9 @@ in
   imports = [ kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s kubenix.modules.docker ];
 
   docker.images = {
-    postgresql.image = inherit postgresql;
-    postgresqlExporter.image = inherit postgresqlExporter;
-    bitnamiShell.image = inherit bitnamiShell;
+    postgresql.image = postgresql;
+    postgresqlExporter.image = postgresqlExporter;
+    bitnamiShell.image = bitnamiShell;
   };
 
   test = {
