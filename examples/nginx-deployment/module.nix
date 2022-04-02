@@ -1,11 +1,14 @@
-{ config, lib, pkgs, kubenix, ... }:
-
-with lib;
-let
-  nginx = pkgs.callPackage ./image.nix { };
-in
 {
-  imports = with kubenix.modules; [ k8s docker ];
+  config,
+  lib,
+  pkgs,
+  kubenix,
+  ...
+}:
+with lib; let
+  nginx = pkgs.callPackage ./image.nix {};
+in {
+  imports = with kubenix.modules; [k8s docker];
 
   docker.images.nginx.image = nginx;
 
@@ -54,10 +57,12 @@ in
 
   kubernetes.resources.services.nginx = {
     spec = {
-      ports = [{
-        name = "http";
-        port = 80;
-      }];
+      ports = [
+        {
+          name = "http";
+          port = 80;
+        }
+      ];
       selector.app = "nginx";
     };
   };

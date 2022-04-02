@@ -1,9 +1,7 @@
-{ pkgs ? import <nixpkgs> { } }:
-let
-  fetchhelm = pkgs.callPackage ./fetchhelm.nix { };
-  chart2json = pkgs.callPackage ./chart2json.nix { };
-in
-rec {
+{pkgs ? import <nixpkgs> {}}: let
+  fetchhelm = pkgs.callPackage ./fetchhelm.nix {};
+  chart2json = pkgs.callPackage ./chart2json.nix {};
+in rec {
   postgresql-chart = fetchhelm {
     chart = "stable/postgresql";
     version = "0.18.1";

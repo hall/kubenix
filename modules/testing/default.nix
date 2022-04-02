@@ -1,11 +1,15 @@
-{ config, pkgs, lib, kubenix, ... }:
-
-with lib;
-let
+{
+  config,
+  pkgs,
+  lib,
+  kubenix,
+  ...
+}:
+with lib; let
   cfg = config.testing;
 
   testModule = {
-    imports = [ ./evalTest.nix ];
+    imports = [./evalTest.nix];
 
     # passthru testing configuration
     config._module.args = {
@@ -16,9 +20,7 @@ let
 
   isTestEnabled = test:
     (cfg.enabledTests == null || elem test.name cfg.enabledTests) && test.enable;
-
-in
-{
+in {
   imports = [
     ./docker.nix
     ./driver/kubetest.nix
@@ -41,28 +43,28 @@ in
 
     common = mkOption {
       description = "List of common options to apply to tests";
-      type = types.listOf (types.submodule ({ config, ... }: {
+      type = types.listOf (types.submodule ({config, ...}: {
         options = {
           features = mkOption {
             description = "List of features that test has to have to apply options";
             type = types.listOf types.str;
-            default = [ ];
+            default = [];
           };
 
           options = mkOption {
             description = "Options to apply to test";
             type = types.unspecified;
-            default = { };
-            apply = default: { _file = "testing.common"; } // default;
+            default = {};
+            apply = default: {_file = "testing.common";} // default;
           };
         };
       }));
-      default = [ ];
+      default = [];
     };
 
     tests = mkOption {
       description = "List of test cases";
-      default = [ ];
+      default = [];
       type = types.listOf (types.coercedTo types.path
         (module: {
           inherit module;
@@ -86,7 +88,7 @@ in
     args = mkOption {
       description = "Attribute set of extra args passed to tests";
       type = types.attrs;
-      default = { };
+      default = {};
     };
 
     success = mkOption {

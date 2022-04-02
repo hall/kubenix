@@ -1,8 +1,10 @@
-{ config, lib, ... }:
-
-with lib;
 {
-  imports = [ ./base.nix ];
+  config,
+  lib,
+  ...
+}:
+with lib; {
+  imports = [./base.nix];
 
   options.submodule = {
     name = mkOption {
@@ -25,24 +27,24 @@ with lib;
     tags = mkOption {
       description = "List of submodule tags";
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
     };
 
     exports = mkOption {
       description = "Attribute set of functions to export";
       type = types.attrs;
-      default = { };
+      default = {};
     };
 
     passthru = mkOption {
       description = "Attribute set to passthru";
       type = types.attrs;
-      default = { };
+      default = {};
     };
 
-    args._empty = mkOption { };
+    args._empty = mkOption {};
   };
 
   config._module.args.args = config.submodule.args;
-  config._m.features = [ "submodule" ];
+  config._m.features = ["submodule"];
 }

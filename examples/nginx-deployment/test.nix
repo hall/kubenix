@@ -1,9 +1,13 @@
-{ config, lib, pkgs, kubenix, test, ... }:
-
-with lib;
-
 {
-  imports = [ kubenix.modules.test ./module.nix ];
+  config,
+  lib,
+  pkgs,
+  kubenix,
+  test,
+  ...
+}:
+with lib; {
+  imports = [kubenix.modules.test ./module.nix];
 
   test = {
     name = "nginx-deployment";

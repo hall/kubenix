@@ -1,11 +1,14 @@
-{ config, lib, pkgs, docker, ... }:
-
-with lib;
-let
-  cfg = config.docker;
-in
 {
-  imports = [ ./base.nix ];
+  config,
+  lib,
+  pkgs,
+  docker,
+  ...
+}:
+with lib; let
+  cfg = config.docker;
+in {
+  imports = [./base.nix];
 
   options.docker = {
     registry.url = mkOption {
@@ -16,7 +19,11 @@ in
 
     images = mkOption {
       description = "Attribute set of docker images that should be published";
-      type = types.attrsOf (types.submodule ({ name, config, ... }: {
+      type = types.attrsOf (types.submodule ({
+        name,
+        config,
+        ...
+      }: {
         options = {
           image = mkOption {
             description = "Docker image to publish";
@@ -52,13 +59,13 @@ in
           };
         };
       }));
-      default = { };
+      default = {};
     };
 
     export = mkOption {
       description = "List of images to export";
       type = types.listOf types.package;
-      default = [ ];
+      default = [];
     };
 
     copyScript = mkOption {
@@ -73,22 +80,29 @@ in
 
   config = {
     # define docker feature
-    _m.features = [ "docker" ];
+    _m.features = ["docker"];
 
     # propagate docker options if docker feature is enabled
-    _m.propagate = [{
-      features = [ "docker" ];
-      module = { config, name, ... }: {
-        # propagate registry options
-        docker.registry = cfg.registry;
-      };
-    }];
+    _m.propagate = [
+      {
+        features = ["docker"];
+        module = {
+          config,
+          name,
+          ...
+        }: {
+          # propagate registry options
+          docker.registry = cfg.registry;
+        };
+      }
+    ];
 
     # pass docker library as param
-    _module.args.docker = import ../lib/docker { inherit lib pkgs; };
+    _module.args.docker = import ../lib/docker {inherit lib pkgs;};
 
     # list of exported docker images
-    docker.export = mapAttrsToList (_: i: i.image)
+    docker.export =
+      mapAttrsToList (_: i: i.image)
       (filterAttrs (_: i: i.registry != null) config.docker.images);
   };
 }

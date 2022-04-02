@@ -1,10 +1,11 @@
-{ evalModules, registry }:
-
-let
+{
+  evalModules,
+  registry,
+}: let
   # evaluated configuration
-  config = (evalModules {
-    module =
-      { kubenix, ... }: {
+  config =
+    (evalModules {
+      module = {kubenix, ...}: {
         imports = [
           kubenix.modules.testing
           ./module.nix
@@ -16,12 +17,12 @@ let
         kubernetes.version = "1.21";
 
         testing = {
-          tests = [ ./test.nix ];
+          tests = [./test.nix];
           docker.registryUrl = "";
           # testing commonalities for tests that exhibit the respective feature
           common = [
             {
-              features = [ "k8s" ];
+              features = ["k8s"];
               options = {
                 kubernetes.version = "1.20";
               };
@@ -29,10 +30,9 @@ let
           ];
         };
       };
-  }).config;
-
-in
-{
+    })
+    .config;
+in {
   inherit config;
 
   # config checks

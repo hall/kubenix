@@ -1,9 +1,9 @@
-{ system ? builtins.currentSystem }:
-let
+{system ? builtins.currentSystem}: let
 in
-(
-  (import ./compat.nix).flake-compat {
-    src = ./.;
-    inherit system;
-  }
-).shellNix
+  (
+    (import ./compat.nix).flake-compat {
+      src = ./.;
+      inherit system;
+    }
+  )
+  .shellNix

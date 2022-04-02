@@ -1,7 +1,11 @@
-{ name, config, lib, kubenix, ... }:
-
-with lib;
-let
+{
+  name,
+  config,
+  lib,
+  kubenix,
+  ...
+}:
+with lib; let
   instance1 = config.submodules.instances.instance1;
   instance2 = config.submodules.instances.instance2;
   instance3 = config.submodules.instances.instance3;
@@ -9,8 +13,8 @@ let
   instance5 = config.submodules.instances.instance5;
   versioned-submodule = config.submodules.instances.versioned-submodule;
 
-  submodule = { name, ... }: {
-    imports = [ kubenix.modules.submodule ];
+  submodule = {name, ...}: {
+    imports = [kubenix.modules.submodule];
 
     options.submodule.args = {
       value = mkOption {
@@ -24,17 +28,17 @@ let
       };
     };
   };
-in
-{
-  imports = with kubenix.modules; [ test submodules ];
+in {
+  imports = with kubenix.modules; [test submodules];
 
   test = {
     name = "submodules-defaults";
     description = "Simple submodule test";
-    assertions = [{
-      message = "should apply defaults by tag1";
-      assertion = instance1.config.submodule.args.value == "value1";
-    }
+    assertions = [
+      {
+        message = "should apply defaults by tag1";
+        assertion = instance1.config.submodule.args.value == "value1";
+      }
       {
         message = "should apply defaults by tag2";
         assertion = instance2.config.submodule.args.value == "value2";
@@ -46,8 +50,9 @@ in
       {
         message = "should apply defaults to all";
         assertion =
-          instance1.config.submodule.args.defaultValue == "value" &&
-          instance2.config.submodule.args.defaultValue == "value";
+          instance1.config.submodule.args.defaultValue
+          == "value"
+          && instance2.config.submodule.args.defaultValue == "value";
       }
       {
         message = "instance1 and instance3 should have value of default-value";
@@ -64,27 +69,29 @@ in
       {
         message = "should apply defaults to versioned submodule";
         assertion = versioned-submodule.config.submodule.args.defaultValue == "versioned-submodule";
-      }];
-  };
-
-  submodules.imports = [{
-    modules = [
-      submodule
-      {
-        submodule = {
-          name = "submodule1";
-          tags = [ "tag1" ];
-        };
       }
     ];
-  }
+  };
+
+  submodules.imports = [
+    {
+      modules = [
+        submodule
+        {
+          submodule = {
+            name = "submodule1";
+            tags = ["tag1"];
+          };
+        }
+      ];
+    }
     {
       modules = [
         submodule
         {
           submodule = {
             name = "submodule2";
-            tags = [ "tag2" ];
+            tags = ["tag2"];
           };
         }
       ];
@@ -95,7 +102,7 @@ in
         {
           submodule = {
             name = "submodule3";
-            tags = [ "tag2" ];
+            tags = ["tag2"];
           };
         }
       ];
@@ -131,17 +138,19 @@ in
           };
         }
       ];
-    }];
+    }
+  ];
 
-  submodules.defaults = [{
-    default.submodule.args.defaultValue = mkDefault "value";
-  }
+  submodules.defaults = [
     {
-      tags = [ "tag1" ];
+      default.submodule.args.defaultValue = mkDefault "value";
+    }
+    {
+      tags = ["tag1"];
       default.submodule.args.value = mkDefault "value1";
     }
     {
-      tags = [ "tag2" ];
+      tags = ["tag2"];
       default.submodule.args.value = mkDefault "value2";
     }
     {
@@ -149,7 +158,7 @@ in
       default.submodule.args.value = mkDefault "value4";
     }
     {
-      default = { config, ... }: {
+      default = {config, ...}: {
         submodule.args.defaultValue = mkIf (config.submodule.args.value == "custom-value") "my-custom-value";
       };
     }
@@ -157,7 +166,8 @@ in
       name = "versioned-submodule";
       version = "2.0.0";
       default.submodule.args.value = mkDefault "versioned";
-    }];
+    }
+  ];
 
   submodules.instances.instance1.submodule = "submodule1";
   submodules.instances.instance2.submodule = "submodule2";

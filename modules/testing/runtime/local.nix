@@ -1,7 +1,10 @@
-{ lib, config, pkgs, ... }:
-
-with lib;
-let
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
+with lib; let
   testing = config.testing;
 
   script = pkgs.writeScript "run-local-k8s-tests-${testing.name}.sh" ''
@@ -31,8 +34,7 @@ let
     echo "--> running tests"
     ${testing.testScript} --kube-config=$KUBECONFIG
   '';
-in
-{
+in {
   options.testing.runtime.local = {
     script = mkOption {
       type = types.package;

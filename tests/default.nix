@@ -1,20 +1,20 @@
-{ system ? builtins.currentSystem
-, evalModules ? (import ../. { }).evalModules.${system}
-}:
-
-{ k8sVersion ? "1.21"
-, registry ? throw "Registry url not defined"
-, doThrowError ? true # whether any testing error should throw an error
-, enabledTests ? null
-}:
-
-let
-  config = (evalModules {
-
-    module =
-      { kubenix, pkgs, ... }: {
-
-        imports = [ kubenix.modules.testing ];
+{
+  system ? builtins.currentSystem,
+  evalModules ? (import ../. {}).evalModules.${system},
+}: {
+  k8sVersion ? "1.21",
+  registry ? throw "Registry url not defined",
+  doThrowError ? true, # whether any testing error should throw an error
+  enabledTests ? null,
+}: let
+  config =
+    (evalModules {
+      module = {
+        kubenix,
+        pkgs,
+        ...
+      }: {
+        imports = [kubenix.modules.testing];
 
         testing = {
           inherit doThrowError enabledTests;
@@ -36,21 +36,20 @@ let
             ./submodules/passthru.nix
           ];
 
-          args = { images = pkgs.callPackage ./images.nix { }; };
+          args = {images = pkgs.callPackage ./images.nix {};};
           docker.registryUrl = registry;
 
           common = [
             {
-              features = [ "k8s" ];
+              features = ["k8s"];
               options = {
                 kubernetes.version = k8sVersion;
               };
             }
           ];
         };
-
       };
-
-  }).config;
+    })
+    .config;
 in
-config.testing // { recurseForDerivations = true; }
+  config.testing // {recurseForDerivations = true;}

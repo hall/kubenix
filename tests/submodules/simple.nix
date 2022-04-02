@@ -1,20 +1,24 @@
-{ name, config, lib, kubenix, ... }:
-
-with lib;
-let
+{
+  name,
+  config,
+  lib,
+  kubenix,
+  ...
+}:
+with lib; let
   cfg = config.submodules.instances.instance;
   args = cfg.config.submodule.args;
-in
-{
-  imports = with kubenix.modules; [ test submodules ];
+in {
+  imports = with kubenix.modules; [test submodules];
 
   test = {
     name = "submodules-simple";
     description = "Simple k8s submodule test";
-    assertions = [{
-      message = "Submodule name is set";
-      assertion = cfg.name == "instance";
-    }
+    assertions = [
+      {
+        message = "Submodule name is set";
+        assertion = cfg.name == "instance";
+      }
       {
         message = "Submodule version is set";
         assertion = cfg.version == null;
@@ -34,32 +38,35 @@ in
       {
         message = "should have tag set";
         assertion = elem "tag" (cfg.config.submodule.tags);
-      }];
+      }
+    ];
   };
 
   submodules.propagate.enable = true;
-  submodules.imports = [{
-    module = { submodule, ... }: {
-      imports = [ kubenix.modules.submodule ];
+  submodules.imports = [
+    {
+      module = {submodule, ...}: {
+        imports = [kubenix.modules.submodule];
 
-      options.submodule.args = {
-        name = mkOption {
-          description = "Submodule name";
-          type = types.str;
-          default = submodule.name;
+        options.submodule.args = {
+          name = mkOption {
+            description = "Submodule name";
+            type = types.str;
+            default = submodule.name;
+          };
+          value = mkOption {
+            description = "Submodule argument";
+            type = types.str;
+          };
         };
-        value = mkOption {
-          description = "Submodule argument";
-          type = types.str;
+
+        config = {
+          submodule.name = "submodule";
+          submodule.tags = ["tag"];
         };
       };
-
-      config = {
-        submodule.name = "submodule";
-        submodule.tags = [ "tag" ];
-      };
-    };
-  }];
+    }
+  ];
 
   submodules.instances.instance = {
     submodule = "submodule";

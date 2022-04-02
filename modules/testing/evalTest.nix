@@ -1,7 +1,11 @@
-{ lib, config, testing, kubenix, ... }:
-
-with lib;
-let
+{
+  lib,
+  config,
+  testing,
+  kubenix,
+  ...
+}:
+with lib; let
   modules = [
     # testing module
     config.module
@@ -13,10 +17,12 @@ let
     {
       config = {
         kubenix.project = mkDefault config.name;
-        _module.args = {
-          inherit kubenix;
-          test = evaled.config;
-        } // testing.args;
+        _module.args =
+          {
+            inherit kubenix;
+            test = evaled.config;
+          }
+          // testing.args;
       };
     }
   ];
@@ -36,28 +42,29 @@ let
   # common options that can be applied on this test
   commonOpts =
     filter
-      (d:
-        (intersectLists d.features testFeatures) == d.features ||
-        (length d.features) == 0
-      )
-      testing.common;
+    (
+      d:
+        (intersectLists d.features testFeatures)
+        == d.features
+        || (length d.features) == 0
+    )
+    testing.common;
 
   # add common options modules to all modules
   modulesWithCommonOptions = modules ++ (map (d: d.options) commonOpts);
 
   # evaled test
-  evaled =
-    let
-      evaled' = kubenix.evalModules {
-        modules = modulesWithCommonOptions;
-      };
-    in
-    if testing.doThrowError then evaled'
+  evaled = let
+    evaled' = kubenix.evalModules {
+      modules = modulesWithCommonOptions;
+    };
+  in
+    if testing.doThrowError
+    then evaled'
     else if (builtins.tryEval evaled'.config.test.assertions).success
-    then evaled' else null;
-
-in
-{
+    then evaled'
+    else null;
+in {
   options = {
     module = mkOption {
       description = "Module defining kubenix test";
@@ -100,7 +107,7 @@ in
       description = "Test result";
       type = types.unspecified;
       internal = true;
-      default = [ ];
+      default = [];
     };
 
     script = mkOption {
@@ -108,7 +115,6 @@ in
       type = types.nullOr (types.either types.lines types.path);
       internal = true;
     };
-
   };
 
   config = mkMerge [

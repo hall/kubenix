@@ -1,31 +1,43 @@
-{ lib }:
-
-with lib;
-
-rec {
+{lib}:
+with lib; rec {
   # TODO: refactor with mkOptionType
-  mkSecretOption = { description ? "", default ? { }, allowNull ? true }: mkOption {
-    inherit description;
-    type = (if allowNull then types.nullOr else id) (types.submodule {
-      options = {
-        name = mkOption ({
-          description = "Name of the secret where secret is stored";
-          type = types.str;
-          default = default.name;
-        } // (optionalAttrs (default ? "name") {
-          default = default.name;
-        }));
+  mkSecretOption = {
+    description ? "",
+    default ? {},
+    allowNull ? true,
+  }:
+    mkOption {
+      inherit description;
+      type =
+        (
+          if allowNull
+          then types.nullOr
+          else id
+        ) (types.submodule {
+          options = {
+            name = mkOption ({
+                description = "Name of the secret where secret is stored";
+                type = types.str;
+                default = default.name;
+              }
+              // (optionalAttrs (default ? "name") {
+                default = default.name;
+              }));
 
-        key = mkOption ({
-          description = "Name of the key where secret is stored";
-          type = types.str;
-        } // (optionalAttrs (default ? "key") {
-          default = default.key;
-        }));
-      };
-    });
-    default = if default == null then null else { };
-  };
+            key = mkOption ({
+                description = "Name of the key where secret is stored";
+                type = types.str;
+              }
+              // (optionalAttrs (default ? "key") {
+                default = default.key;
+              }));
+          };
+        });
+      default =
+        if default == null
+        then null
+        else {};
+    };
 
   secretToEnv = value: {
     valueFrom.secretKeyRef = {
@@ -34,7 +46,10 @@ rec {
   };
 
   # Creates kubernetes list from a list of kubernetes objects
-  mkList = { items, labels ? { } }: {
+  mkList = {
+    items,
+    labels ? {},
+  }: {
     kind = "List";
     apiVersion = "v1";
 
@@ -42,22 +57,27 @@ rec {
   };
 
   # Creates hashed kubernetes list from a list of kubernetes objects
-  mkHashedList = { items, labels ? { } }:
-    let
-      hash = builtins.hashString "sha1" (builtins.toJSON items);
+  mkHashedList = {
+    items,
+    labels ? {},
+  }: let
+    hash = builtins.hashString "sha1" (builtins.toJSON items);
 
-      labeledItems = map
-        (item: recursiveUpdate item {
+    labeledItems =
+      map
+      (item:
+        recursiveUpdate item {
           metadata.labels."kubenix/hash" = hash;
         })
-        items;
-
-    in
+      items;
+  in
     mkList {
       items = labeledItems;
-      labels = {
-        "kubenix/hash" = hash;
-      } // labels;
+      labels =
+        {
+          "kubenix/hash" = hash;
+        }
+        // labels;
     };
 
   toBase64 = lib.toBase64;

@@ -1,9 +1,13 @@
-{ lib, pkgs }:
-
-with lib;
-
 {
-  copyDockerImages = { images, dest, args ? "" }:
+  lib,
+  pkgs,
+}:
+with lib; {
+  copyDockerImages = {
+    images,
+    dest,
+    args ? "",
+  }:
     pkgs.writeScript "copy-docker-images.sh" (concatMapStrings
       (image: ''
         #!${pkgs.runtimeShell}

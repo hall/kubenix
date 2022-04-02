@@ -1,8 +1,10 @@
-{ dockerTools, nginx }:
-
+{
+  dockerTools,
+  nginx,
+}:
 dockerTools.buildLayeredImage {
   name = "nginx";
-  contents = [ nginx ];
+  contents = [nginx];
   extraCommands = ''
     mkdir -p etc
     chmod u+w etc
@@ -10,9 +12,9 @@ dockerTools.buildLayeredImage {
     echo "nginx:x:1000:nginx" > etc/group
   '';
   config = {
-    Cmd = [ "nginx" "-c" "/etc/nginx/nginx.conf" ];
+    Cmd = ["nginx" "-c" "/etc/nginx/nginx.conf"];
     ExposedPorts = {
-      "80/tcp" = { };
+      "80/tcp" = {};
     };
   };
 }

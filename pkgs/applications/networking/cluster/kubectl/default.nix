@@ -1,5 +1,8 @@
-{ stdenv, kubernetes, installShellFiles }:
-
+{
+  stdenv,
+  kubernetes,
+  installShellFiles,
+}:
 stdenv.mkDerivation {
   name = "kubectl-${kubernetes.version}";
 
@@ -7,9 +10,9 @@ stdenv.mkDerivation {
   # split out (see homepage)
   dontUnpack = true;
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [installShellFiles];
 
-  outputs = [ "out" "man" ];
+  outputs = ["out" "man"];
 
   installPhase = ''
     install -D ${kubernetes}/bin/kubectl -t $out/bin
@@ -22,8 +25,10 @@ stdenv.mkDerivation {
     done
   '';
 
-  meta = kubernetes.meta // {
-    description = "Kubernetes CLI";
-    homepage = "https://github.com/kubernetes/kubectl";
-  };
+  meta =
+    kubernetes.meta
+    // {
+      description = "Kubernetes CLI";
+      homepage = "https://github.com/kubernetes/kubectl";
+    };
 }

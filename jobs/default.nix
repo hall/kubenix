@@ -1,4 +1,3 @@
-{ pkgs }:
-{
-  generators = pkgs.callPackage ./generators { };
+{pkgs}: {
+  generators = pkgs.callPackage ./generators {};
 }

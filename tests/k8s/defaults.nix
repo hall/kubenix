@@ -1,20 +1,23 @@
-{ config, lib, kubenix, ... }:
-
-with lib;
-let
+{
+  config,
+  lib,
+  kubenix,
+  ...
+}:
+with lib; let
   pod1 = config.kubernetes.api.resources.pods.pod1;
   pod2 = config.kubernetes.api.resources.pods.pod2;
-in
-{
-  imports = with kubenix.modules; [ test k8s ];
+in {
+  imports = with kubenix.modules; [test k8s];
 
   test = {
     name = "k8s-defaults";
     description = "Simple k8s testing wheter name, apiVersion and kind are preset";
-    assertions = [{
-      message = "Should have label set with resource";
-      assertion = pod1.metadata.labels.resource-label == "value";
-    }
+    assertions = [
+      {
+        message = "Should have label set with resource";
+        assertion = pod1.metadata.labels.resource-label == "value";
+      }
       {
         message = "Should have default label set with group, version, kind";
         assertion = pod1.metadata.labels.gvk-label == "value";
@@ -22,19 +25,21 @@ in
       {
         message = "Should have conditional annotation set";
         assertion = pod2.metadata.annotations.conditional-annotation == "value";
-      }];
+      }
+    ];
   };
 
-  kubernetes.resources.pods.pod1 = { };
+  kubernetes.resources.pods.pod1 = {};
 
   kubernetes.resources.pods.pod2 = {
     metadata.labels.custom-label = "value";
   };
 
-  kubernetes.api.defaults = [{
-    resource = "pods";
-    default.metadata.labels.resource-label = "value";
-  }
+  kubernetes.api.defaults = [
+    {
+      resource = "pods";
+      default.metadata.labels.resource-label = "value";
+    }
     {
       group = "core";
       kind = "Pod";
@@ -43,10 +48,11 @@ in
     }
     {
       resource = "pods";
-      default = { config, ... }: {
+      default = {config, ...}: {
         config.metadata.annotations = mkIf (config.metadata.labels ? "custom-label") {
           conditional-annotation = "value";
         };
       };
-    }];
+    }
+  ];
 }

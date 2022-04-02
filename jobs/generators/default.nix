@@ -1,6 +1,7 @@
-{ pkgs, lib }:
-let
-
+{
+  pkgs,
+  lib,
+}: let
   generateIstio = import ./istio {
     inherit
       pkgs
@@ -8,22 +9,22 @@ let
       ;
   };
 
-  generateK8S = name: spec: import ./k8s {
-    inherit
-      name
-      pkgs
-      lib
-      spec
-      ;
-  };
-
-in
-{
-
-  istio = pkgs.linkFarm "istio-generated" [{
-    name = "latest.nix";
-    path = generateIstio;
-  }];
+  generateK8S = name: spec:
+    import ./k8s {
+      inherit
+        name
+        pkgs
+        lib
+        spec
+        ;
+    };
+in {
+  istio = pkgs.linkFarm "istio-generated" [
+    {
+      name = "latest.nix";
+      path = generateIstio;
+    }
+  ];
 
   k8s = pkgs.linkFarm "k8s-generated" [
     {
@@ -50,5 +51,4 @@ in
       });
     }
   ];
-
 }

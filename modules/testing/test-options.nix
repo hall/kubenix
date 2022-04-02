@@ -1,11 +1,12 @@
-{ lib, config, pkgs, ... }:
-
-with lib;
-let
-  cfg = config.test;
-
-in
 {
+  lib,
+  config,
+  pkgs,
+  ...
+}:
+with lib; let
+  cfg = config.test;
+in {
   options.test = {
     name = mkOption {
       description = "Test name";
@@ -38,8 +39,13 @@ in
           };
         };
       });
-      default = [ ];
-      example = [{ assertion = false; message = "you can't enable this for some reason"; }];
+      default = [];
+      example = [
+        {
+          assertion = false;
+          message = "you can't enable this for some reason";
+        }
+      ];
       description = ''
         This option allows modules to express conditions that must
         hold for the evaluation of the system configuration to
@@ -52,6 +58,5 @@ in
       type = types.nullOr (types.either types.lines types.path);
       default = null;
     };
-
   };
 }
