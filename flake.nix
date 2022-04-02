@@ -62,9 +62,7 @@
 
         jobs = import ./jobs {inherit pkgs;};
 
-        devShells.default = with pkgs;
-          devshell.mkShell
-          {imports = [(devshell.importTOML ./devshell.toml)];};
+        devShells.default = import ./devshell {inherit pkgs inputs;};
 
         packages = inputs.flake-utils.lib.flattenTree {
           inherit (pkgs) kubernetes kubectl;
