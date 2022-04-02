@@ -14,10 +14,14 @@
   } @ inputs:
     (inputs.flake-utils.lib.eachDefaultSystem (
       system: let
-        pkgs = inputs.nixpkgs.legacyPackages."${system}".appendOverlays [
-          self.overlay
-          inputs.devshell.overlay
-        ];
+        pkgs = import inputs.nixpkgs {
+          overlays = [
+            self.overlays.default
+            inputs.devshell.overlay
+          ];
+          config.allowUnsupportedSystem = true;
+          inherit system;
+        };
 
         lib = pkgs.lib;
 
@@ -57,7 +61,7 @@
 
         jobs = import ./jobs {inherit pkgs;};
 
-        devShell = with pkgs;
+        devShells.default = with pkgs;
           devshell.mkShell
           {imports = [(devshell.importTOML ./devshell.toml)];};
 
@@ -87,7 +91,7 @@
     ))
     // {
       nixosModules.kubenix = import ./modules;
-      overlay = final: prev: {
+      overlays.default = final: prev: {
         kubenix.evalModules = self.evalModules.${prev.system};
         # up to date versions of their nixpkgs equivalents
         # kubernetes =
