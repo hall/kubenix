@@ -415,7 +415,8 @@ in {
         features = ["k8s" "submodule"];
         module = {config, ...}: {
           # set module defaults
-          kubernetes.api.defaults = (filter (default: default.propagate) cfg.api.defaults)
+          kubernetes.api.defaults =
+            (filter (default: default.propagate) cfg.api.defaults)
             ++ [
               # set module name and version for all kuberentes resources
               {

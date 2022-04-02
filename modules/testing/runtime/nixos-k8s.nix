@@ -12,10 +12,7 @@ with lib; let
   kubecerts = "/var/lib/kubernetes/secrets";
 
   # how we differ from the standard configuration of mkKubernetesBaseTest
-  extraConfiguration = {
-    config,
-    ...
-  }: {
+  extraConfiguration = {config, ...}: {
     virtualisation = {
       memorySize = 2048;
     };

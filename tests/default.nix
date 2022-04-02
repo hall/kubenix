@@ -7,7 +7,8 @@
   doThrowError ? true, # whether any testing error should throw an error
   enabledTests ? null,
 }: let
-  inherit ((evalModules {
+  inherit
+    ((evalModules {
       module = {
         kubenix,
         pkgs,
@@ -48,6 +49,8 @@
           ];
         };
       };
-    })) config;
+    }))
+    config
+    ;
 in
   config.testing // {recurseForDerivations = true;}

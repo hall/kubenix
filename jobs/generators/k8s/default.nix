@@ -305,7 +305,8 @@ with lib; let
 
   genResourceOptions = resource:
     with gen; let
-      submoduleForDefinition' = definition: submoduleForDefinition
+      submoduleForDefinition' = definition:
+        submoduleForDefinition
         definition.ref
         definition.name
         definition.kind

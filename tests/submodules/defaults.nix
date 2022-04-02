@@ -13,7 +13,7 @@ with lib; let
   inherit (config.submodules.instances) instance5;
   inherit (config.submodules.instances) versioned-submodule;
 
-  submodule = { ...}: {
+  submodule = {...}: {
     imports = [kubenix.modules.submodule];
 
     options.submodule.args = {

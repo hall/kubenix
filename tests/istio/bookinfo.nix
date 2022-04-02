@@ -1,7 +1,4 @@
-{
-  kubenix,
-  ...
-}: {
+{kubenix, ...}: {
   imports = with kubenix.modules; [test k8s istio];
 
   test = {

@@ -3,7 +3,8 @@
   registry,
 }: let
   # evaluated configuration
-  inherit ((evalModules {
+  inherit
+    ((evalModules {
       module = {kubenix, ...}: {
         imports = [
           kubenix.modules.testing
@@ -29,7 +30,9 @@
           ];
         };
       };
-    })) config;
+    }))
+    config
+    ;
 in {
   inherit config;
 

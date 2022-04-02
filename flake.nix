@@ -12,7 +12,7 @@
     nixpkgs,
     ...
   } @ inputs:
-    (inputs.flake-utils.lib.eachSystem ["x86_64-linux"](
+    (inputs.flake-utils.lib.eachSystem ["x86_64-linux"] (
       #inputs.flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import inputs.nixpkgs {
@@ -77,10 +77,10 @@
             else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" {} "exit 1";
           mkExamples = attrs:
             (import ./examples {inherit evalModules;})
-              ({registry = "docker.io/gatehub";} // attrs);
+            ({registry = "docker.io/gatehub";} // attrs);
           mkK8STests = attrs:
             (import ./tests {inherit evalModules;})
-              ({registry = "docker.io/gatehub";} // attrs);
+            ({registry = "docker.io/gatehub";} // attrs);
         in {
           # TODO: access "success" derivation with nice testing utils for nice output
           nginx-example = wasSuccess (mkExamples {}).nginx-deployment.config.testing;

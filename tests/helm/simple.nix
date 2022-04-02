@@ -1,9 +1,14 @@
-{ config, lib, pkgs, kubenix, helm, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  kubenix,
+  helm,
+  ...
+}:
 with lib;
 with kubenix.lib;
-with pkgs.dockerTools;
-let
+with pkgs.dockerTools; let
   corev1 = config.kubernetes.api.resources.core.v1;
   appsv1 = config.kubernetes.api.resources.apps.v1;
 
@@ -30,9 +35,8 @@ let
     finalImageName = "docker.io/bitnami/bitnami-shell";
     finalImageTag = "10";
   };
-in
-{
-  imports = [ kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s kubenix.modules.docker ];
+in {
+  imports = [kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s kubenix.modules.docker];
 
   docker.images = {
     postgresql.image = postgresql;
@@ -43,14 +47,16 @@ in
   test = {
     name = "helm-simple";
     description = "Simple k8s testing wheter name, apiVersion and kind are preset";
-    assertions = [{
-      message = "should have generated resources";
-      assertion =
-        appsv1.StatefulSet ? "app-psql-postgresql-primary" &&
-        appsv1.StatefulSet ? "app-psql-postgresql-read" &&
-        corev1.Secret ? "app-psql-postgresql" &&
-        corev1.Service ? "app-psql-postgresql-headless";
-    }
+    assertions = [
+      {
+        message = "should have generated resources";
+        assertion =
+          appsv1.StatefulSet
+          ? "app-psql-postgresql-primary"
+          && appsv1.StatefulSet ? "app-psql-postgresql-read"
+          && corev1.Secret ? "app-psql-postgresql"
+          && corev1.Service ? "app-psql-postgresql-headless";
+      }
       {
         message = "should have values passed";
         assertion = appsv1.StatefulSet.app-psql-postgresql-read.spec.replicas == 2;
@@ -59,7 +65,8 @@ in
         message = "should have namespace defined";
         assertion =
           appsv1.StatefulSet.app-psql-postgresql-primary.metadata.namespace == "test";
-      }];
+      }
+    ];
     script = ''
       @pytest.mark.applymanifest('${config.kubernetes.resultYAML}')
       def test_helm_deployment(kube):
