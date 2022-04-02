@@ -483,7 +483,7 @@ in
     buildInputs = [pkgs.nixpkgs-fmt];
   } ''
     cat << 'GENERATED' > ./raw
-    "${generated}"
+    ${generated}
     GENERATED
 
     nixpkgs-fmt ./raw
