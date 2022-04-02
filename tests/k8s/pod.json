@@ -5,9 +5,11 @@
     "name": "test"
   },
   "spec": {
-    "containers": [{
-      "name": "test",
-      "image": "busybox"
-    }]
+    "containers": [
+      {
+        "name": "test",
+        "image": "busybox"
+      }
+    ]
   }
 }

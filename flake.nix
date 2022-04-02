@@ -2,9 +2,16 @@
   description = "Kubernetes resource builder using nix";
 
   inputs = {
+    flake-compat.url = "github:edolstra/flake-compat";
+    flake-compat.flake = false;
+
     flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.nixpkgs.follows = "nixpgks";
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
     devshell.url = "github:numtide/devshell";
+    devshell.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {

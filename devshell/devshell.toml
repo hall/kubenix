@@ -8,20 +8,7 @@ eval = "$DEVSHELL_ROOT/kubeconfig.json"
 
 [devshell]
 name = "kubenix"
-packages = [
-  "fd",
-  "dive",
-  "alejandra",
-  "kube3d",
-  "kubie",
-  "k9s",
-]
-
-[[commands]]
-name = "fmt"
-help = "Check Nix formatting"
-category = "checks"
-command = "alejandra ${@} ."
+packages = ["fd", "dive", "kube3d", "kubie", "k9s"]
 
 [[commands]]
 name = "evalnix"
@@ -41,4 +28,3 @@ category = "k8s"
 [[commands]]
 package = "k9s"
 category = "k8s"
-
