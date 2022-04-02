@@ -50,5 +50,12 @@ in {
         sha256 = "sha256-EoqYTbtaTlzs7vneoNtXUmdnjTM/U+1gYwCiEy0lOcw=";
       });
     }
+    {
+      name = "v1.23.nix";
+      path = generateK8S "v1.23" (builtins.fetchurl {
+        url = "https://github.com/kubernetes/kubernetes/raw/v1.23.0/api/openapi-spec/swagger.json";
+        sha256 = "sha256:0jivg8nlxka1y7gzqpcxkmbvhcbxynyrxmjn0blky30q5064wx2a";
+      });
+    }
   ];
 }

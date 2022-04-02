@@ -87,6 +87,7 @@
           tests-k8s-1_19 = wasSuccess (mkK8STests {k8sVersion = "1.19";});
           tests-k8s-1_20 = wasSuccess (mkK8STests {k8sVersion = "1.20";});
           tests-k8s-1_21 = wasSuccess (mkK8STests {k8sVersion = "1.21";});
+          tests-k8s-1_23 = wasSuccess (mkK8STests {k8sVersion = "1.23";});
         };
       }
     ))

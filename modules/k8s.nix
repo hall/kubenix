@@ -272,8 +272,8 @@ in {
   options.kubernetes = {
     version = mkOption {
       description = "Kubernetes version to use";
-      type = types.enum ["1.19" "1.20" "1.21"];
-      default = "1.21";
+      type = types.enum ["1.19" "1.20" "1.21" "1.23"];
+      default = "1.23";
     };
 
     namespace = mkOption {
