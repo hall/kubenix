@@ -236,8 +236,11 @@ in {
           }: let
             evaledSubmodule' = evalModules {
               inherit specialArgs;
-              modules = config.modules ++ [./base.nix];
-              check = false;
+              modules = config.modules ++ [./base.nix] ++ [
+                {
+                  _module.args.check = false;
+                }
+              ];
             };
 
             evaledSubmodule =

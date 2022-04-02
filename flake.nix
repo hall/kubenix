@@ -76,13 +76,16 @@
             else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" {} "exit 1";
           mkExamples = attrs:
             (import ./examples {inherit evalModules;})
-            ({registry = "docker.io/gatehub";} // attrs);
+              ({registry = "docker.io/gatehub";} // attrs);
+          mkK8STests = attrs:
+            (import ./tests {inherit evalModules;})
+              ({registry = "docker.io/gatehub";} // attrs);
         in {
           # TODO: access "success" derivation with nice testing utils for nice output
           nginx-example = wasSuccess (mkExamples {}).nginx-deployment.config.testing;
-          #tests-k8s-1_19 = wasSuccess (mkK8STests {k8sVersion = "1.19";});
-          # tests-k8s-1_20 = wasSuccess (mkK8STests {k8sVersion = "1.20";});
-          # tests-k8s-1_21 = wasSuccess (mkK8STests {k8sVersion = "1.21";});
+          tests-k8s-1_19 = wasSuccess (mkK8STests {k8sVersion = "1.19";});
+          tests-k8s-1_20 = wasSuccess (mkK8STests {k8sVersion = "1.20";});
+          tests-k8s-1_21 = wasSuccess (mkK8STests {k8sVersion = "1.21";});
         };
       }
     ))
