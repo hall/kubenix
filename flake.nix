@@ -3,33 +3,28 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs";
-    devshell-flake.url = "github:numtide/devshell";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    devshell.url = "github:numtide/devshell";
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-    devshell-flake,
-  }:
-    (flake-utils.lib.eachDefaultSystem (
+    ...
+  } @ inputs:
+    (inputs.flake-utils.lib.eachDefaultSystem (
       system: let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
-            self.overlay
-            devshell-flake.overlay
-          ];
-          config = {allowUnsupportedSystem = true;};
-        };
+        pkgs = inputs.nixpkgs.legacyPackages."${system}".appendOverlays [
+          self.overlay
+          inputs.devshell.overlay
+        ];
 
         lib = pkgs.lib;
 
         kubenix = {
           lib = import ./lib {inherit lib pkgs;};
           evalModules = self.evalModules.${system};
-          modules = self.modules;
+          modules = self.nixosModules.kubenix;
         };
 
         # evalModules with same interface as lib.evalModules and kubenix as
@@ -61,7 +56,7 @@
           devshell.mkShell
           {imports = [(devshell.importTOML ./devshell.toml)];};
 
-        packages = flake-utils.lib.flattenTree {
+        packages = inputs.flake-utils.lib.flattenTree {
           inherit (pkgs) kubernetes kubectl;
         };
 
@@ -86,14 +81,14 @@
       }
     ))
     // {
-      modules = import ./modules;
+      nixosModules.kubenix = import ./modules;
       overlay = final: prev: {
         kubenix.evalModules = self.evalModules.${prev.system};
         # up to date versions of their nixpkgs equivalents
-        kubernetes =
-          prev.callPackage ./pkgs/applications/networking/cluster/kubernetes
-          {};
-        kubectl = prev.callPackage ./pkgs/applications/networking/cluster/kubectl {};
+        # kubernetes =
+        #   prev.callPackage ./pkgs/applications/networking/cluster/kubernetes
+        #   {};
+        # kubectl = prev.callPackage ./pkgs/applications/networking/cluster/kubectl {};
       };
     };
 }

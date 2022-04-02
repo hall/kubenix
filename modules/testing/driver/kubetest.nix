@@ -40,7 +40,7 @@ let
        in "${prefix}_${t.name}_test.py";
      });
   in pkgs.linkFarm "${testing.name}-tests" (
-    lib.imap0 op allEligibleTests;
+    lib.imap0 op allEligibleTests
   );
 
   testScript = pkgs.writeScript "test-${testing.name}.sh" ''
