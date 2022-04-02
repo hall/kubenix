@@ -14,9 +14,6 @@ with lib; let
   # how we differ from the standard configuration of mkKubernetesBaseTest
   extraConfiguration = {
     config,
-    pkgs,
-    lib,
-    nodes,
     ...
   }: {
     virtualisation = {

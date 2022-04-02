@@ -6,9 +6,7 @@
   images,
   ...
 }:
-with lib; let
-  cfg = config.submodules.instances.passthru;
-in {
+with lib; {
   imports = with kubenix.modules; [test submodules k8s docker];
 
   test = {

@@ -85,7 +85,7 @@ with lib; let
 
   passthruConfig =
     mapAttrsToList
-    (name: opt: {
+    (name: _opt: {
       ${name} = mkMerge (mapAttrsToList
         (
           _: inst:
@@ -162,7 +162,7 @@ with lib; let
           # Merging of submodules is done as part of mergeOptionDecls, as we have to annotate
           # each submodule with its location.
           payload = [];
-          binOp = lhs: rhs: [];
+          binOp = _lhs: _rhs: [];
         };
     };
 in {
@@ -177,7 +177,7 @@ in {
 
     submodules.defaults = mkOption {
       description = "List of defaults to apply to submodule instances";
-      type = types.listOf (types.submodule ({config, ...}: {
+      type = types.listOf (types.submodule ({ ...}: {
         options = {
           name = mkOption {
             description = "Name of the submodule to apply defaults for";

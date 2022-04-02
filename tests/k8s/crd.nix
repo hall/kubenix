@@ -2,7 +2,6 @@
   config,
   lib,
   kubenix,
-  pkgs,
   ...
 }:
 with lib; let

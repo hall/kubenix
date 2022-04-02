@@ -74,7 +74,7 @@ with lib; let
       then types.attrs
       else throw "type ${def.type} not supported";
 
-    submoduleOf = definitions: ref: ''(submoduleOf "${ref}")'';
+    submoduleOf = _definitions: ref: ''(submoduleOf "${ref}")'';
 
     submoduleForDefinition = ref: name: kind: group: version: ''(submoduleForDefinition "${ref}" "${name}" "${kind}" "${group}" "${version}")'';
 
@@ -111,7 +111,7 @@ with lib; let
     with gen;
       mapAttrs
       (
-        name: definition:
+        _name: definition:
         # if $ref is in definition it means it's an alias of other definition
           if hasAttr "$ref" definition
           then definitions."${refDefinition definition}"
@@ -209,12 +209,12 @@ with lib; let
               optionalProps =
                 filterAttrs
                 (
-                  propName: property:
+                  propName: _property:
                     !(elem propName (definition.required or []))
                 )
                 definition.properties;
             in
-              mapAttrs (name: property: mkOverride 1002 null) optionalProps;
+              mapAttrs (_name: _property: mkOverride 1002 null) optionalProps;
           }
       )
       swagger.definitions;
@@ -271,7 +271,7 @@ with lib; let
       })
     (filterAttrs
       (
-        name: path:
+        _name: path:
           hasAttr "post" path
           && path.post."x-kubernetes-action" == "post"
       )
@@ -282,7 +282,7 @@ with lib; let
   resourceTypes = genResourceTypes swagger;
 
   resourceTypesByKind = zipAttrs (mapAttrsToList
-    (name: resourceType: {
+    (_name: resourceType: {
       ${resourceType.kind} = resourceType;
     })
     resourceTypes);
@@ -290,7 +290,7 @@ with lib; let
   resourcesTypesByKindSortByVersion =
     mapAttrs
     (
-      kind: resourceTypes:
+      _kind: resourceTypes:
         reverseList (sort
           (
             r1: r2:
@@ -301,13 +301,11 @@ with lib; let
     resourceTypesByKind;
 
   latestResourceTypesByKind =
-    mapAttrs (kind: resources: last resources) resourcesTypesByKindSortByVersion;
+    mapAttrs (_kind: resources: last resources) resourcesTypesByKindSortByVersion;
 
   genResourceOptions = resource:
     with gen; let
-      submoduleForDefinition' = definition: let
-      in
-        submoduleForDefinition
+      submoduleForDefinition' = definition: submoduleForDefinition
         definition.ref
         definition.name
         definition.kind

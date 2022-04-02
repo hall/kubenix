@@ -43,7 +43,7 @@ in {
 
     common = mkOption {
       description = "List of common options to apply to tests";
-      type = types.listOf (types.submodule ({config, ...}: {
+      type = types.listOf (types.submodule ({ ...}: {
         options = {
           features = mkOption {
             description = "List of features that test has to have to apply options";

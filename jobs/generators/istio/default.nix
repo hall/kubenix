@@ -73,7 +73,7 @@ with lib; let
       then types.attrs
       else throw "type ${def.type} not supported";
 
-    submoduleOf = definitions: ref: ''(submoduleOf "${ref}")'';
+    submoduleOf = _definitions: ref: ''(submoduleOf "${ref}")'';
 
     submoduleForDefinition = ref: name: kind: group: version: ''(submoduleForDefinition "${ref}" "${name}" "${kind}" "${group}" "${version}")'';
 
@@ -91,7 +91,7 @@ with lib; let
   genDefinitions = swagger:
     with gen; (mapAttrs
       (
-        name: definition:
+        _name: definition:
         # if $ref is in definition it means it's an alias of other definition
           if hasAttr "$ref" definition
           then definitions."${refDefinition definition}"
@@ -194,19 +194,19 @@ with lib; let
               optionalProps =
                 filterAttrs
                 (
-                  propName: property:
+                  propName: _property:
                     !(elem propName (definition.required or []))
                 )
                 definition.properties;
             in
-              mapAttrs (name: property: mkOverride 1002 null) optionalProps;
+              mapAttrs (_name: _property: mkOverride 1002 null) optionalProps;
           }
       )
       swagger.definitions);
 
   genResources = swagger:
     (mapAttrsToList
-      (name: property: rec {
+      (_name: property: rec {
         splittedType = splitString "." (removePrefix "me.snowdrop.istio.api." property.javaType);
         group = (concatStringsSep "." (take ((length splittedType) - 2) splittedType)) + ".istio.io";
         kind = removeSuffix "Spec" (last splittedType);
@@ -215,13 +215,13 @@ with lib; let
       })
       (filterAttrs
         (
-          name: property:
+          _name: property:
             (hasPrefix "me.snowdrop.istio.api" property.javaType)
             && hasSuffix "Spec" property.javaType
         )
         swagger.properties))
     ++ (mapAttrsToList
-      (name: property: rec {
+      (_name: property: rec {
         splittedType = splitString "." (removePrefix "me.snowdrop.istio.mixer." property.javaType);
         group = "config.istio.io";
         version = "v1alpha2";
@@ -230,7 +230,7 @@ with lib; let
       })
       (filterAttrs
         (
-          name: property:
+          _name: property:
             (hasPrefix "me.snowdrop.istio.mixer" property.javaType)
             && hasSuffix "Spec" property.javaType
         )

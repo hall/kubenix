@@ -16,7 +16,7 @@ with lib; let
     name = "recursive-attrs";
     description = "recursive attribute set";
     check = isAttrs;
-    merge = loc: foldl' (res: def: recursiveUpdate res def.value) {};
+    merge = _loc: foldl' (res: def: recursiveUpdate res def.value) {};
   };
 
   parseApiVersion = apiVersion: let

@@ -87,8 +87,6 @@ in {
       {
         features = ["docker"];
         module = {
-          config,
-          name,
           ...
         }: {
           # propagate registry options

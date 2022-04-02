@@ -2,12 +2,9 @@
   config,
   lib,
   kubenix,
-  pkgs,
   ...
 }:
-with lib; let
-  cfg = config.kubernetes.api.resources.customResourceDefinitions.crontabs;
-in {
+with lib; {
   imports = with kubenix.modules; [test k8s];
 
   test = {

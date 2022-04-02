@@ -25,7 +25,7 @@ with lib; let
 
   moduleToAttrs = value:
     if isAttrs value
-    then mapAttrs (n: v: moduleToAttrs v) (filterAttrs (n: v: v != null && !(hasPrefix "_" n)) value)
+    then mapAttrs (_n: v: moduleToAttrs v) (filterAttrs (n: v: v != null && !(hasPrefix "_" n)) value)
     else if isList value
     then map (v: moduleToAttrs v) value
     else value;
@@ -38,7 +38,7 @@ with lib; let
 
       defaults = mkOption {
         description = "Kubernetes defaults to apply to resources";
-        type = types.listOf (types.submodule ({config, ...}: {
+        type = types.listOf (types.submodule ({ ...}: {
           options = {
             group = mkOption {
               description = "Group to apply default to (all by default)";
@@ -258,7 +258,7 @@ with lib; let
         getSubOptions = finalType.getSubOptions;
         getSubModules = finalType.getSubModules;
         substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
-        typeMerge = t1: t2: null;
+        typeMerge = _t1: _t2: null;
         functor = (defaultFunctor name) // {wrapped = finalType;};
       };
   in
@@ -405,7 +405,7 @@ in {
     _m.propagate = [
       {
         features = ["k8s"];
-        module = {config, ...}: {
+        module = { ...}: {
           # propagate kubernetes version and namespace
           kubernetes.version = mkDefault cfg.version;
           kubernetes.namespace = mkDefault cfg.namespace;
@@ -485,7 +485,7 @@ in {
     kubernetes.objects = flatten (mapAttrsToList
       (
         _: type:
-          mapAttrsToList (name: resource: moduleToAttrs resource)
+          mapAttrsToList (_name: resource: moduleToAttrs resource)
           cfg.api.resources.${type.group}.${type.version}.${type.kind}
       )
       cfg.api.types);

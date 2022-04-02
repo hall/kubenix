@@ -1,12 +1,9 @@
 {
   lib,
   config,
-  pkgs,
   ...
 }:
-with lib; let
-  cfg = config.test;
-in {
+with lib; {
   options.test = {
     name = mkOption {
       description = "Test name";

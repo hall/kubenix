@@ -38,7 +38,7 @@
           modules ? [module],
           ...
         }: let
-          lib' = lib.extend (lib: self: import ./lib/upstreamables.nix {inherit lib pkgs;});
+          lib' = lib.extend (lib: _self: import ./lib/upstreamables.nix {inherit lib pkgs;});
           attrs' = builtins.removeAttrs attrs ["module"];
         in
           lib'.evalModules (lib.recursiveUpdate
@@ -77,9 +77,6 @@
           mkExamples = attrs:
             (import ./examples {inherit evalModules;})
             ({registry = "docker.io/gatehub";} // attrs);
-          mkK8STests = attrs:
-            (import ./tests {inherit evalModules;})
-            ({registry = "docker.io/gatehub";} // attrs);
         in {
           # TODO: access "success" derivation with nice testing utils for nice output
           nginx-example = wasSuccess (mkExamples {}).nginx-deployment.config.testing;
@@ -91,7 +88,7 @@
     ))
     // {
       nixosModules.kubenix = import ./modules;
-      overlays.default = final: prev: {
+      overlays.default = _final: prev: {
         kubenix.evalModules = self.evalModules.${prev.system};
         # up to date versions of their nixpkgs equivalents
         # kubernetes =

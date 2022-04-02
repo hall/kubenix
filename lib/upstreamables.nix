@@ -26,7 +26,7 @@ with lib; let
       builtins.readFile
       (pkgs.runCommand "value-to-b64" {} "echo -n '${value}' | ${pkgs.coreutils}/bin/base64 -w0 > $out");
 
-    exp = base: exp: foldr (value: acc: acc * base) 1 (range 1 exp);
+    exp = base: exp: foldr (_value: acc: acc * base) 1 (range 1 exp);
 
     octalToDecimal = value:
       (foldr

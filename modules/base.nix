@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   ...
 }:
@@ -19,7 +18,7 @@ with lib; {
 
     _m.propagate = mkOption {
       description = "Module propagation options";
-      type = types.listOf (types.submodule ({config, ...}: {
+      type = types.listOf (types.submodule ({ ...}: {
         options = {
           features = mkOption {
             description = "List of features that submodule has to have to propagate module";

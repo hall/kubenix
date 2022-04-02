@@ -42,7 +42,7 @@ with lib; let
           getSubOptions = finalType.getSubOptions;
           getSubModules = finalType.getSubModules;
           substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
-          typeMerge = t1: t2: null;
+          typeMerge = _t1: _t2: null;
           functor = (defaultFunctor name) // {wrapped = finalType;};
         };
     };
@@ -62,7 +62,7 @@ with lib; let
       values);
 
   submoduleOf = ref:
-    types.submodule ({name, ...}: {
+    types.submodule ({ ...}: {
       options = definitions."${ref}".options or {};
       config = definitions."${ref}".config or {};
     });
@@ -234,7 +234,7 @@ with lib; let
               "io.k8s.api.admissionregistration.v1.MutatingWebhook" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -454,7 +454,7 @@ with lib; let
               "io.k8s.api.admissionregistration.v1.ValidatingWebhook" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -660,7 +660,7 @@ with lib; let
               "io.k8s.api.admissionregistration.v1beta1.MutatingWebhook" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -882,7 +882,7 @@ with lib; let
               "io.k8s.api.admissionregistration.v1beta1.ValidatingWebhook" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -1288,7 +1288,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.DaemonSetCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "currentNumberScheduled" = mkOption {
@@ -1507,7 +1507,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.DeploymentCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "observedGeneration" = mkOption {
@@ -1687,7 +1687,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.ReplicaSetCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "fullyLabeledReplicas" = mkOption {
@@ -1907,7 +1907,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.StatefulSetCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "currentReplicas" = mkOption {
@@ -4502,7 +4502,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.batch.v1.JobCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "failed" = mkOption {
@@ -5719,7 +5719,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ComponentCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "kind" = mkOption {
@@ -5960,7 +5960,7 @@ with lib; let
             types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EnvVar" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "envFrom" = mkOption {
@@ -5996,7 +5996,7 @@ with lib; let
               "containerPort");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "readinessProbe" = mkOption {
@@ -6042,7 +6042,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeDevice" "devicePath");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "volumeMounts" = mkOption {
@@ -6052,7 +6052,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeMount" "mountPath");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "workingDir" = mkOption {
@@ -6565,7 +6565,7 @@ with lib; let
             types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EnvVar" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "envFrom" = mkOption {
@@ -6643,7 +6643,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeDevice" "devicePath");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "volumeMounts" = mkOption {
@@ -6653,7 +6653,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeMount" "mountPath");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "workingDir" = mkOption {
@@ -6699,7 +6699,7 @@ with lib; let
             coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EphemeralContainer" "name";
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "kind" = mkOption {
@@ -7638,7 +7638,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.NamespaceCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "phase" = mkOption {
@@ -7926,7 +7926,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.NodeAddress" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "allocatable" = mkOption {
@@ -7944,7 +7944,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.NodeCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "config" = mkOption {
@@ -8280,7 +8280,7 @@ with lib; let
               "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "phase" = mkOption {
@@ -8848,7 +8848,7 @@ with lib; let
           type = coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Container" "name";
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "dnsConfig" = mkOption {
@@ -8871,7 +8871,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EphemeralContainer" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "hostAliases" = mkOption {
@@ -8880,7 +8880,7 @@ with lib; let
             types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.HostAlias" "ip");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "hostIPC" = mkOption {
@@ -8906,7 +8906,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.LocalObjectReference" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "initContainers" = mkOption {
@@ -8916,7 +8916,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Container" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "nodeName" = mkOption {
@@ -9003,7 +9003,7 @@ with lib; let
               "topologyKey");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "volumes" = mkOption {
@@ -9012,7 +9012,7 @@ with lib; let
             types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Volume" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -9063,7 +9063,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "containerStatuses" = mkOption {
@@ -9109,7 +9109,7 @@ with lib; let
             types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodIP" "ip");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "qosClass" = mkOption {
@@ -9596,7 +9596,7 @@ with lib; let
               "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "fullyLabeledReplicas" = mkOption {
@@ -10241,7 +10241,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ObjectReference" "name");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -10439,7 +10439,7 @@ with lib; let
             (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ServicePort" "port");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "publishNotReadyAddresses" = mkOption {
@@ -10505,7 +10505,7 @@ with lib; let
               "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "loadBalancer" = mkOption {
@@ -13612,7 +13612,7 @@ with lib; let
               "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "currentHealthy" = mkOption {
@@ -13860,7 +13860,7 @@ with lib; let
               "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "currentHealthy" = mkOption {
@@ -15525,7 +15525,7 @@ with lib; let
           type = coerceAttrsOfSubmodulesToListByKey "io.k8s.api.storage.v1.CSINodeDriver" "name";
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -16212,7 +16212,7 @@ with lib; let
             coerceAttrsOfSubmodulesToListByKey "io.k8s.api.storage.v1beta1.CSINodeDriver" "name";
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -18467,7 +18467,7 @@ with lib; let
               "io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference" "uid");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
         "resourceVersion" = mkOption {
@@ -18903,7 +18903,7 @@ with lib; let
               "io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
@@ -19078,7 +19078,7 @@ with lib; let
               "io.k8s.kube-aggregator.pkg.apis.apiregistration.v1beta1.APIServiceCondition" "type");
           apply = values:
             if values != null
-            then mapAttrsToList (n: v: v) values
+            then mapAttrsToList (_n: v: v) values
             else values;
         };
       };
