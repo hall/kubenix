@@ -282,7 +282,6 @@ in {
       default = null;
     };
 
-
     customResources = mkOption {
       description = "Setup custom resources";
       type = types.listOf types.attrs;

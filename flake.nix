@@ -61,9 +61,10 @@
                     };
                   }
                 ];
-              specialArgs = {inherit kubenix;
-                             inherit pkgs;
-                            };
+              specialArgs = {
+                inherit kubenix;
+                inherit pkgs;
+              };
             }
             attrs');
       in {

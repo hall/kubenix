@@ -1,6 +1,6 @@
 {
-   pkgs,
-   lib,
+  pkgs,
+  lib,
 }: let
   generateIstio = import ./istio {
     inherit

@@ -1,25 +1,47 @@
 # Contributing
 
+Thanks for your interest in contributing!
+We welcome ideas, code, docs, etc -- just open an issue or MR.
+
+## Setup
+
+This project uses [flakes](https://nixos.wiki/wiki/Flakes) so a development environment can be created with
+
+    nix develop
+
+where you will find a [devshell](https://numtide.github.io/devshell) prompt (which supports [direnv](https://direnv.net/) so a one-time `direnv allow` at the base of the repo should automate the dev shell process).
+
+## Commits
+
+There's no formal commit process at this time.
+
+Do try to format the repo before submission, however.
+
+    nix develop -c treefmt
+
 ## Kubernetes versions
 
-Edit [`./jobs/generators/default.nix`](./jobs/generators/default.nix) and add a block for the new version of Kubernetes in `generate.k8s`. For example:
+To support a new Kubernetes version:
 
-```nix
-{
-  name = "v1.23.nix";
-  path = generateK8S "v1.23" (builtins.fetchurl {
-    url = "https://github.com/kubernetes/kubernetes/raw/v1.23.0/api/openapi-spec/swagger.json";
-    sha256 = "0jivg8nlxka1y7gzqpcxkmbvhcbxynyrxmjn0blky30q5064wx2a";
-  });
-}
-```
+- Edit [`./jobs/generators/default.nix`](./jobs/generators/default.nix) and add a block for the version under `k8s`; for example:
 
-Then build and copy all specs to [`modules/generated/`](./modules/generated/):
+  ```nix
+  {
+    name = "v1.23.nix";
+    path = generateK8S "v1.23" (builtins.fetchurl {
+      url = "https://github.com/kubernetes/kubernetes/raw/v1.23.0/api/openapi-spec/swagger.json";
+      sha256 = "0jivg8nlxka1y7gzqpcxkmbvhcbxynyrxmjn0blky30q5064wx2a";
+    });
+  }
+  ```
 
-    nix build '.#jobs.x86_64-linux.generators.k8s'
-    cp ./result/* modules/generated/
+- Build and copy the updated specs to [`modules/generated/`](./modules/generated/)
 
-Now add the version in [`./modules/k8s.nix`](./modules/k8s.nix) under `options.kubernetes.version.type` as well as a new check in [`./flake.nix`](./flake.nix) (e.g., `tests-k8s-1_23`).
+      nix build '.#jobs.x86_64-linux.generators.k8s'
+      cp ./result/* modules/generated/
+
+- Add the version in [`./modules/k8s.nix`](./modules/k8s.nix) under `options.kubernetes.version.type`
+- Add a new check in [`./flake.nix`](./flake.nix) (e.g., `tests-k8s-1_23`)
 
 ## Tests
 
