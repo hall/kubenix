@@ -15,7 +15,7 @@ where you will find a [devshell](https://numtide.github.io/devshell) prompt (whi
 
 There's no formal commit process at this time.
 
-Do try to format the repo before submission, however.
+Do try to format the repo with [treefmt](https://github.com/numtide/treefmt) before submission, however.
 
     nix develop -c treefmt
 
