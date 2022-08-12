@@ -10,13 +10,11 @@ Kubernetes resource management with Nix
 
 ## Usage
 
-See [./docs/examples/](./docs/examples/) for now.
+Apply all resources with
 
-<!-- Apply all resources with
+    nix run github:hall/kubenix . -- apply
 
-    nix run github:hall/kubenix
-
-> **HINT**: run `nix run github:hall/kubenix -- --help` for more commands
+> **HINT**: run `nix run github:hall/kubenix . -- --help` for more commands
 
 A minimal example flake:
 
@@ -24,15 +22,20 @@ A minimal example flake:
 {
   inputs.kubenix = "github:hall/kubenix";
   outputs = {self, ...}@inputs: {
-    # nixosConfigurations.hostname = {
-    #   modules = [ inputs.kubenix.nixosModule ];
-    # };
-    kubernetes.cluster.resources.pod.test.spec.containers.nginx.image = "nginx";
+    nixosConfigurations.hostname = {
+      modules = [ inputs.kubenix.nixosModule ];
+    };
+    kubernetes.resources.pods."app" = {
+      spec.containers."app" = {
+        name = "app";
+        image = "nginx";
+      };
+    };
   }
 }
 ```
 
-A more complete example config:
+<!-- A more complete example config:
 
 ```nix
 {
@@ -42,7 +45,6 @@ A more complete example config:
     helm = {
       releases = {};
     };
-    docker = {};
   }
 }
 ``` -->

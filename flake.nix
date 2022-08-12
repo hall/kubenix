@@ -74,9 +74,14 @@
 
         devShells.default = import ./devshell {inherit pkgs inputs;};
 
-        packages = inputs.flake-utils.lib.flattenTree {
-          inherit (pkgs) kubernetes kubectl;
-        };
+        packages =
+          inputs.flake-utils.lib.flattenTree {
+            inherit (pkgs) kubernetes kubectl;
+          }
+          // {
+            cli = pkgs.callPackage ./pkgs/kubenix.nix {};
+            default = self.packages.${system}.cli;
+          };
 
         checks = let
           wasSuccess = suite:
