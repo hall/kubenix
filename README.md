@@ -1,41 +1,52 @@
-**Kubenix 2.0 is in still work in progress, expect breaking changes**
+# kubenix
 
-# KubeNix
+Kubernetes resource management with Nix
 
-> Kubernetes resource builder written in nix
+<img style="display: block;  margin: 2em auto;" src="./docs/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
 
-[![Build Status](https://travis-ci.com/xtruder/kubenix.svg?branch=master)](https://travis-ci.com/xtruder/kubenix)
+> **WARN**: this is a work in progress, expect breaking changes
 
-## About
+## Usage
 
-KubeNix is a kubernetes resource builder, that uses nix module system for
-definition of kubernetes resources and nix build system for building complex
-kubernetes resources very easily.
+See [./docs/examples/](./docs/examples/) for now.
 
-## Development
+<!-- Apply all resources with
 
-### Building tests
+    nix run github:hall/kubenix
 
-```shell
-nix-build release.nix -A test-results --show-trace
+> **HINT**: run `nix run github:hall/kubenix -- --help` for more commands
+
+A minimal example flake:
+
+```nix
+{
+  inputs.kubenix = "github:hall/kubenix";
+  outputs = {self, ...}@inputs: {
+    # nixosConfigurations.hostname = {
+    #   modules = [ inputs.kubenix.nixosModule ];
+    # };
+    kubernetes.cluster.resources.pod.test.spec.containers.nginx.image = "nginx";
+  }
+}
 ```
 
-**Building single e2e test**
+A more complete example config:
 
-```
-nix-build release.nix -A tests.k8s-1_21.testsByName.k8s-crd.test
-nix-build release.nix -A tests.k8s-1_21.testsByName.<test-name>.test
-```
+```nix
+{
+  kubernetes = {
+    context = "default";
+    resources = {};
+    helm = {
+      releases = {};
+    };
+    docker = {};
+  }
+}
+``` -->
 
-**Debugging e2e test**
+## Attribution
 
-```
-nix-build release.nix -A tests.k8s-1_21.testsByName.k8s-crd.test.driver
-nix-build release.nix -A tests.k8s-1_21.testsByName.<test-name>.test.driver
-resut/bin/nixos-test-driver
-testScript;
-```
+This project was forked from https://github.com/GTrunSec/kubenix which was forked from https://github.com/xtruder/kubenix.
 
-## License
-
-[MIT](LICENSE) © [Jaka Hudoklin](https://x-truder.net)
+Logo is a mishmash of the [Kubernetes wheel](https://github.com/kubernetes/kubernetes/blob/master/logo/logo.svg) and the [NixOs snowflake](https://github.com/NixOS/nixos-artwork/blob/master/logo/white.svg).

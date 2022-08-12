@@ -83,7 +83,7 @@
             then pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-succeeded" {} "echo success > $out"
             else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" {} "exit 1";
           mkExamples = attrs:
-            (import ./examples {inherit evalModules;})
+            (import ./docs/examples {inherit evalModules;})
             ({registry = "docker.io/gatehub";} // attrs);
           mkK8STests = attrs:
             (import ./tests {inherit evalModules;})
