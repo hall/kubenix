@@ -19,6 +19,8 @@ Then build and copy all specs to [`modules/generated/`](./modules/generated/):
     nix build '.#jobs.x86_64-linux.generators.k8s'
     cp ./result/* modules/generated/
 
+Now add the version in [`./modules/k8s.nix`](./modules/k8s.nix) under `options.kubernetes.version.type` as well as a new check in [`./flake.nix`](./flake.nix) (e.g., `tests-k8s-1_23`).
+
 ## Tests
 
 Tests are executed through GitHub actions; see the [workflow definition](../kubenix/.github/workflows/ci.yml) for commands.
