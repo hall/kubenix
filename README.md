@@ -2,7 +2,9 @@
 
 Kubernetes resource management with Nix
 
-<img style="display: block;  margin: 2em auto;" src="./docs/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
+<p align="center" style="margin: 2em auto;">
+  <img src="./docs/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
+</p>
 
 > **WARN**: this is a work in progress, expect breaking changes
 
