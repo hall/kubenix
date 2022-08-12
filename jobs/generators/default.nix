@@ -1,6 +1,6 @@
 {
-  pkgs,
-  lib,
+   pkgs,
+   lib,
 }: let
   generateIstio = import ./istio {
     inherit
@@ -55,6 +55,13 @@ in {
       path = generateK8S "v1.23" (builtins.fetchurl {
         url = "https://github.com/kubernetes/kubernetes/raw/v1.23.0/api/openapi-spec/swagger.json";
         sha256 = "sha256:0jivg8nlxka1y7gzqpcxkmbvhcbxynyrxmjn0blky30q5064wx2a";
+      });
+    }
+    {
+      name = "v1.24.nix";
+      path = generateK8S "v1.24" (builtins.fetchurl {
+        url = "https://github.com/kubernetes/kubernetes/raw/v1.24.0/api/openapi-spec/swagger.json";
+        sha256 = "sha256:0fp5hbqk2q0imrfi4mwp1ia0bmn0xnl6hcr07y52q2cp41pmfhqd";
       });
     }
   ];
