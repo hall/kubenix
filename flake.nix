@@ -90,7 +90,9 @@
             '')
           ];
           # KUBECONFIG = "kubeconfig.json";
-          NODE_PATH = "${pkgs.nodePackages.prettier-plugin-toml}/lib/node_modules:$NODE_PATH";
+          shellHook = ''
+            export NODE_PATH="${pkgs.nodePackages.prettier-plugin-toml}/lib/node_modules:$NODE_PATH"
+          '';
         };
 
         formatter = pkgs.treefmt;
