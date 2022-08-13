@@ -14,7 +14,7 @@ Apply all resources with
 
     nix run github:hall/kubenix . -- apply
 
-> **HINT**: run `nix run github:hall/kubenix . -- --help` for more commands
+> **HINT**: use ` --help` for more commands
 
 A minimal example flake:
 

@@ -17,7 +17,7 @@ There's no formal commit process at this time.
 
 Do try to format the repo with [treefmt](https://github.com/numtide/treefmt) before submission, however.
 
-    nix develop -c treefmt
+    nix fmt
 
 ## Kubernetes versions
 

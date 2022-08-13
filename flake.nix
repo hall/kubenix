@@ -1,17 +1,12 @@
 {
-  description = "Kubernetes resource builder using nix";
+  description = "Kubernetes resource management with nix";
 
   inputs = {
-    flake-compat.url = "github:edolstra/flake-compat";
-    flake-compat.flake = false;
-
-    flake-utils.url = "github:numtide/flake-utils";
-    flake-utils.inputs.nixpkgs.follows = "nixpgks";
-
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
-    devshell.url = "github:numtide/devshell";
-    devshell.inputs.nixpkgs.follows = "nixpkgs";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -25,7 +20,6 @@
         pkgs = import inputs.nixpkgs {
           overlays = [
             self.overlays.default
-            inputs.devshell.overlay
           ];
           config.allowUnsupportedSystem = true;
           inherit system;
@@ -72,10 +66,36 @@
 
         jobs = import ./jobs {inherit pkgs;};
 
-        devShells.default = import ./devshell {inherit pkgs inputs;};
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            # formatters
+            alejandra
+            black
+            nodePackages.prettier
+            nodePackages.prettier-plugin-toml
+            shfmt
+            treefmt
+
+            # extra tools
+            dive
+            fd
+            k9s
+            kube3d
+            kubie
+          ];
+          # KUBECONFIG = "kubeconfig.json";
+          NODE_PATH = "${pkgs.nodePackages.prettier-plugin-toml}/lib/node_modules:$NODE_PATH";
+          shellHook = ''
+            # check nix parsing
+            alias evalnix="fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null"
+          '';
+        };
+
+        formatter = pkgs.treefmt;
 
         packages =
-          inputs.flake-utils.lib.flattenTree {
+          inputs.flake-utils.lib.flattenTree
+          {
             inherit (pkgs) kubernetes kubectl;
           }
           // {
