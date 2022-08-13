@@ -83,12 +83,14 @@
             kube3d
             kubie
           ];
+          packages = [
+            (pkgs.writeShellScriptBin "evalnix" ''
+              # check nix parsing
+              fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null
+            '')
+          ];
           # KUBECONFIG = "kubeconfig.json";
           NODE_PATH = "${pkgs.nodePackages.prettier-plugin-toml}/lib/node_modules:$NODE_PATH";
-          shellHook = ''
-            # check nix parsing
-            alias evalnix="fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null"
-          '';
         };
 
         formatter = pkgs.treefmt;
