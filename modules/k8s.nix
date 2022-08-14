@@ -8,6 +8,7 @@
   ...
 }:
 with lib; let
+  versions = (import ../versions.nix).versions;
   cfg = config.kubernetes;
 
   gvkKeyFn = type: "${type.group}/${type.version}/${type.kind}";
@@ -272,8 +273,8 @@ in {
   options.kubernetes = {
     version = mkOption {
       description = "Kubernetes version to use";
-      type = types.enum ["1.19" "1.20" "1.21" "1.23" "1.24"];
-      default = "1.24";
+      type = types.enum versions;
+      default = lib.lists.last versions;
     };
 
     namespace = mkOption {
