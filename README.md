@@ -51,6 +51,7 @@ Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
 
 Either way the JSON manifests will be written to `./result`.
 
+See [./docs/examples](./docs/examples) for more.
 
 ## Attribution
 
