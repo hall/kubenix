@@ -68,8 +68,6 @@
       in {
         inherit evalModules pkgs;
 
-        jobs = import ./jobs {inherit pkgs;};
-
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # formatters
@@ -109,7 +107,8 @@
           // {
             cli = pkgs.callPackage ./pkgs/kubenix.nix {};
             default = self.packages.${system}.cli;
-          };
+          }
+          // import ./jobs {inherit pkgs;};
 
         checks = let
           wasSuccess = suite:

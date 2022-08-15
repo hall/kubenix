@@ -33,7 +33,7 @@ To support a new Kubernetes version:
 
 - Build and copy the updated specs to [`modules/generated/`](./modules/generated/)
 
-      nix build '.#jobs.x86_64-linux.generators.k8s'
+      nix build '.#generators.k8s'
       cp ./result/* modules/generated/
 
 ## Tests
