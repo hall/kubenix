@@ -32,8 +32,8 @@ in {
   imports = [./k8s.nix];
 
   options.kubernetes.helm = {
-    instances = mkOption {
-      description = "Attribute set of helm instances";
+    releases = mkOption {
+      description = "Attribute set of helm releases";
       type = types.attrsOf (types.submodule ({
         config,
         name,
@@ -108,7 +108,7 @@ in {
 
     kubernetes.api.resources = mkMerge (flatten (mapAttrsToList
       (
-        _: instance:
+        _: release:
           map
           (object: let
             apiVersion = parseApiVersion object.apiVersion;
@@ -117,10 +117,10 @@ in {
             "${apiVersion.group}"."${apiVersion.version}".${object.kind}."${name}" = mkMerge ([
                 object
               ]
-              ++ instance.overrides);
+              ++ release.overrides);
           })
-          instance.objects
+          release.objects
       )
-      cfg.instances));
+      cfg.releases));
   };
 }

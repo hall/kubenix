@@ -80,7 +80,7 @@ in {
     '';
   };
 
-  kubernetes.helm.instances.app-psql = {
+  kubernetes.helm.releases.app-psql = {
     namespace = "some-overridden-by-kubetest";
     chart = helm.fetch {
       repo = "https://charts.bitnami.com/bitnami";

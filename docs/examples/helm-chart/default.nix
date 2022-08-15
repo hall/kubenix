@@ -2,7 +2,7 @@
 (evalModules {
   module = {kubenix, ...}: {
     imports = with kubenix.modules; [helm];
-    kubernetes.helm.instances.example = {
+    kubernetes.helm.releases.example = {
       chart = kubenix.lib.helm.fetch {
         chart = "nginx";
         repo = "https://charts.bitnami.com/bitnami";
