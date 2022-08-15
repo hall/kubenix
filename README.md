@@ -16,7 +16,25 @@ Kubernetes resource management with Nix
 
 > **HINT**: use ` --help` for more commands -->
 
-Create a `default.nix` file:
+A minimal example flake (build with `nix build`):
+
+```nix
+{
+  inputs.kubenix.url = "github:hall/kubenix";
+  outputs = {self, kubenix, ... }@inputs: let
+    system = "x86_64-linux";
+  in {
+    packages.${system}.default = (kubenix.evalModules.${system} {
+      module = { kubenix, ... }: {
+        imports = with kubenix.modules; [k8s];
+        kubernetes.resources.pods.example.spec.containers.nginx.image = "nginx";
+      };
+    }).config.kubernetes.result;
+  };
+}
+```
+
+Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
 
 ```nix
 { kubenix ? import (builtins.fetchGit {
@@ -24,48 +42,15 @@ Create a `default.nix` file:
   rev = "aa734afc9cf7a5146a7a9d93fd534e81572c8122";
 }) }:
 (kubenix.evalModules.x86_64-linux {
-  module = {kubenix, ...}: {
+  module = {kubenix, ... }: {
     imports = with kubenix.modules; [k8s];
-    kubernetes.resources.pods.test.spec.containers.nginx.image = "nginx";
+    kubernetes.resources.pods.example.spec.containers.nginx.image = "nginx";
   };
 }).config.kubernetes.result
 ```
 
-Then execute `nix-build` to write JSON manifests to `./result`.
+Either way the JSON manifests will be written to `./result`.
 
-<!-- A minimal example flake:
-
-```nix
-{
-  inputs.kubenix.url = "github:hall/kubenix";
-  outputs = {self, ...}@inputs: {
-    kubenix = {
-      module = { inputs.kubenix, ...}: {
-        kubernetes.resources.pods."app" = {
-          spec.containers."app" = {
-            name = "app";
-            image = "nginx";
-          };
-        };
-      }
-    }
-  }
-}
-``` -->
-
-<!-- A more complete example config:
-
-```nix
-{
-  kubernetes = {
-    context = "default";
-    resources = {};
-    helm = {
-      releases = {};
-    };
-  }
-}
-``` -->
 
 ## Attribution
 
