@@ -7,6 +7,10 @@
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -134,11 +138,6 @@
       nixosModules.kubenix = import ./modules;
       overlays.default = _final: prev: {
         kubenix.evalModules = self.evalModules.${prev.system};
-        # up to date versions of their nixpkgs equivalents
-        # kubernetes =
-        #   prev.callPackage ./pkgs/applications/networking/cluster/kubernetes
-        #   {};
-        # kubectl = prev.callPackage ./pkgs/applications/networking/cluster/kubectl {};
       };
     };
 }

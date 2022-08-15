@@ -10,30 +10,48 @@ Kubernetes resource management with Nix
 
 ## Usage
 
-Apply all resources with
+<!-- Apply all resources with
 
     nix run github:hall/kubenix . -- apply
 
-> **HINT**: use ` --help` for more commands
+> **HINT**: use ` --help` for more commands -->
 
-A minimal example flake:
+Create a `default.nix` file:
+
+```nix
+{ kubenix ? import (builtins.fetchGit {
+  url = "https://github.com/hall/kubenix.git";
+  rev = "aa734afc9cf7a5146a7a9d93fd534e81572c8122";
+}) }:
+(kubenix.evalModules.x86_64-linux {
+  module = {kubenix, ...}: {
+    imports = with kubenix.modules; [k8s];
+    kubernetes.resources.pods.test.spec.containers.nginx.image = "nginx";
+  };
+}).config.kubernetes.result
+```
+
+Then execute `nix-build` to write JSON manifests to `./result`.
+
+<!-- A minimal example flake:
 
 ```nix
 {
-  inputs.kubenix = "github:hall/kubenix";
+  inputs.kubenix.url = "github:hall/kubenix";
   outputs = {self, ...}@inputs: {
-    nixosConfigurations.hostname = {
-      modules = [ inputs.kubenix.nixosModule ];
-    };
-    kubernetes.resources.pods."app" = {
-      spec.containers."app" = {
-        name = "app";
-        image = "nginx";
-      };
-    };
+    kubenix = {
+      module = { inputs.kubenix, ...}: {
+        kubernetes.resources.pods."app" = {
+          spec.containers."app" = {
+            name = "app";
+            image = "nginx";
+          };
+        };
+      }
+    }
   }
 }
-```
+``` -->
 
 <!-- A more complete example config:
 
