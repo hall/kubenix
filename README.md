@@ -10,12 +10,6 @@ Kubernetes resource management with Nix
 
 ## Usage
 
-<!-- Apply all resources with
-
-    nix run github:hall/kubenix . -- apply
-
-> **HINT**: use ` --help` for more commands -->
-
 A minimal example flake (build with `nix build`):
 
 ```nix
@@ -52,6 +46,30 @@ Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
 Either way the JSON manifests will be written to `./result`.
 
 See [./docs/examples](./docs/examples) for more.
+
+## CLI
+
+> **NOTE**: this is a WIP CLI which currently reads the `k8s` attribute on a local flake
+
+Render all resources with
+
+    nix run github:hall/kubenix -- render
+
+> **HINT**: use ` --help` for more commands
+
+### Support
+
+The following table gives a general overview of currently supported functionality.
+
+|        | kubectl | kustomize | helm  | helmfile |
+| ------ | :-----: | :-------: | :---: | :------: |
+| render |    x    |           | x[^2] |          |
+| diff   |         |           |       |          |
+| apply  |  x[^1]  |           |       |          |
+| hooks  |    -    |     -     |       |          |
+
+[^1]: currently create-only
+[^2]: piping rendered helm charts to kubectl is a lossy process (e.g., [hooks](https://helm.sh/docs/topics/charts_hooks/) will not work)
 
 ## Attribution
 
