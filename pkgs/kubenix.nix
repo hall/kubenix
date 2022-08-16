@@ -38,9 +38,11 @@ writeShellScriptBin "kubenix" ''
 
   function _kubectl() {
     MANIFESTS=$(mktemp)
-    # TODO: find a better filter, not just not-helm
+    # TODO: find a better filter, not just not-helm, not-crd
     cat $(${nix}/bin/nix build '.#k8s.config.kubernetes.result' --json | jq -r '.[0].outputs.out') \
-     | jq '.items[] | select(.metadata.labels."app.kubernetes.io/managed-by" != "Helm")' > $MANIFESTS
+     | jq '.items[]
+       | select(.metadata.labels."app.kubernetes.io/managed-by" != "Helm")
+       | select(.kind != "CustomResourceDefinition")' > $MANIFESTS
 
     [ -n "$MANIFESTS" ] || return 0
 
