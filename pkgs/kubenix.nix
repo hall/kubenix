@@ -1,9 +1,8 @@
-{ lib
-, writeShellScriptBin
-, nix
-, jq
+{ jq
 , kubectl
 , kubernetes-helm
+, nix
+, writeShellScriptBin
 ,
 }:
 writeShellScriptBin "kubenix" ''
@@ -17,6 +16,10 @@ writeShellScriptBin "kubenix" ''
       apply    - create resources in target cluster
       diff     - show a diff between configured and live resources
       render   - print resource manifests to stdout
+
+    options:
+      -h --help     - show this menu
+      -v --verbose  - increase output details
     "
   }
 
@@ -44,7 +47,7 @@ writeShellScriptBin "kubenix" ''
        | select(.metadata.labels."app.kubernetes.io/managed-by" != "Helm")
        | select(.kind != "CustomResourceDefinition")' > $MANIFESTS
 
-    [ -n "$MANIFESTS" ] || return 0
+    [ -s "$MANIFESTS" ] || return 0
 
     case $1 in
       render)
