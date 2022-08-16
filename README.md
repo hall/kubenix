@@ -59,14 +59,13 @@ Render all resources with
 
 ### Support
 
-The following table gives a general overview of currently supported functionality.
+The following table gives a general overview of currently supported/planned functionality.
 
-|        | kubectl | kustomize | helm  | helmfile |
-| ------ | :-----: | :-------: | :---: | :------: |
-| render |    x    |           | x[^2] |          |
-| diff   |         |           |       |          |
-| apply  |  x[^1]  |           |       |          |
-| hooks  |    -    |     -     |       |          |
+|           | kubectl | kustomize | helm  | helmfile |
+| --------- | :-----: | :-------: | :---: | :------: |
+| render    |    x    |           | x[^2] |          |
+| diff      |    x    |           |   x   |          |
+| apply[^1] |    x    |           |   x   |          |
 
 [^1]: currently create-only
 [^2]: piping rendered helm charts to kubectl is a lossy process (e.g., [hooks](https://helm.sh/docs/topics/charts_hooks/) will not work)

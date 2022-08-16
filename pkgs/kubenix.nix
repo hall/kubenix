@@ -1,71 +1,92 @@
-{
-  lib,
-  writeShellScriptBin,
-  coreutils,
-  nix,
-  jq,
-  kubectl,
-}: let
-  name = "kubenix";
-in
-  lib.recursiveUpdate (writeShellScriptBin name ''
-    set -Eeuo pipefail
+{ lib
+, writeShellScriptBin
+, nix
+, jq
+, kubectl
+, kubernetes-helm
+,
+}:
+writeShellScriptBin "kubenix" ''
+  set -Eeuo pipefail
 
-    NAME=${name}
-    function help() {
-      echo "
-      kubenix - Kubernetes resource management with Nix
+  function _help() {
+    echo "
+    kubenix - Kubernetes resource management with Nix
 
-      commands:
-        apply    - create resources in target cluster
-        diff     - show a diff between rendered and live resources
-        render   - print resource manifests to stdout
-      "
-    }
+    commands:
+      apply    - create resources in target cluster
+      diff     - show a diff between configured and live resources
+      render   - print resource manifests to stdout
+    "
+  }
 
-    MANIFEST="$(${nix}/bin/nix eval '.#k8s.config.kubernetes.result' --raw)"
+  function _helm() {
+    RELEASES="$(${nix}/bin/nix eval '.#k8s.config.kubernetes.helm' --json | jq -c '.releases[] | del(.objects)')"
+    [ -n "$RELEASES" ] || return 0
 
-    function apply() {
-      ${kubectl}/bin/kubectl apply -f $MANIFEST
-    }
+    for release in $RELEASES; do
+      values=$(mktemp)
+      echo $release | jq -r '.values' > $values
 
-    function render() {
-      cat $MANIFEST | ${jq}/bin/jq
-    }
+      ${kubernetes-helm}/bin/helm $@ \
+        -n $(echo $release | jq -r '.namespace // "default"') \
+        $(echo $release | jq -r '.name') \
+        $(echo $release | jq -r '.chart') \
+        -f $values
+    done
+  }
 
-    function diff() {
-      ${kubectl}/bin/kubectl diff -f $MANIFEST
-    }
+  function _kubectl() {
+    MANIFESTS=$(mktemp)
+    # TODO: find a better filter, not just not-helm
+    cat $(${nix}/bin/nix build '.#k8s.config.kubernetes.result' --json | jq -r '.[0].outputs.out') \
+     | jq '.items[] | select(.metadata.labels."app.kubernetes.io/managed-by" != "Helm")' > $MANIFESTS
 
-    while test $# -gt 0; do
-      case "$1" in
-        apply|"")
-          shift
-          apply
-          ;;
-        diff)
-          shift
-          diff
-          ;;
-        render)
-          shift
-          render
-          ;;
-        -h|--help)
-          help
-          exit 0
-          ;;
-        -v|--verbose)
-          shift
-          set -x
-          ;;
-        *)
-          help
-          exit 1
-          ;;
+    [ -n "$MANIFESTS" ] || return 0
+
+    case $1 in
+      render)
+        cat $MANIFESTS;;
+      *)
+        ${kubectl}/bin/kubectl $@ -f $MANIFESTS;;
+    esac
+  }
+
+  # if no args given, add empty string
+  [ $# -eq 0 ] && set -- ""
+
+  # parse arguments
+  while test $# -gt 0; do
+    case "$1" in
+
+      apply)
+        _kubectl apply
+        _helm upgrade --install
+        shift;;
+
+      diff)
+        _kubectl diff
+        _helm diff upgrade --allow-unreleased 
+        shift;;
+
+      render)
+        _kubectl render
+        _helm template
+        shift;;
+
+      -h|--help|"")
+        _help
+        exit 0;;
+
+      -v|--verbose)
+        set -x
+        shift;;
+
+      *)
+        _help
+        exit 1;;
+
       esac
     done
+''
 
-
-  '')
-  {meta.description = "";}
