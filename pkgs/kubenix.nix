@@ -63,12 +63,12 @@ writeShellScriptBin "kubenix" ''
 
       apply)
         _kubectl apply
-        _helm upgrade --install
+        _helm upgrade --install --create-namespace
         shift;;
 
       diff)
         _kubectl diff
-        _helm diff upgrade --allow-unreleased 
+        _helm diff upgrade --allow-unreleased
         shift;;
 
       render)
@@ -91,4 +91,3 @@ writeShellScriptBin "kubenix" ''
       esac
     done
 ''
-
