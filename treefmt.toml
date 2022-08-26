@@ -1,3 +1,6 @@
+[global]
+excludes = ["./docs/themes/*"]
+
 [formatter.nix]
 command = "alejandra"
 includes = ["*.nix"]
@@ -20,6 +23,5 @@ options = [
   "2", # indent 2
   "-s", # simplify the code
   "-w", # write back to the file
-
 ]
 includes = ["*.sh", "*.bash"]
