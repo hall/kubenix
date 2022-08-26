@@ -1,8 +1,7 @@
-{{ range $name, $option := .Site.Data.options }}
+{{ $module := .Page.File.BaseFileName }}
 
-{{ if hasPrefix $name "_" }}
-  {{/* remove internal objects */}}
-{{ else }}
+{{ range $name, $option := .Site.Data.options }}
+{{ if hasPrefix $name $module }}
 
 {{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
 
@@ -41,5 +40,8 @@
         </tr>
     </table>
 </details>
+{{ else }}
+  {{/* remove internal objects */}}
 {{ end }}
+
 {{ end }}
