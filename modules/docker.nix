@@ -34,13 +34,13 @@ in {
           name = mkOption {
             description = "Desired docker image name";
             type = types.str;
-            default = builtins.unsafeDiscardStringContext config.image.imageName;
+            default = ""; #builtins.unsafeDiscardStringContext config.image.imageName;
           };
 
           tag = mkOption {
             description = "Desired docker image tag";
             type = types.str;
-            default = builtins.unsafeDiscardStringContext config.image.imageTag;
+            default = ""; #builtins.unsafeDiscardStringContext config.image.imageTag;
           };
 
           registry = mkOption {
