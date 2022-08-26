@@ -1,6 +1,6 @@
 title = "kubenix"
 theme = "hugo-book"
-baseURL = "https://hall.github.com/kubenix"
+baseURL = "https://hall.github.io/kubenix"
 
 [params]
 BookLogo = "logo.svg"
