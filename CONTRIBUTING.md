@@ -39,3 +39,14 @@ To support a new Kubernetes version:
 ## Tests
 
 Tests are executed through GitHub actions; see the [workflow definition](../kubenix/.github/workflows/ci.yml) for commands.
+
+## Docs
+
+Generate a json object of module options with
+
+    nix build '.#docs'
+
+Then move it into the `./docs` directory and build the static site
+
+    mv ./result ./docs/data/options.json
+    hugo serve

@@ -1,0 +1,45 @@
+{{ range $name, $option := .Site.Data.options }}
+
+{{ if hasPrefix $name "_" }}
+  {{/* remove internal objects */}}
+{{ else }}
+
+{{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
+
+<details style="list-style: none;">
+    <summary>
+        <pre><code class="code-block">{{ $name }}</code></pre>
+    </summary>
+
+    <table>
+        <tr>
+            <td>Description</td>
+            <td>{{ $option.description }}</td>
+        </tr>
+
+
+        <tr>
+            <td>Type</td>
+            <td><pre>{{ $option.type }}</pre></td>
+        </tr>
+
+        <tr>
+            <td>Default</td>
+            <td>{{- transform.Highlight ($option.default | jsonify) "nix" -}}</td>
+        </tr>
+
+        {{ with $option.example }}
+        <tr>
+            <td>Example</td>
+            <td>{{- transform.Highlight (. | jsonify) "nix" -}}</td>
+        </tr>
+        {{ end }}
+
+        <tr>
+            <td>Declared in</td>
+            <td><a href="{{ $.Site.Params.BookRepo }}/blob/main/{{ $path }}" target="_blank">{{ $path }}</a></td>
+        </tr>
+    </table>
+</details>
+{{ end }}
+{{ end }}

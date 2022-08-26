@@ -1,0 +1,41 @@
+details {
+  padding: 0rem 1rem !important;
+  margin: 1rem;
+
+  > summary {
+    padding: 0rem !important;
+
+    // do not show arrow bullet point
+    list-style: none;
+    ::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  table, tbody {
+    // fill entire width
+    width: 100% !important;
+    display: table;
+
+
+    tr {
+      // make code blocks a little smaller
+      pre {
+        margin: 0 !important;
+        padding: 0.2rem !important;
+      }
+
+      // field name
+      td:first-child {
+        font-weight: bold;
+        font-size: 90%;
+
+        width: 8em;
+        min-width: 8em;
+        max-width: 8em;
+        word-break: break-all;
+      }
+    }
+  }
+}
+

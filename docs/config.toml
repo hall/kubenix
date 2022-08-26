@@ -1,0 +1,8 @@
+title = "kubenix"
+theme = "hugo-book"
+baseURL = "https://hall.github.com/kubenix"
+
+[params]
+BookLogo = "logo.svg"
+BookRepo = "https://github.com/hall/kubenix"
+BookSection = '*'

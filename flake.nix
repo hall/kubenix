@@ -84,6 +84,7 @@
             k9s
             kube3d
             kubie
+            hugo
           ];
           packages = [
             (pkgs.writeShellScriptBin "evalnix" ''
@@ -107,6 +108,14 @@
           // {
             cli = pkgs.callPackage ./pkgs/kubenix.nix {};
             default = self.packages.${system}.cli;
+            docs = import ./docs {
+              inherit pkgs;
+              options =
+                (self.evalModules.${system} {
+                  # modules = (builtins.attrValues self.nixosModules.kubenix);
+                  module = self.nixosModules.kubenix.docker;
+                }).options;
+            };
           }
           // import ./jobs {inherit pkgs;};
 
