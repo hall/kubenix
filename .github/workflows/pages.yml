@@ -3,7 +3,7 @@ name: pages
 on:
   push:
     branches:
-      - doc-gen # TODO: set to main before merge
+      - 1-generate-module-options-docs # TODO: set to main before merge
   pull_request:
 
 jobs:
