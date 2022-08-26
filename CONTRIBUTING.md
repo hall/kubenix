@@ -44,9 +44,10 @@ Tests are executed through GitHub actions; see the [workflow definition](../kube
 
 Generate a json object of module options with
 
-    nix build '.#docs'
+    nix build '.#docs' -o ./docs/data/options.json
 
-Then move it into the `./docs` directory and build the static site
+Then build and serve the static site
 
-    mv ./result ./docs/data/options.json
-    hugo serve
+    cd docs && hugo serve
+
+which will be available at <http://localhost:1313/kubenix>.

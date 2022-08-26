@@ -1,2 +1,4 @@
+public/
 resources/
 *.lock
+data/options.json
