@@ -1,22 +1,45 @@
 details {
   padding: 0rem 1rem !important;
   margin: 1rem;
+  padding: 0 !important;
 
   > summary {
     padding: 0rem !important;
+    margin: 0 !important;
 
     // do not show arrow bullet point
     list-style: none;
     ::-webkit-details-marker {
       display: none;
     }
+
+    // replace builtin arrows with custom ones
+    pre {
+      display: inline-block;
+      width: 100%;
+      margin: 0 !important;
+      padding-left: 50px !important;
+      vertical-align: middle;
+    }
+    &:before {
+      position: fixed;
+      content: "〉";
+      margin: 15px 20px;
+      font-weight: bold;
+    }
+  }
+
+  &[open] summary:before {
+      content: "﹀";
+      margin: 20px 16px;
+      font-weight: bold;
   }
 
   table, tbody {
     // fill entire width
     width: 100% !important;
     display: table;
-
+    margin: 0 !important;
 
     tr {
       // make code blocks a little smaller
