@@ -5,7 +5,7 @@
 
 {{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
 
-<details style="list-style: none;">
+<details id="{{ $name }}">
     <summary>
         <pre><code class="code-block">{{ $name }}</code></pre>
     </summary>

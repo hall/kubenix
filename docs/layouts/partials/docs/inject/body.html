@@ -1,0 +1,21 @@
+<script>
+  window.onload = function(){
+    // open details of option in URL fragment
+    document.getElementById(decodeURI(window.location.hash.substring(1)))?.setAttribute("open", "");
+
+    var options = document.getElementsByTagName('details');
+    for(var i = 0; i < options.length; i++) {
+        options[i].onclick = function() {
+
+            // set URL fragment to option id
+            window.location.hash = this.id;
+
+            // collapse all other options
+            for(var j = 0; j < options.length; j++) {
+                if (i != j) options[j].removeAttribute("open");
+            }
+        };
+    }
+
+  }; 
+</script>
