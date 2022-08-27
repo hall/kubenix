@@ -5,14 +5,17 @@
 
     var options = document.getElementsByTagName('details');
     for(var i = 0; i < options.length; i++) {
-        options[i].onclick = function() {
+        options[i].getElementsByTagName("summary")[0].onclick = function() {
 
             // set URL fragment to option id
-            window.location.hash = this.id;
+            window.location.hash = this.parentElement.id;
+
+            // is current panel open, return immediately as it's just being closed
+            if (this.parentElement.hasAttribute("open")) return;
 
             // collapse all other options
             for(var j = 0; j < options.length; j++) {
-                if (i != j) options[j].removeAttribute("open");
+                options[j].removeAttribute("open");
             }
         };
     }

@@ -24,13 +24,13 @@
 
         <tr>
             <td>Default</td>
-            <td>{{- transform.Highlight ($option.default | jsonify) "nix" -}}</td>
+            <td>{{ partial "highlight" $option.default }}</td>
         </tr>
 
         {{ with $option.example }}
         <tr>
             <td>Example</td>
-            <td>{{- transform.Highlight (. | jsonify) "nix" -}}</td>
+            <td>{{ partial "highlight" . }}</td>
         </tr>
         {{ end }}
 

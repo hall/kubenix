@@ -23,6 +23,15 @@ details {
       pre {
         margin: 0 !important;
         padding: 0.2rem !important;
+
+        &.highlight {
+          color: #f8f8f2;
+          background-color: #333333;
+        };
+
+        code {
+          vertical-align: text-bottom;
+        }
       }
 
       // field name
