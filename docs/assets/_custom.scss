@@ -1,3 +1,22 @@
+$foreground-color: #f8f8f2;
+$background-color: #333333;
+
+// create an arrow rotated by $angle
+@mixin arrow($angle) {
+  content: "";
+  display: inline-block;
+  position: fixed;
+  // size
+  padding: 3px;
+  // position
+  margin: 18px 15px;
+  border: solid $background-color;
+  border-width: 0 2px 2px 0;
+
+  transform: rotate($angle);
+  -webkit-transform: rotate($angle);
+}
+
 details {
   padding: 0rem 1rem !important;
   margin: 1rem;
@@ -18,21 +37,16 @@ details {
       display: inline-block;
       width: 100%;
       margin: 0 !important;
-      padding-left: 50px !important;
+      padding-left: 42px !important;
       vertical-align: middle;
     }
     &:before {
-      position: fixed;
-      content: "〉";
-      margin: 15px 20px;
-      font-weight: bold;
+      @include arrow(-45deg);
     }
   }
 
   &[open] summary:before {
-      content: "﹀";
-      margin: 20px 16px;
-      font-weight: bold;
+      @include arrow(45deg);
   }
 
   table, tbody {
@@ -48,8 +62,8 @@ details {
         padding: 0.2rem !important;
 
         &.highlight {
-          color: #f8f8f2;
-          background-color: #333333;
+          color: $foreground-color;
+          background-color: $background-color;
         };
 
         code {
