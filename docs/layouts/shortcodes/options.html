@@ -1,6 +1,11 @@
-{{ $module := .Page.File.BaseFileName }}
+{{ $module := $.Page.File.BaseFileName }}
+
+{{/* the kubenix module filename is currently "base" */}}
+{{ if eq $module "base" }}{{ $module = "kubenix" }}{{ end }}
 
 {{ range $name, $option := .Site.Data.options }}
+
+{{/* only show options for the current module */}}
 {{ if hasPrefix $name $module }}
 
 {{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
@@ -40,8 +45,6 @@
         </tr>
     </table>
 </details>
-{{ else }}
-  {{/* remove internal objects */}}
 {{ end }}
 
 {{ end }}
