@@ -126,11 +126,12 @@ with lib; let
   };
 
   indexOf = lst: value:
-    head (filter (v: v != -1) (imap0 (i: v:
-      if v == value
-      then i
-      else -1)
-    lst));
+    head (filter (v: v != -1) (imap0
+      (i: v:
+        if v == value
+        then i
+        else -1)
+      lst));
 
   compareVersions = ver1: ver2: let
     getVersion = substring 1 10;
@@ -302,7 +303,7 @@ in {
       type = types.submodule {
         imports =
           [
-            (./generated + ''/v'' + cfg.version + ".nix")
+            ./generated/v${cfg.version}.nix
             apiOptions
           ]
           ++ customResourceOptions;

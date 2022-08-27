@@ -113,6 +113,7 @@
             # create a page for each module in hugo
             for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
               [[ $mod == "base" ]] && mod=kubenix
+              [[ $mod == "k8s" ]] && mod=kubernetes
               echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
             done
 

@@ -1,44 +1,21 @@
+{{ $module := $.Page.File.BaseFileName }}
 {{ range $name, $option := .Site.Data.options }}
 
-{{/* only show options for the current module */}}
-{{ if hasPrefix $name (print $.Page.File.BaseFileName ".") }}
+  {{/* some module options are nested under others */}}
+  {{ if and (hasPrefix $name "kubernetes.helm.") }}
+    {{ if (eq $module "helm") }}
+      {{ partial "details" (dict "name" $name "option" $option) }}
+    {{ end }}
+  {{ else }}
 
-{{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
-
-<details id="{{ $name }}">
-    <summary>
-        <pre>{{ $name }}</pre>
-    </summary>
-
-    <table>
-        <tr>
-            <td>Description</td>
-            <td>{{ $option.description }}</td>
-        </tr>
-
-        <tr>
-            <td>Type</td>
-            <td><pre>{{ $option.type }}</pre></td>
-        </tr>
-
-        <tr>
-            <td>Default</td>
-            <td>{{ partial "highlight" $option.default }}</td>
-        </tr>
-
-        {{ with $option.example }}
-        <tr>
-            <td>Example</td>
-            <td>{{ partial "highlight" . }}</td>
-        </tr>
-        {{ end }}
-
-        <tr>
-            <td>Declared in</td>
-            <td><a href="{{ $.Site.Params.BookRepo }}/blob/main/{{ $path }}" target="_blank">{{ $path }}</a></td>
-        </tr>
-    </table>
-</details>
-{{ end }}
+     {{/* only show options for the current module */}}
+     {{/* but don't list _all_ kubernetes resources */}}
+     {{ if and 
+         (not (hasPrefix $name "kubernetes.api.resources."))
+         (hasPrefix $name (print $module ".")) 
+     }}
+         {{ partial "details" (dict "name" $name "option" $option) }}
+     {{ end }}
+  {{ end }}
 
 {{ end }}
