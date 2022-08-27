@@ -17270,7 +17270,7 @@ in
       };
       "apiextensions.k8s.io"."v1"."CustomResourceDefinition" = mkOption {
         description = "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.";
-        type = (types.attrsOf (submoduleForDefinition "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinition" "customresourcedefinitions" "CustomResourceDefinition" "apiextensions.k8s.io" "v1"));
+        type = types.attrs;
         default = { };
       };
       "apiregistration.k8s.io"."v1"."APIService" = mkOption {
@@ -17337,7 +17337,7 @@ in
       };
       "customResourceDefinitions" = mkOption {
         description = "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.";
-        type = (types.attrsOf (submoduleForDefinition "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinition" "customresourcedefinitions" "CustomResourceDefinition" "apiextensions.k8s.io" "v1"));
+        type = types.attrs;
         default = { };
       };
       "daemonSets" = mkOption {
