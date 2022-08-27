@@ -1,7 +1,7 @@
 {{ range $name, $option := .Site.Data.options }}
 
 {{/* only show options for the current module */}}
-{{ if hasPrefix $name $.Page.File.BaseFileName }}
+{{ if hasPrefix $name (print $.Page.File.BaseFileName ".") }}
 
 {{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
 
