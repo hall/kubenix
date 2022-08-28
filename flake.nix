@@ -100,26 +100,38 @@
 
         formatter = pkgs.treefmt;
 
-        apps.docs = inputs.flake-utils.lib.mkApp {
-          drv = pkgs.writeShellScriptBin "gen-docs" ''
-            set -eo pipefail
+        apps = {
+          docs = inputs.flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "gen-docs" ''
+              set -eo pipefail
 
-            # generate json object of module options
-            nix build '.#docs' -o ./docs/data/options.json
+              # generate json object of module options
+              nix build '.#docs' -o ./docs/data/options.json
 
-            # remove all old module pages
-            rm ./docs/content/modules/*.md || true
+              # remove all old module pages
+              rm ./docs/content/modules/*.md || true
 
-            # create a page for each module in hugo
-            for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
-              [[ $mod == "base" ]] && mod=kubenix
-              [[ $mod == "k8s" ]] && mod=kubernetes
-              echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
-            done
+              # create a page for each module in hugo
+              for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
+                [[ $mod == "base" ]] && mod=kubenix
+                [[ $mod == "k8s" ]] && mod=kubernetes
+                echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
+              done
 
-            # build the site
-            cd docs && ${pkgs.hugo}/bin/hugo $@
-          '';
+              # build the site
+              cd docs && ${pkgs.hugo}/bin/hugo $@
+            '';
+          };
+          generate = inputs.flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "gen-modules" ''
+              set -eo pipefail
+
+              nix build '.#generate-k8s'
+              cp ./result/* ./modules/generated/
+
+              rm result
+            '';
+          };
         };
 
         packages =
