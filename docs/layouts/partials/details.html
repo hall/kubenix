@@ -1,5 +1,6 @@
 {{ $name := index . "name" }}
 {{ $option := index . "option" }}
+{{ $repo := index . "repo" }}
 
 {{ $path := path.Join (after 2 (split (index $option.declarations 0) "/")) }}
 
@@ -33,7 +34,7 @@
 
         <tr>
             <td>Declared in</td>
-            <td><a href="{{ $.Site.Params.BookRepo }}/blob/main/{{ $path }}" target="_blank">{{ $path }}</a></td>
+            <td><a href="{{ $repo }}/blob/main/{{ $path }}" target="_blank">{{ $path }}</a></td>
         </tr>
     </table>
 </details>

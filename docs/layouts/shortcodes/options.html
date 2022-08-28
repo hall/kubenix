@@ -1,10 +1,11 @@
 {{ $module := $.Page.File.BaseFileName }}
+{{ $repo := $.Site.Params.BookRepo }}
 {{ range $name, $option := .Site.Data.options }}
 
   {{/* some module options are nested under others */}}
   {{ if and (hasPrefix $name "kubernetes.helm.") }}
     {{ if (eq $module "helm") }}
-      {{ partial "details" (dict "name" $name "option" $option) }}
+      {{ partial "details" (dict "name" $name "option" $option "repo" $repo) }}
     {{ end }}
   {{ else }}
 
@@ -14,7 +15,7 @@
          (not (hasPrefix $name "kubernetes.api.resources."))
          (hasPrefix $name (print $module ".")) 
      }}
-         {{ partial "details" (dict "name" $name "option" $option) }}
+         {{ partial "details" (dict "name" $name "option" $option "repo" $repo) }}
      {{ end }}
   {{ end }}
 
