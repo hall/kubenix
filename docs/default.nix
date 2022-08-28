@@ -1,3 +1,4 @@
+# adapted from: https://discourse.nixos.org/t/franken-script-to-generate-nixos-options-docs-with-custom-modules/1674/4
 {
   pkgs,
   options,
