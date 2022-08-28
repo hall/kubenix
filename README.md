@@ -75,9 +75,3 @@ The following table gives a general overview of currently supported/planned func
 This project was forked from https://github.com/GTrunSec/kubenix which was forked from https://github.com/xtruder/kubenix.
 
 Logo is a mishmash of the [Kubernetes wheel](https://github.com/kubernetes/kubernetes/blob/master/logo/logo.svg) and the [NixOs snowflake](https://github.com/NixOS/nixos-artwork/blob/master/logo/white.svg).
-
-## TODO
-
-- dynamic loading of CRDs for validation
-- secrets management support
-- resource deletion if object is removed from nix
