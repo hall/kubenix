@@ -1,3 +1,6 @@
+[global]
+excludes = ["./docs/themes/*"]
+
 [formatter.nix]
 command = "alejandra"
 includes = ["*.nix"]

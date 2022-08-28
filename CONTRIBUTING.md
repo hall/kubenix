@@ -38,3 +38,11 @@ To support a new Kubernetes version:
 ## Tests
 
 Tests are executed through GitHub actions; see the [workflow definition](../kubenix/.github/workflows/ci.yml) for commands.
+
+## Docs
+
+Build and serve the static site
+
+    nix run '.#docs' serve
+
+which will be available at <http://localhost:1313>.

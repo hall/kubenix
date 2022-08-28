@@ -1,0 +1,10 @@
+{{ $text := . }}
+
+{{/* if text is a multiline string add nix's double single-quotes */}}
+{{ if in $text "\n" }}
+  {{ $text = print "''\n  " (strings.TrimSuffix "  " (replace $text "\n" "\n  ") ) "''" }}
+{{ else }}
+  {{ $text = jsonify $text }}
+{{ end }}
+
+<pre class="highlight"><code>{{ $text }}</code></pre>

@@ -1,3 +1,6 @@
 {
-    "nix.formatterPath": "alejandra"
+    "nix.formatterPath": "alejandra",
+    "search.exclude": {
+        "docs/themes": true
+    }
 }

@@ -1,0 +1,91 @@
+$foreground-color: #f8f8f2;
+$background-color: #333333;
+
+// create an arrow rotated by $angle
+@mixin arrow($angle) {
+  content: "";
+  display: inline-block;
+  position: fixed;
+  // size
+  padding: 3px;
+  // position
+  margin: 18px 15px;
+  border: solid $background-color;
+  border-width: 0 2px 2px 0;
+
+  transform: rotate($angle);
+  -webkit-transform: rotate($angle);
+}
+
+details {
+  padding: 0rem 1rem !important;
+  margin: 1rem;
+  padding: 0 !important;
+
+  > summary {
+    padding: 0rem !important;
+    margin: 0 !important;
+
+    // do not show arrow bullet point
+    list-style: none;
+    ::-webkit-details-marker {
+      display: none;
+    }
+
+    // replace builtin arrows with custom ones
+    pre {
+      display: inline-block;
+      width: 100%;
+      margin: 0 !important;
+      padding-left: 42px !important;
+      vertical-align: middle;
+    }
+    &:before {
+      @include arrow(-45deg);
+    }
+  }
+
+  &[open] summary:before {
+      @include arrow(45deg);
+  }
+
+  table, tbody {
+    // fill entire width
+    width: 100% !important;
+    display: table;
+    margin: 0 !important;
+
+    tr {
+      // make code blocks a little smaller
+      pre {
+        margin: 0 !important;
+        padding: 0.2rem !important;
+
+        &.highlight {
+          color: $foreground-color;
+          background-color: $background-color;
+        };
+
+        code {
+          vertical-align: text-bottom;
+          padding-left: 0.2rem !important;
+        }
+      }
+
+      // field name
+      td:first-child {
+        font-weight: bold;
+        font-size: 90%;
+
+        width: 8em;
+        min-width: 8em;
+        max-width: 8em;
+        word-break: break-all;
+      }
+    }
+  }
+}
+
+aside.book-menu span {
+  font-weight: bold;
+}

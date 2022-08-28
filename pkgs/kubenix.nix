@@ -1,9 +1,9 @@
-{ jq
-, kubectl
-, kubernetes-helm
-, nix
-, writeShellScriptBin
-,
+{
+  jq,
+  kubectl,
+  kubernetes-helm,
+  nix,
+  writeShellScriptBin,
 }:
 writeShellScriptBin "kubenix" ''
   set -Eeuo pipefail
@@ -53,7 +53,7 @@ writeShellScriptBin "kubenix" ''
       render)
         cat $MANIFESTS;;
       *)
-        ${kubectl}/bin/kubectl $@ -f $MANIFESTS;;
+        ${kubectl}/bin/kubectl $@ -f $MANIFESTS || true;;
     esac
   }
 

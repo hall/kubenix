@@ -3,7 +3,7 @@
 Kubernetes resource management with Nix
 
 <p align="center" style="margin: 2em auto;">
-  <img src="./docs/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
+  <img src="./docs/static/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
 </p>
 
 > **WARN**: this is a work in progress, expect breaking changes
@@ -49,7 +49,7 @@ See [./docs/examples](./docs/examples) for more.
 
 ## CLI
 
-> **NOTE**: this is a WIP CLI which currently reads the `k8s` attribute on a local flake
+> **NOTE**: this is a WIP CLI which currently reads the `k8s` package on a local flake
 
 Render all resources with
 

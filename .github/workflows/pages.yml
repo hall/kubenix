@@ -1,0 +1,43 @@
+name: pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v16
+        with:
+          install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.8.0pre20220311_d532269/install
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            allow-import-from-derivation = true
+
+      - name: build
+        run: nix run '.#docs' -- --minify
+
+      - name: upload
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs/public'
+
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v1
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write

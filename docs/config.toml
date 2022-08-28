@@ -1,0 +1,10 @@
+title = "kubenix"
+theme = "hugo-book"
+baseURL = "https://kubenix.org/"
+
+[params]
+BookLogo = "logo.svg"
+BookRepo = "https://github.com/hall/kubenix"
+BookSection = '*'
+# most pages at this time are auto-generated so editing doesn't make sense
+# BookEditPath = 'edit/main/docs'

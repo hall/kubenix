@@ -84,6 +84,7 @@
             k9s
             kube3d
             kubie
+            hugo
           ];
           packages = [
             (pkgs.writeShellScriptBin "evalnix" ''
@@ -100,6 +101,28 @@
         formatter = pkgs.treefmt;
 
         apps = {
+          docs = inputs.flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "gen-docs" ''
+              set -eo pipefail
+
+              # generate json object of module options
+              nix build '.#docs' -o ./docs/data/options.json
+
+              # remove all old module pages
+              rm ./docs/content/modules/*.md || true
+
+              # create a page for each module in hugo
+              for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
+                [[ $mod == "base" ]] && mod=kubenix
+                [[ $mod == "k8s" ]] && mod=kubernetes
+                [[ $mod == "submodule"* ]] && continue
+                echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
+              done
+
+              # build the site
+              cd docs && ${pkgs.hugo}/bin/hugo $@
+            '';
+          };
           generate = inputs.flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "gen-modules" ''
               set -eo pipefail
@@ -120,8 +143,23 @@
           // {
             cli = pkgs.callPackage ./pkgs/kubenix.nix {};
             default = self.packages.${system}.cli;
+            docs = import ./docs {
+              inherit pkgs;
+              options =
+                (self.evalModules.${system} {
+                  modules =
+                    builtins.attrValues (builtins.removeAttrs
+                      # the submodules module currently doesn't evaluate:
+                      #     error: No module found ‹name›/latest
+                      # not sure how important that documentation is a this time
+                      self.nixosModules.kubenix ["submodule" "submodules"]);
+                })
+                .options;
+            };
           }
-          // import ./jobs {inherit pkgs;};
+          // import ./jobs {
+            inherit pkgs;
+          };
 
         checks = let
           wasSuccess = suite:
@@ -139,7 +177,8 @@
             # TODO: access "success" derivation with nice testing utils for nice output
             nginx-example = wasSuccess (mkExamples {}).nginx-deployment.config.testing;
           }
-          // builtins.listToAttrs (builtins.map (v: {
+          // builtins.listToAttrs (builtins.map
+            (v: {
               name = "test-k8s-${builtins.replaceStrings ["."] ["_"] v}";
               value = wasSuccess (mkK8STests {k8sVersion = v;});
             })
