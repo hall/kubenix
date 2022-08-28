@@ -1,6 +1,6 @@
 # kubenix
 
-Kubernetes resource management with Nix
+Kubernetes management with Nix
 
 <p align="center" style="margin: 2em auto;">
   <img src="./docs/static/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>

@@ -1,5 +1,5 @@
 {
-  description = "Kubernetes resource management with nix";
+  description = "Kubernetes management with nix";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

@@ -10,7 +10,7 @@ writeShellScriptBin "kubenix" ''
 
   function _help() {
     echo "
-    kubenix - Kubernetes resource management with Nix
+    kubenix - Kubernetes management with Nix
 
     commands:
       apply    - create resources in target cluster
