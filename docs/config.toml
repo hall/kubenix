@@ -6,3 +6,4 @@ baseURL = "https://kubenix.org/"
 BookLogo = "logo.svg"
 BookRepo = "https://github.com/hall/kubenix"
 BookSection = '*'
+BookEditPath = 'edit/main/docs'
