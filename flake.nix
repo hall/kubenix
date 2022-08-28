@@ -115,6 +115,7 @@
               for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
                 [[ $mod == "base" ]] && mod=kubenix
                 [[ $mod == "k8s" ]] && mod=kubernetes
+                [[ $mod == "submodule"* ]] && continue
                 echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
               done
 
@@ -146,7 +147,12 @@
               inherit pkgs;
               options =
                 (self.evalModules.${system} {
-                  modules = builtins.attrValues self.nixosModules.kubenix;
+                  modules =
+                    builtins.attrValues (builtins.removeAttrs
+                      # the submodules module currently doesn't evaluate:
+                      #     error: No module found ‹name›/latest
+                      # not sure how important that documentation is a this time
+                      self.nixosModules.kubenix ["submodule" "submodules"]);
                 })
                 .options;
             };

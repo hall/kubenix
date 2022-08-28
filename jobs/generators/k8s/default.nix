@@ -484,7 +484,7 @@ with lib; let
     }
   '';
 in
-  pkgs.runCommand "k8s-${name}-gen.nix" 
+  pkgs.runCommand "k8s-${name}-gen.nix"
   {
     buildInputs = [pkgs.nixpkgs-fmt];
   } ''

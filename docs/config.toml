@@ -6,4 +6,5 @@ baseURL = "https://kubenix.org/"
 BookLogo = "logo.svg"
 BookRepo = "https://github.com/hall/kubenix"
 BookSection = '*'
-BookEditPath = 'edit/main/docs'
+# most pages at this time are auto-generated so editing doesn't make sense
+# BookEditPath = 'edit/main/docs'
