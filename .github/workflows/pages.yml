@@ -36,3 +36,8 @@ jobs:
       - name: deploy
         id: deployment
         uses: actions/deploy-pages@v1
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
