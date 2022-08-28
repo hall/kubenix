@@ -31,10 +31,9 @@ To support a new Kubernetes version:
   }
   ```
 
-- Build and copy the updated specs to [`modules/generated/`](./modules/generated/)
+- Build and copy the updated specs to [`modules/generated/`](./modules/generated/) with
 
-      nix build '.#generate-k8s'
-      cp ./result/* modules/generated/
+      nix run '.#generate'
 
 ## Tests
 

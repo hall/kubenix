@@ -99,6 +99,19 @@
 
         formatter = pkgs.treefmt;
 
+        apps = {
+          generate = inputs.flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "gen-modules" ''
+              set -eo pipefail
+
+              nix build '.#generate-k8s'
+              cp ./result/* ./modules/generated/
+
+              rm result
+            '';
+          };
+        };
+
         packages =
           inputs.flake-utils.lib.flattenTree
           {
