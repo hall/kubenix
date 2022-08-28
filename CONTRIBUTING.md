@@ -45,4 +45,4 @@ Build and serve the static site
 
     nix run '.#docs' serve
 
-which will be available at <http://localhost:1313/kubenix>.
+which will be available at <http://localhost:1313>.
