@@ -10,7 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: pages
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v3
@@ -28,11 +28,11 @@ jobs:
       - name: build
         run: nix run '.#docs' -- --minify
 
-
       - name: upload
         uses: actions/upload-pages-artifact@v1
         with:
           path: './docs/public'
+
       - name: deploy
         id: deployment
         uses: actions/deploy-pages@v1
