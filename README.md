@@ -72,6 +72,6 @@ The following table gives a general overview of currently supported/planned func
 
 ## Attribution
 
-This project was forked from https://github.com/GTrunSec/kubenix which was forked from https://github.com/xtruder/kubenix.
+This project was forked from [GTrunSec](https://github.com/GTrunSec/kubenix), which was forked from [xtruder](https://github.com/xtruder/kubenix), with commits incorporated from [blaggacao](https://github.com/blaggacao/kubenix).
 
 Logo is a mishmash of the [Kubernetes wheel](https://github.com/kubernetes/kubernetes/blob/master/logo/logo.svg) and the [NixOs snowflake](https://github.com/NixOS/nixos-artwork/blob/master/logo/white.svg).
