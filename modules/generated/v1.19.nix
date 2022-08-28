@@ -16603,11 +16603,11 @@ let
         };
         "allOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "anyOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "default" = mkOption {
           description = "default is a default value for undefined object fields. Defaulting is a beta feature under the CustomResourceDefaulting feature gate. Defaulting requires spec.preserveUnknownFields to be false.";
@@ -16695,7 +16695,7 @@ let
         };
         "not" = mkOption {
           description = "";
-          type = (types.nullOr (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps"));
+          type = types.unspecified;
         };
         "nullable" = mkOption {
           description = "";
@@ -16703,7 +16703,7 @@ let
         };
         "oneOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "pattern" = mkOption {
           description = "";
@@ -17307,11 +17307,11 @@ let
         };
         "allOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "anyOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "default" = mkOption {
           description = "default is a default value for undefined object fields. Defaulting is a beta feature under the CustomResourceDefaulting feature gate. CustomResourceDefinitions with defaults must be created using the v1 (or newer) CustomResourceDefinition API.";
@@ -17399,7 +17399,7 @@ let
         };
         "not" = mkOption {
           description = "";
-          type = (types.nullOr (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaProps"));
+          type = types.unspecified;
         };
         "nullable" = mkOption {
           description = "";
@@ -17407,7 +17407,7 @@ let
         };
         "oneOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "pattern" = mkOption {
           description = "";
