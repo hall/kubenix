@@ -15705,11 +15705,11 @@ let
         };
         "allOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "anyOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "default" = mkOption {
           description = "default is a default value for undefined object fields. Defaulting is a beta feature under the CustomResourceDefaulting feature gate. Defaulting requires spec.preserveUnknownFields to be false.";
@@ -15797,7 +15797,7 @@ let
         };
         "not" = mkOption {
           description = "";
-          type = (types.nullOr (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps"));
+          type = types.unspecified;
         };
         "nullable" = mkOption {
           description = "";
@@ -15805,7 +15805,7 @@ let
         };
         "oneOf" = mkOption {
           description = "";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps")));
+          type = types.unspecified;
         };
         "pattern" = mkOption {
           description = "";
@@ -17270,7 +17270,7 @@ in
       };
       "apiextensions.k8s.io"."v1"."CustomResourceDefinition" = mkOption {
         description = "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.";
-        type = types.attrs;
+        type = (types.attrsOf (submoduleForDefinition "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinition" "customresourcedefinitions" "CustomResourceDefinition" "apiextensions.k8s.io" "v1"));
         default = { };
       };
       "apiregistration.k8s.io"."v1"."APIService" = mkOption {
@@ -17337,7 +17337,7 @@ in
       };
       "customResourceDefinitions" = mkOption {
         description = "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.";
-        type = types.attrs;
+        type = (types.attrsOf (submoduleForDefinition "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinition" "customresourcedefinitions" "CustomResourceDefinition" "apiextensions.k8s.io" "v1"));
         default = { };
       };
       "daemonSets" = mkOption {

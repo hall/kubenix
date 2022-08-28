@@ -138,7 +138,10 @@ with lib; let
                         type = requiredOrNot (mapType swagger.definitions.${refDefinition property});
                       }
                       else {
-                        type = requiredOrNot (submoduleOf definitions (refDefinition property));
+                        type = if (refDefinition property) == _name then
+                          types.unspecified # do not allow self-referential values
+                        else
+                          requiredOrNot (submoduleOf definitions (refDefinition property));
                       }
                     # if property has an array type
                     else if property.type == "array"
@@ -165,7 +168,10 @@ with lib; let
                           }
                           # in other case it's a simple list
                           else {
-                            type = requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
+                            type = if (refDefinition property.items) == _name then
+                              types.unspecified # do not allow self-referential values
+                            else
+                              requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
                           }
                       # in other case it only references a simple type
                       else {
@@ -478,7 +484,7 @@ with lib; let
     }
   '';
 in
-  pkgs.runCommand "k8s-${name}-gen.nix"
+  pkgs.runCommand "k8s-${name}-gen.nix" 
   {
     buildInputs = [pkgs.nixpkgs-fmt];
   } ''
