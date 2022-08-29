@@ -49,7 +49,7 @@ which will be available at <http://localhost:1313>.
 
 ### Examples
 
-Examples are written at [./docs/content/examples](./docs/content/examples) and are also used as tests which can be executed with
+Examples are written at [./docs/content/examples](./docs/content/examples) and are (or will, really) also used as tests which can be executed with
 
     nix flake check
 
