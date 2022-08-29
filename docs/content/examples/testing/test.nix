@@ -5,8 +5,8 @@
   test,
   ...
 }:
-with lib; {
-  imports = with kubenix.modules; [test];
+{
+  imports = with kubenix.modules; [test] ;
 
   test = {
     name = "example";
