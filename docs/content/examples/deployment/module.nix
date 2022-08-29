@@ -4,8 +4,7 @@
   pkgs,
   kubenix,
   ...
-}:
-{
+}: {
   imports = with kubenix.modules; [k8s];
 
   kubernetes.resources = {
