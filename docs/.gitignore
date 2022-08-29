@@ -3,3 +3,4 @@ resources/
 *.lock
 options.json
 content/modules/*.md
+!_index.md

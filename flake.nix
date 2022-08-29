@@ -166,16 +166,14 @@
             if suite.success
             then pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-succeeded" {} "echo success > $out"
             else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" {} "exit 1";
-          mkExamples = attrs:
-            (import ./docs/examples {inherit evalModules;})
-            ({registry = "docker.io/gatehub";} // attrs);
+          examples = import ./docs/content/examples;
           mkK8STests = attrs:
             (import ./tests {inherit evalModules;})
             ({registry = "docker.io/gatehub";} // attrs);
         in
           {
             # TODO: access "success" derivation with nice testing utils for nice output
-            nginx-example = wasSuccess (mkExamples {}).nginx-deployment.config.testing;
+            nginx-example = wasSuccess examples.deployment.config.testing;
           }
           // builtins.listToAttrs (builtins.map
             (v: {

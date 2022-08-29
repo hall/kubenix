@@ -89,3 +89,27 @@ details {
 aside.book-menu span {
   font-weight: bold;
 }
+
+.source {
+  position: relative;
+  .filename {
+      position: absolute;
+      right: 12px;
+      top: -2px;
+      line-height: 0;
+      font-size: 0.8rem;
+      // padding-top: 18 !important;
+      background-color: transparent;
+      color: #d8dee9;
+  }
+  > pre:not(.filename) {
+    // prolly a bit of a work-around but can be cleaned up later
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.listing {
+  position: absolute;
+  bottom: 10px;
+}

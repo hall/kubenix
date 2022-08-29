@@ -1,0 +1,8 @@
+{{ $file := .Get 0 }}
+<div class="source">
+  <pre class="filename">{{ $file }}</pre>
+  <pre><code>
+    {{- $file := path.Join .Page.File.Dir $file -}}
+    {{- highlight ($file | readFile | safeHTML) (path.Ext $file) -}}
+  </code></pre>
+</div>

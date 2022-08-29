@@ -1,0 +1,11 @@
+{{- $option := .Get 0 -}}
+{{- $module := index (strings.Split $option ".") 0 -}}
+
+{{/* should we use markdown instead of html? some envs strip raw html */}}
+{{- $md := .Get 1 | default false -}}
+
+{{- if $md -}}
+[{{ $option }}](/modules/{{ $module }}/#{{ $option }})
+{{- else -}}
+<a href="/modules/{{ $module }}/#{{ $option }}">{{ $option }}</a>
+{{- end -}}

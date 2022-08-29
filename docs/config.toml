@@ -2,6 +2,9 @@ title = "kubenix"
 theme = "hugo-book"
 baseURL = "https://kubenix.org/"
 
+[markup.highlight]
+style = "nord"
+
 [params]
 BookLogo = "logo.svg"
 BookRepo = "https://github.com/hall/kubenix"
