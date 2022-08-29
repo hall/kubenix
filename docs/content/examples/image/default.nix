@@ -1,10 +1,13 @@
-{
-  kubenix ? import ../../../..
-, pkgs ? import <nixpkgs> {}
-}:
+{ kubenix ? import ../../../.. }:
 kubenix.evalModules.${builtins.currentSystem} {
-  module = {kubenix, ...}: {
-    imports = with kubenix.modules; [docker];
-    docker.images.example.image = pkgs.callPackage ./image.nix {};
+  module = {kubenix, config, pkgs, ...}: {
+    imports = with kubenix.modules; [k8s docker];
+    docker = {
+      registry.url = "docker.somewhere.io";
+      images.example.image =  pkgs.callPackage ./image.nix {};
+    };
+    kubernetes.resources.pods.example.spec.containers = {
+      custom.image = config.docker.images.example.path;
+    };
   };
 }
