@@ -8,7 +8,7 @@
         options[i].getElementsByTagName("summary")[0].onclick = function() {
 
             // set URL fragment to option id
-            window.location.hash = this.parentElement.id;
+            history.pushState({}, "", `#${this.parentElement.id}`);
 
             // is current panel open, return immediately as it's just being closed
             if (this.parentElement.hasAttribute("open")) return;
