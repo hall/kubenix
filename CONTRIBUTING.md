@@ -46,3 +46,11 @@ Build and serve the static site
     nix run '.#docs' serve
 
 which will be available at <http://localhost:1313>.
+
+### Examples
+
+Examples are written at [./docs/content/examples](./docs/content/examples) and are (or will, really) also used as tests which can be executed with
+
+    nix flake check
+
+In general, that just means: don't directly put nix snippets into a markdown doc; instead use the shortcode provided to pull them in so they don't have to be parsed out for testing.

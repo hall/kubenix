@@ -87,5 +87,25 @@ details {
 }
 
 aside.book-menu span {
+  // make menu headers bold
   font-weight: bold;
+}
+
+.source {
+  position: relative;
+  .filename {
+      position: absolute;
+      right: 0px;
+      margin: 0;
+      line-height: 0;
+      font-size: 0.8rem;
+      background-color: transparent;
+      color: #d8dee9;
+  }
+}
+
+// directory listing on examples page
+.listing {
+  position: absolute;
+  bottom: 10px;
 }

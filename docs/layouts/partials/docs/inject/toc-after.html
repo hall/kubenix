@@ -1,0 +1,29 @@
+{{/* only show a directory listing on example pages */}}
+{{- if and (eq $.Section "examples") (ne $.Page.File.Path "examples/_index.md") -}}
+
+{{/* get base directory */}}
+{{- $dir := $.Page.File.Dir -}}
+
+{{- $loc := path.Join $.Site.Params.BookRepo "blob" "main" "docs" "content" $.Page.File.Dir -}}
+
+{{/* create a list of nix files */}}
+{{- $files := slice -}}
+{{- range readDir (path.Join "content" $dir) -}}
+  {{- if strings.HasSuffix .Name ".nix" -}}
+    {{- $files = $files | append . -}}
+  {{- end -}}
+{{- end -}}
+
+<pre class="listing">
+<a href="{{ $loc }}">{{- index (split $dir "/") 1 }}</a>/
+{{- range $i, $file := $files }}
+{{- if ne (add $i 1) (len $files) }}
+├──
+{{- else  }}
+└──
+{{- end -}}
+&nbsp;<a href="{{ path.Join $loc $file.Name }}" >{{ $file.Name }}</a>
+{{- end -}}
+</pre>
+
+{{- end -}}

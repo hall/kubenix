@@ -4,13 +4,8 @@
   pkgs,
   kubenix,
   ...
-}:
-with lib; let
-  nginx = pkgs.callPackage ./image.nix {};
-in {
-  imports = with kubenix.modules; [k8s docker];
-
-  docker.images.nginx.image = nginx;
+}: {
+  imports = with kubenix.modules; [k8s];
 
   kubernetes.resources = {
     deployments.nginx.spec = {
@@ -21,7 +16,7 @@ in {
         spec = {
           securityContext.fsGroup = 1000;
           containers.nginx = {
-            image = config.docker.images.nginx.path;
+            image = "nginx";
             imagePullPolicy = "IfNotPresent";
             volumeMounts = {
               "/etc/nginx".name = "config";
