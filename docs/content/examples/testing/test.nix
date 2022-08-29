@@ -4,9 +4,8 @@
   kubenix,
   test,
   ...
-}:
-{
-  imports = with kubenix.modules; [test] ;
+}: {
+  imports = [kubenix.modules.test];
 
   test = {
     name = "example";
