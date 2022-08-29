@@ -173,7 +173,7 @@
         in
           {
             # TODO: access "success" derivation with nice testing utils for nice output
-            nginx-example = wasSuccess examples.deployment.config.testing;
+            testing = wasSuccess examples.testing.config.testing;
           }
           // builtins.listToAttrs (builtins.map
             (v: {

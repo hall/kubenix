@@ -1,4 +1,7 @@
-{kubenix ? import ../../../.., pkgs ? import <nixpkgs> {}}:
+{
+  kubenix ? import ../../../..
+, pkgs ? import <nixpkgs> {}
+}:
 kubenix.evalModules.${builtins.currentSystem} {
   module = {kubenix, ...}: {
     imports = with kubenix.modules; [docker];
