@@ -2,8 +2,8 @@ To define a helm release, use the {{< option "kubernetes.helm.releases" >}} opti
 
 {{< source "default.nix" >}}
 
-Fetch and render the chart:
+Fetch and render the chart just as we did with plain manifests:
 
 ```sh
-nix eval -f . config.kubernetes.generated
+nix eval -f . --json config.kubernetes.generated
 ```

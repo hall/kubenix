@@ -8,7 +8,9 @@ kubenix.evalModules.${builtins.currentSystem} {
         repo = "https://charts.bitnami.com/bitnami";
         sha256 = "sha256-wP3tcBnySx+kvZqfW2W9k665oi8KOI50tCcAl0g9cuw=";
       };
-      values = {};
+      values = {
+        replicaCount = 2;
+      };
     };
   };
 }
