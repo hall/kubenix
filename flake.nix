@@ -109,7 +109,7 @@
               nix build '.#docs' -o ./docs/data/options.json
 
               # remove all old module pages
-              rm ./docs/content/modules/*.md || true
+              rm ./docs/content/modules/[!_]?*.md || true
 
               # create a page for each module in hugo
               for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
