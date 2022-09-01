@@ -24,17 +24,14 @@ writeShellScriptBin "kubenix" ''
   }
 
   function _helm() {
-    RELEASES="$(${nix}/bin/nix eval '.#k8s.config.kubernetes.helm' --json | jq -c '.releases[] | del(.objects)')"
-    [ -n "$RELEASES" ] || return 0
-
-    for release in $RELEASES; do
+    ${nix}/bin/nix eval '.#kubenix.config.kubernetes.helm' --json | jq -c '.releases[] | del(.objects)' | while read -r release; do
       values=$(mktemp)
-      echo $release | jq -r '.values' > $values
+      echo "$release" | jq -r '.values' > $values
 
       ${kubernetes-helm}/bin/helm $@ \
-        -n $(echo $release | jq -r '.namespace // "default"') \
-        $(echo $release | jq -r '.name') \
-        $(echo $release | jq -r '.chart') \
+        -n $(echo "$release" | jq -r '.namespace // "default"') \
+        $(echo "$release" | jq -r '.name') \
+        $(echo "$release" | jq -r '.chart') \
         -f $values
     done
   }
@@ -42,8 +39,8 @@ writeShellScriptBin "kubenix" ''
   function _kubectl() {
     MANIFESTS=$(mktemp)
     # TODO: find a better filter, not just not-helm, not-crd
-    cat $(${nix}/bin/nix build '.#k8s.config.kubernetes.result' --json | jq -r '.[0].outputs.out') \
-     | jq '.items[]
+    resources=$(${nix}/bin/nix build '.#kubenix.config.kubernetes.result' --json | jq -r '.[0].outputs.out')
+    cat $resources | jq '.items[]
        | select(.metadata.labels."app.kubernetes.io/managed-by" != "Helm")
        | select(.kind != "CustomResourceDefinition")' > $MANIFESTS
 
