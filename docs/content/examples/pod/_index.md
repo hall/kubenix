@@ -16,7 +16,7 @@ Here, `example` is an arbitrary string which identifies the pod (just as `ex` id
 The format under {{< option "kubernetes.resources" true >}} largely mirrors that of the [Kubernetes API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/) which can generally be explored with `kubectl`; e.g.
 
 ```sh
-kubectl explain poc.spec.containers
+kubectl explain pod.spec.containers
 ```
 
 However, our format uses the plural form and injects resource names where appropriate.
