@@ -283,12 +283,14 @@ in {
       description = "Kubernetes version to use";
       type = types.enum versions;
       default = lib.lists.last versions;
+      example = "1.24";
     };
 
     namespace = mkOption {
       description = "Default namespace where to deploy kubernetes resources";
       type = types.nullOr types.str;
       default = null;
+      example = "default";
     };
 
     customResources = mkOption {
@@ -332,22 +334,35 @@ in {
 
     customTypes = mkOption {
       description = "List of custom resource types to make API for";
+      example = [
+        {
+          helmchartconfig = {
+            attrName = "helmchartconfig";
+            kind = "HelmChartConfig";
+            version = "v1";
+            group = "helm.cattle.io";
+          };
+        }
+      ];
       type =
         coerceListOfSubmodulesToAttrs
         {
           options = {
             group = mkOption {
               description = "Custom type group";
+              example = "helm.cattle.io";
               type = types.str;
             };
 
             version = mkOption {
               description = "Custom type version";
+              example = "v1";
               type = types.str;
             };
 
             kind = mkOption {
               description = "Custom type kind";
+              example = "HelmChartConfig";
               type = types.str;
             };
 
@@ -359,6 +374,7 @@ in {
 
             attrName = mkOption {
               description = "Name of the nixified attribute";
+              # default = name;
               type = types.str;
             };
 
