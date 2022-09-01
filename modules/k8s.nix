@@ -272,6 +272,13 @@ in {
   imports = [./base.nix];
 
   options.kubernetes = {
+    kubeconfig = mkOption {
+      description = "path to kubeconfig file (default: use $KUBECONFIG)";
+      type = types.nullOr types.str;
+      default = null;
+      example = "/run/secrets/kubeconfig";
+    };
+
     version = mkOption {
       description = "Kubernetes version to use";
       type = types.enum versions;

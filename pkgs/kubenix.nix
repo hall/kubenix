@@ -60,6 +60,10 @@ writeShellScriptBin "kubenix" ''
   # if no args given, add empty string
   [ $# -eq 0 ] && set -- ""
 
+  # use kubeconfig, if given
+  kubeconfig=$(nix eval '.#kubenix.config.kubernetes.kubeconfig' --raw)
+  [ -n "$kubeconfig" ] && export KUBECONFIG=$kubeconfig
+
   # parse arguments
   while test $# -gt 0; do
     case "$1" in
