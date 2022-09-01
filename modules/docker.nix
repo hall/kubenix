@@ -34,13 +34,19 @@ in {
           name = mkOption {
             description = "Desired docker image name";
             type = types.str;
-            default = if config.image != null then builtins.unsafeDiscardStringContext config.image.imageName else "";
+            default =
+              if config.image != null
+              then builtins.unsafeDiscardStringContext config.image.imageName
+              else "";
           };
 
           tag = mkOption {
             description = "Desired docker image tag";
             type = types.str;
-            default = if config.image != null then builtins.unsafeDiscardStringContext config.image.imageTag else "";
+            default =
+              if config.image != null
+              then builtins.unsafeDiscardStringContext config.image.imageTag
+              else "";
           };
 
           registry = mkOption {

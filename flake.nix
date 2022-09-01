@@ -147,12 +147,11 @@
               inherit pkgs;
               options =
                 (self.evalModules.${system} {
-                  modules =
-                    builtins.attrValues (builtins.removeAttrs
-                      # the submodules module currently doesn't evaluate:
-                      #     error: No module found ‹name›/latest
-                      # not sure how important that documentation is a this time
-                      self.nixosModules.kubenix ["submodule" "submodules"]);
+                  modules = builtins.attrValues (builtins.removeAttrs
+                    # the submodules module currently doesn't evaluate:
+                    #     error: No module found ‹name›/latest
+                    # not sure how important that documentation is a this time
+                    self.nixosModules.kubenix ["submodule" "submodules"]);
                 })
                 .options;
             };
