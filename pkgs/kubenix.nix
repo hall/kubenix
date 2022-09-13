@@ -23,8 +23,10 @@ writeShellScriptBin "kubenix" ''
     "
   }
 
+  SYSTEM=$(nix show-config --json | jq -r '.system.value')
+
   function _helm() {
-    ${nix}/bin/nix eval '.#kubenix.config.kubernetes.helm' --json | jq -c '.releases[] | del(.objects)' | while read -r release; do
+    ${nix}/bin/nix eval ".#kubenix.$SYSTEM.config.kubernetes.helm" --json | jq -c '.releases[] | del(.objects)' | while read -r release; do
       values=$(mktemp)
       echo "$release" | jq -r '.values' > $values
 
@@ -39,7 +41,7 @@ writeShellScriptBin "kubenix" ''
   function _kubectl() {
     MANIFESTS=$(mktemp)
     # TODO: find a better filter, not just not-helm, not-crd
-    resources=$(${nix}/bin/nix build '.#kubenix.config.kubernetes.result' --json | jq -r '.[0].outputs.out')
+    resources=$(${nix}/bin/nix build ".#kubenix.$SYSTEM.config.kubernetes.result" --json | jq -r '.[0].outputs.out')
     cat $resources | jq '.items[]
        | select(.metadata.labels."app.kubernetes.io/managed-by" != "Helm")
        | select(.kind != "CustomResourceDefinition")' > $MANIFESTS
@@ -58,7 +60,7 @@ writeShellScriptBin "kubenix" ''
   [ $# -eq 0 ] && set -- ""
 
   # use kubeconfig, if given
-  kubeconfig=$(nix eval '.#kubenix.config.kubernetes.kubeconfig' --raw)
+  kubeconfig=$(nix eval ".#kubenix.$SYSTEM.config.kubernetes.kubeconfig" --raw)
   [ -n "$kubeconfig" ] && export KUBECONFIG=$kubeconfig
 
   # parse arguments
