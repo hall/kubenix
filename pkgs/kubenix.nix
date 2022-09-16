@@ -3,6 +3,7 @@
   kubectl,
   kubernetes-helm,
   nix,
+  vals,
   writeShellScriptBin,
 }:
 writeShellScriptBin "kubenix" ''
@@ -26,7 +27,7 @@ writeShellScriptBin "kubenix" ''
   function _helm() {
     ${nix}/bin/nix eval '.#kubenix.config.kubernetes.helm' --json | jq -c '.releases[] | del(.objects)' | while read -r release; do
       values=$(mktemp)
-      echo "$release" | jq -r '.values' > $values
+      echo "$release" | jq -r '.values' | ${vals}/bin/vals eval > $values
 
       ${kubernetes-helm}/bin/helm $@ \
         -n $(echo "$release" | jq -r '.namespace // "default"') \
@@ -50,7 +51,7 @@ writeShellScriptBin "kubenix" ''
       render)
         cat $MANIFESTS;;
       *)
-        ${kubectl}/bin/kubectl $@ -f $MANIFESTS || true;;
+        cat $MANIFESTS | ${vals}/bin/vals eval | ${kubectl}/bin/kubectl $@ -f - || true;;
     esac
   }
 

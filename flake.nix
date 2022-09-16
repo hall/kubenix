@@ -141,8 +141,11 @@
             inherit (pkgs) kubernetes kubectl;
           }
           // {
-            cli = pkgs.callPackage ./pkgs/kubenix.nix {};
+            cli = pkgs.callPackage ./pkgs/kubenix.nix {
+              inherit (self.packages.${system}) vals;
+            };
             default = self.packages.${system}.cli;
+            vals = pkgs.callPackage ./pkgs/vals.nix {};
             docs = import ./docs {
               inherit pkgs;
               options =
