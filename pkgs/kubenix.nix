@@ -31,11 +31,20 @@ writeShellScriptBin "kubenix" ''
       values=$(mktemp)
       echo "$release" | jq -r '.values' | ${vals}/bin/vals eval > $values
 
-      ${kubernetes-helm}/bin/helm $@ \
-        -n $(echo "$release" | jq -r '.namespace // "default"') \
-        $(echo "$release" | jq -r '.name') \
-        $(echo "$release" | jq -r '.chart') \
-        -f $values
+      name=$(echo "$release" | jq -r '.name')
+      chart=$(echo "$release" | jq -r '.chart')
+      namespace=$(echo "$release" | jq -r '.namespace // "default"')
+
+      args="-n $namespace $name $chart -f $values"
+
+      # only apply when there are changes
+      if [[ "$1" == "upgrade" ]]; then
+        if ${kubernetes-helm}/bin/helm diff upgrade $args --allow-unreleased --detailed-exitcode 2> /dev/null; then
+           continue
+        fi
+      fi
+
+      ${kubernetes-helm}/bin/helm $@ $args
     done
   }
 
