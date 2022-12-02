@@ -70,7 +70,7 @@ writeShellScriptBin "kubenix" ''
 
       apply)
         _kubectl apply
-        _helm upgrade --install --create-namespace
+        _helm upgrade --atomic --install --create-namespace
         shift;;
 
       diff)
