@@ -26,7 +26,7 @@ with lib;
       buildCommand = ''
         # template helm file and write resources to yaml
         helm template "${name}" \
-          ${optionalString (kubeVersion != null) "--api-versions ${kubeVersion}"} \
+          ${optionalString (kubeVersion != null) "--kube-version ${kubeVersion}"} \
           ${optionalString (namespace != null) "--namespace ${namespace}"} \
           ${optionalString (values != {}) "-f ${valuesJsonFile}"} \
           ${chart} >resources.yaml
