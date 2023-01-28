@@ -125,9 +125,12 @@
           generate = inputs.flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "gen-modules" ''
               set -eo pipefail
+              dir=./modules/generated
 
+              rm -rf $dir
+              mkdir $dir
               nix build '.#generate-k8s'
-              cp ./result/* ./modules/generated/
+              cp ./result/* $dir/
 
               rm result
             '';
