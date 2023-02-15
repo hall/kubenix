@@ -18,6 +18,8 @@ with lib;
     values ? {},
     # kubernetes version to template chart for
     kubeVersion ? null,
+    # whether to include CRD
+    includeCRDs ? false
   }: let
     valuesJsonFile = builtins.toFile "${name}-values.json" (builtins.toJSON values);
   in
@@ -29,6 +31,7 @@ with lib;
           ${optionalString (kubeVersion != null) "--kube-version ${kubeVersion}"} \
           ${optionalString (namespace != null) "--namespace ${namespace}"} \
           ${optionalString (values != {}) "-f ${valuesJsonFile}"} \
+          ${optionalString (includeCRDs) "--include-crds"} \
           ${chart} >resources.yaml
 
         # split multy yaml file into multiple files
