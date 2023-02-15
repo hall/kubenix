@@ -21,7 +21,7 @@ with lib; let
       then "null"
       else builtins.toString value;
 
-    removeEmptyLines = str: concatStringsSep "\n" (filter (l: (builtins.match "(  |)+" l) == null) (splitString "\n" str));
+    removeEmptyLines = str: concatStringsSep "\n" (filter (l: builtins.match "[[:space:]]*" l != []) (splitString "\n" str));
 
     mkOption = {
       description ? null,
