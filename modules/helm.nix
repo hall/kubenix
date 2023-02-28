@@ -81,6 +81,20 @@ in {
             default = true;
           };
 
+          includeCRDs = mkOption {
+            description = '' 
+              Whether to include CRDs.
+
+              Warning: Always including CRDs here is dangerous and can break CRs in your cluster as CRDs may be updated unintentionally.
+              An interactive `helm install` NEVER updates CRDs, only installs them when they are not existing.
+              See https://github.com/helm/community/blob/aa8e13054d91ee69857b13149a9652be09133a61/hips/hip-0011.md
+            
+              Only set this to true if you know what you are doing and are manually checking the included CRDs for breaking changes whenever updating the Helm chart.
+            '';
+            type = types.bool;
+            default = false;
+          };
+
           objects = mkOption {
             description = "Generated kubernetes objects";
             type = types.listOf types.attrs;
@@ -95,7 +109,7 @@ in {
         ];
 
         config.objects = importJSON (helm.chart2json {
-          inherit (config) chart name namespace values kubeVersion;
+          inherit (config) chart name namespace values kubeVersion includeCRDs;
         });
       }));
       default = {};
