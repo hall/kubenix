@@ -80,7 +80,7 @@ with lib; let
 
     coerceAttrsOfSubmodulesToListByKey = ref: mergeKey: ''(coerceAttrsOfSubmodulesToListByKey "${ref}" "${mergeKey}")'';
 
-    attrsToList = "values: if values != null then mapAttrsToList (n: v: v) values else values";
+    attrsToList = "attrsToList";
 
     refDefinition = attr: head (tail (tail (splitString "/" attr."$ref")));
   };
@@ -332,6 +332,19 @@ with lib; let
     with lib;
 
     let
+      hasAttrNotNull = attr: set: hasAttr attr set && !isNull set.''${attr};
+
+      attrsToList = values:
+        if values != null
+        then
+          sort (a: b:
+            if (hasAttrNotNull "_priority" a && hasAttrNotNull "_priority" b)
+            then a._priority < b._priority
+            else false
+          ) (mapAttrsToList (n: v: v) values)
+        else
+          values;
+
       getDefaults = resource: group: version: kind:
         catAttrs "default" (filter (default:
           (default.resource == null || default.resource == resource) &&
@@ -374,13 +387,14 @@ with lib; let
 
       mkOptionDefault = mkOverride 1001;
 
+      # todo: can we use mkOrder
       mergeValuesByKey = mergeKey: values:
-        listToAttrs (map
-          (value: nameValuePair (
+        listToAttrs (imap0
+          (i: value: nameValuePair (
             if isAttrs value.''${mergeKey}
             then toString value.''${mergeKey}.content
             else (toString value.''${mergeKey})
-          ) value)
+          ) (value // { _priority = i; }))
         values);
 
       submoduleOf = ref: types.submodule ({name, ...}: {
@@ -394,7 +408,10 @@ with lib; let
           then toInt name
           else name;
       in {
-        options = definitions."''${ref}".options;
+        options = definitions."''${ref}".options // {
+          # position in original array
+          _priority = mkOption { type = types.nullOr types.int; default = null; };
+        };
         config = definitions."''${ref}".config // {
           ''${mergeKey} = mkOverride 1002 (convertName name);
         };

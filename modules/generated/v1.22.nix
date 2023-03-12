@@ -4,6 +4,21 @@
 with lib;
 
 let
+  hasAttrNotNull = attr: set: hasAttr attr set && !isNull set.${attr};
+
+  attrsToList = values:
+    if values != null
+    then
+      sort
+        (a: b:
+          if (hasAttrNotNull "_priority" a && hasAttrNotNull "_priority" b)
+          then a._priority < b._priority
+          else false
+        )
+        (mapAttrsToList (n: v: v) values)
+    else
+      values;
+
   getDefaults = resource: group: version: kind:
     catAttrs "default" (filter
       (default:
@@ -51,15 +66,16 @@ let
 
   mkOptionDefault = mkOverride 1001;
 
+  # todo: can we use mkOrder
   mergeValuesByKey = mergeKey: values:
-    listToAttrs (map
-      (value: nameValuePair
+    listToAttrs (imap0
+      (i: value: nameValuePair
         (
           if isAttrs value.${mergeKey}
           then toString value.${mergeKey}.content
           else (toString value.${mergeKey})
         )
-        value)
+        (value // { _priority = i; }))
       values);
 
   submoduleOf = ref: types.submodule ({ name, ... }: {
@@ -75,7 +91,10 @@ let
         else name;
     in
     {
-      options = definitions."${ref}".options;
+      options = definitions."${ref}".options // {
+        # position in original array
+        _priority = mkOption { type = types.nullOr types.int; default = null; };
+      };
       config = definitions."${ref}".config // {
         ${mergeKey} = mkOverride 1002 (convertName name);
       };
@@ -186,7 +205,7 @@ let
         "webhooks" = mkOption {
           description = "Webhooks is a list of webhooks and the affected resources and operations.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.admissionregistration.v1.MutatingWebhook" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
       };
 
@@ -365,7 +384,7 @@ let
         "webhooks" = mkOption {
           description = "Webhooks is a list of webhooks and the affected resources and operations.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.admissionregistration.v1.ValidatingWebhook" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
       };
 
@@ -785,7 +804,7 @@ let
         "conditions" = mkOption {
           description = "Represents the latest available observations of a DaemonSet's current state.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.DaemonSetCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "currentNumberScheduled" = mkOption {
           description = "The number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/";
@@ -1016,7 +1035,7 @@ let
         "conditions" = mkOption {
           description = "Represents the latest available observations of a deployment's current state.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.DeploymentCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "observedGeneration" = mkOption {
           description = "The generation observed by the deployment controller.";
@@ -1209,7 +1228,7 @@ let
         "conditions" = mkOption {
           description = "Represents the latest available observations of a replica set's current state.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.ReplicaSetCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "fullyLabeledReplicas" = mkOption {
           description = "The number of pods that have labels matching the labels of the pod template of the replicaset.";
@@ -1457,7 +1476,7 @@ let
         "conditions" = mkOption {
           description = "Represents the latest available observations of a statefulset's current state.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.apps.v1.StatefulSetCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "currentReplicas" = mkOption {
           description = "currentReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by currentRevision.";
@@ -3775,7 +3794,7 @@ let
         "conditions" = mkOption {
           description = "The latest available observations of an object's current state. When a Job fails, one of the conditions will have type \"Failed\" and status true. When a Job is suspended, one of the conditions will have type \"Suspended\" and status true; when the Job is resumed, the status of this condition will become false. When a Job is completed, one of the conditions will have type \"Complete\" and status true. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.batch.v1.JobCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "failed" = mkOption {
           description = "The number of pods which reached phase Failed.";
@@ -4748,7 +4767,7 @@ let
         "conditions" = mkOption {
           description = "List of component conditions observed";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ComponentCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "kind" = mkOption {
           description = "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds";
@@ -5012,7 +5031,7 @@ let
         "env" = mkOption {
           description = "List of environment variables to set in the container. Cannot be updated.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EnvVar" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "envFrom" = mkOption {
           description = "List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.";
@@ -5041,7 +5060,7 @@ let
         "ports" = mkOption {
           description = "List of ports to expose from the container. Exposing a port here gives the system additional information about the network connections a container uses, but is primarily informational. Not specifying a port here DOES NOT prevent that port from being exposed. Any port which is listening on the default \"0.0.0.0\" address inside a container will be accessible from the network. Cannot be updated.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerPort" "containerPort"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "readinessProbe" = mkOption {
           description = "Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes";
@@ -5082,12 +5101,12 @@ let
         "volumeDevices" = mkOption {
           description = "volumeDevices is the list of block devices to be used by the container.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeDevice" "devicePath"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "volumeMounts" = mkOption {
           description = "Pod volumes to mount into the container's filesystem. Cannot be updated.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeMount" "mountPath"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "workingDir" = mkOption {
           description = "Container's working directory. If not specified, the container runtime's default will be used, which might be configured in the container image. Cannot be updated.";
@@ -5661,7 +5680,7 @@ let
         "env" = mkOption {
           description = "List of environment variables to set in the container. Cannot be updated.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EnvVar" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "envFrom" = mkOption {
           description = "List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.";
@@ -5734,12 +5753,12 @@ let
         "volumeDevices" = mkOption {
           description = "volumeDevices is the list of block devices to be used by the container.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeDevice" "devicePath"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "volumeMounts" = mkOption {
           description = "Pod volumes to mount into the container's filesystem. Cannot be updated.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.VolumeMount" "mountPath"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "workingDir" = mkOption {
           description = "Container's working directory. If not specified, the container runtime's default will be used, which might be configured in the container image. Cannot be updated.";
@@ -6801,7 +6820,7 @@ let
         "conditions" = mkOption {
           description = "Represents the latest available observations of a namespace's current state.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.NamespaceCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "phase" = mkOption {
           description = "Phase is the current lifecycle phase of the namespace. More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/";
@@ -7122,7 +7141,7 @@ let
         "addresses" = mkOption {
           description = "List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See http://pr.k8s.io/79391 for an example.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.NodeAddress" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "allocatable" = mkOption {
           description = "Allocatable represents the resources of a node that are available for scheduling. Defaults to Capacity.";
@@ -7135,7 +7154,7 @@ let
         "conditions" = mkOption {
           description = "Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.NodeCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "config" = mkOption {
           description = "Status of the config assigned to the node via the dynamic Kubelet config feature.";
@@ -7497,7 +7516,7 @@ let
         "conditions" = mkOption {
           description = "Current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'ResizeStarted'.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PersistentVolumeClaimCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "phase" = mkOption {
           description = "Phase represents the current phase of PersistentVolumeClaim.";
@@ -8107,7 +8126,7 @@ let
         "containers" = mkOption {
           description = "List of containers belonging to the pod. Containers cannot currently be added or removed. There must be at least one container in a Pod. Cannot be updated.";
           type = (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Container" "name");
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "dnsConfig" = mkOption {
           description = "Specifies the DNS parameters of a pod. Parameters specified here will be merged to the generated DNS configuration based on DNSPolicy.";
@@ -8124,12 +8143,12 @@ let
         "ephemeralContainers" = mkOption {
           description = "List of ephemeral containers run in this pod. Ephemeral containers may be run in an existing pod to perform user-initiated actions such as debugging. This list cannot be specified when creating a pod, and it cannot be modified by updating the pod spec. In order to add an ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource. This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EphemeralContainer" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "hostAliases" = mkOption {
           description = "HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified. This is only valid for non-hostNetwork pods.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.HostAlias" "ip"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "hostIPC" = mkOption {
           description = "Use the host's ipc namespace. Optional: Default to false.";
@@ -8150,12 +8169,12 @@ let
         "imagePullSecrets" = mkOption {
           description = "ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. For example, in the case of docker, only DockerConfig type secrets are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.LocalObjectReference" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "initContainers" = mkOption {
           description = "List of initialization containers belonging to the pod. Init containers are executed in order prior to containers being started. If any init container fails, the pod is considered to have failed and is handled according to its restartPolicy. The name for an init container or normal container must be unique among all containers. Init containers may not have Lifecycle actions, Readiness probes, Liveness probes, or Startup probes. The resourceRequirements of an init container are taken into account during scheduling by finding the highest request/limit for each resource type, and then using the max of of that value or the sum of the normal containers. Limits are applied to init containers in a similar fashion. Init containers cannot currently be added or removed. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Container" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "nodeName" = mkOption {
           description = "NodeName is a request to schedule this pod onto a specific node. If it is non-empty, the scheduler simply schedules this pod onto that node, assuming that it fits resource requirements.";
@@ -8232,12 +8251,12 @@ let
         "topologySpreadConstraints" = mkOption {
           description = "TopologySpreadConstraints describes how a group of pods ought to spread across topology domains. Scheduler will schedule pods in a way which abides by the constraints. All topologySpreadConstraints are ANDed.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.TopologySpreadConstraint" "topologyKey"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "volumes" = mkOption {
           description = "List of volumes that can be mounted by containers belonging to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Volume" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
       };
 
@@ -8286,7 +8305,7 @@ let
         "conditions" = mkOption {
           description = "Current service state of pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "containerStatuses" = mkOption {
           description = "The list has one entry per container in the manifest. Each entry is currently the output of `docker inspect`. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status";
@@ -8323,7 +8342,7 @@ let
         "podIPs" = mkOption {
           description = "podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list is empty if no IPs have been allocated yet.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodIP" "ip"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "qosClass" = mkOption {
           description = "The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md";
@@ -8846,7 +8865,7 @@ let
         "conditions" = mkOption {
           description = "Represents the latest available observations of a replication controller's current state.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ReplicationControllerCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "fullyLabeledReplicas" = mkOption {
           description = "The number of pods that have labels matching the labels of the pod template of the replication controller.";
@@ -9549,7 +9568,7 @@ let
         "secrets" = mkOption {
           description = "Secrets is the list of secrets allowed to be used by pods running using this ServiceAccount. More info: https://kubernetes.io/docs/concepts/configuration/secret";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ObjectReference" "name"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
       };
 
@@ -9743,7 +9762,7 @@ let
         "ports" = mkOption {
           description = "The list of ports that are exposed by this service. More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ServicePort" "port"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "publishNotReadyAddresses" = mkOption {
           description = "publishNotReadyAddresses indicates that any agent which deals with endpoints for this Service should disregard any indications of ready/not-ready. The primary use case for setting this field is for a StatefulSet's Headless Service to propagate SRV DNS records for its Pods for the purpose of peer discovery. The Kubernetes controllers that generate Endpoints and EndpointSlice resources for Services interpret this to mean that all endpoints are considered \"ready\" even if the Pods themselves are not. Agents which consume only Kubernetes generated endpoints through the Endpoints or EndpointSlice resources can safely assume this behavior.";
@@ -9797,7 +9816,7 @@ let
         "conditions" = mkOption {
           description = "Current service state";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "loadBalancer" = mkOption {
           description = "LoadBalancer contains the current status of the load-balancer, if one is present.";
@@ -12598,7 +12617,7 @@ let
         "conditions" = mkOption {
           description = "Conditions contain conditions for PDB. The disruption controller sets the DisruptionAllowed condition. The following are known values for the reason field (additional reasons could be added in the future): - SyncFailed: The controller encountered an error and wasn't able to compute\n              the number of allowed disruptions. Therefore no disruptions are\n              allowed and the status of the condition will be False.\n- InsufficientPods: The number of pods are either at or below the number\n                    required by the PodDisruptionBudget. No disruptions are\n                    allowed and the status of the condition will be False.\n- SufficientPods: There are more pods than required by the PodDisruptionBudget.\n                  The condition will be True, and the number of allowed\n                  disruptions are provided by the disruptionsAllowed property.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "currentHealthy" = mkOption {
           description = "current number of healthy pods";
@@ -12829,7 +12848,7 @@ let
         "conditions" = mkOption {
           description = "Conditions contain conditions for PDB. The disruption controller sets the DisruptionAllowed condition. The following are known values for the reason field (additional reasons could be added in the future): - SyncFailed: The controller encountered an error and wasn't able to compute\n              the number of allowed disruptions. Therefore no disruptions are\n              allowed and the status of the condition will be False.\n- InsufficientPods: The number of pods are either at or below the number\n                    required by the PodDisruptionBudget. No disruptions are\n                    allowed and the status of the condition will be False.\n- SufficientPods: There are more pods than required by the PodDisruptionBudget.\n                  The condition will be True, and the number of allowed\n                  disruptions are provided by the disruptionsAllowed property.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "currentHealthy" = mkOption {
           description = "current number of healthy pods";
@@ -14181,7 +14200,7 @@ let
         "drivers" = mkOption {
           description = "drivers is a list of information of all CSI Drivers existing on a node. If all drivers in the list are uninstalled, this can become empty.";
           type = (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.storage.v1.CSINodeDriver" "name");
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
       };
 
@@ -15886,7 +15905,7 @@ let
         "ownerReferences" = mkOption {
           description = "List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference" "uid"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
         "resourceVersion" = mkOption {
           description = "An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.\n\nPopulated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency";
@@ -16323,7 +16342,7 @@ let
         "conditions" = mkOption {
           description = "Current service state of apiService.";
           type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceCondition" "type"));
-          apply = values: if values != null then mapAttrsToList (n: v: v) values else values;
+          apply = attrsToList;
         };
       };
 
