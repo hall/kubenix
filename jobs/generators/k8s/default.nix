@@ -78,7 +78,7 @@ with lib; let
 
     submoduleForDefinition = ref: name: kind: group: version: ''(submoduleForDefinition "${ref}" "${name}" "${kind}" "${group}" "${version}")'';
 
-    coerceAttrsOfSubmodulesToListByKey = ref: mergeKey: ''(coerceAttrsOfSubmodulesToListByKey "${ref}" "${mergeKey}")'';
+    coerceAttrsOfSubmodulesToListByKey = ref: attrMergeKey: listMergeKeys: ''(coerceAttrsOfSubmodulesToListByKey "${ref}" "${attrMergeKey}" [${concatStringsSep " " (map (key: "\"${toString key}\"") listMergeKeys)}])'';
 
     attrsToList = "attrsToList";
 
@@ -157,16 +157,28 @@ with lib; let
                         }
                         # if a reference is to complex type
                         else
-                          # if x-kubernetes-patch-merge-key is set then make it an
-                          # attribute set of submodules
-                          if hasAttr "x-kubernetes-patch-merge-key" property
+                          # make it an attribute set of submodules if only x-kubernetes-patch-merge-key is present, or
+                          # x-kubernetes-patch-merge-key == x-kubernetes-list-map-keys.
+                          if (hasAttr "x-kubernetes-patch-merge-key" property) && (!(hasAttr "x-kubernetes-list-map-keys" property) || (property."x-kubernetes-list-map-keys" == [property."x-kubernetes-patch-merge-key"]))
                           then let
                             mergeKey = property."x-kubernetes-patch-merge-key";
                           in {
-                            type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey);
+                            type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey []);
                             apply = attrsToList;
                           }
                           # in other case it's a simple list
+                          else
+                            # make it an attribute set of submodules if only x-kubernetes-patch-merge-key is present, or
+                            # x-kubernetes-patch-merge-key == x-kubernetes-list-map-keys.
+                            if hasAttr "properties" swagger.definitions.${refDefinition property.items} &&
+                               hasAttr "name" swagger.definitions.${refDefinition property.items}.properties
+                            then let
+                              mergeKey = "name";
+                            in {
+                              type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey (if hasAttr "x-kubernetes-list-map-keys" property then property."x-kubernetes-list-map-keys" else []));
+                              apply = attrsToList;
+                            }
+
                           else {
                             type =
                               if (refDefinition property.items) == _name
@@ -387,13 +399,21 @@ with lib; let
 
       mkOptionDefault = mkOverride 1001;
 
-      # todo: can we use mkOrder
-      mergeValuesByKey = mergeKey: values:
+      mergeValuesByKey = attrMergeKey: listMergeKeys: values:
         listToAttrs (imap0
           (i: value: nameValuePair (
-            if isAttrs value.''${mergeKey}
-            then toString value.''${mergeKey}.content
-            else (toString value.''${mergeKey})
+            if hasAttr attrMergeKey value
+            then
+              if isAttrs value.''${attrMergeKey}
+              then toString value.''${attrMergeKey}.content
+              else (toString value.''${attrMergeKey})
+            else
+              # generate merge key for list elements if it's not present
+              "__kubenix_list_merge_key_" + (concatStringsSep "" (map (key:
+                if isAttrs value.''${key}
+                then toString value.''${key}.content
+                else (toString value.''${key})
+              ) listMergeKeys))
           ) (value // { _priority = i; }))
         values);
 
@@ -413,7 +433,12 @@ with lib; let
           _priority = mkOption { type = types.nullOr types.int; default = null; };
         };
         config = definitions."''${ref}".config // {
-          ''${mergeKey} = mkOverride 1002 (convertName name);
+          ''${mergeKey} = mkOverride 1002 (
+            # use name as mergeKey only if it is not coming from mergeValuesByKey
+            if (!hasPrefix "__kubenix_list_merge_key_" name)
+            then convertName name
+            else null
+          );
         };
       });
 
@@ -434,10 +459,10 @@ with lib; let
         ];
       });
 
-      coerceAttrsOfSubmodulesToListByKey = ref: mergeKey: (types.coercedTo
+      coerceAttrsOfSubmodulesToListByKey = ref: attrMergeKey: listMergeKeys: (types.coercedTo
         (types.listOf (submoduleOf ref))
-        (mergeValuesByKey mergeKey)
-        (types.attrsOf (submoduleWithMergeOf ref mergeKey))
+        (mergeValuesByKey attrMergeKey listMergeKeys)
+        (types.attrsOf (submoduleWithMergeOf ref attrMergeKey))
       );
 
       definitions = {
