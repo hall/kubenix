@@ -21,10 +21,12 @@ details {
   padding: 0rem 1rem !important;
   margin: 1rem;
   padding: 0 !important;
+  width: 100%;
 
   > summary {
     padding: 0rem !important;
     margin: 0 !important;
+    overflow-x: scroll;
 
     // do not show arrow bullet point
     list-style: none;
@@ -34,8 +36,6 @@ details {
 
     // replace builtin arrows with custom ones
     pre {
-      display: inline-block;
-      width: 100%;
       margin: 0 !important;
       padding-left: 42px !important;
       vertical-align: middle;
@@ -49,10 +49,18 @@ details {
       @include arrow(45deg);
   }
 
+  .table-container {
+    overflow-x: scroll !important;
+  }
+
+  table {
+    display: inline-table !important;
+    // TODO: no idea where this extra pixel comes from
+    width: calc(100% - 1px);
+  }
+
   table, tbody {
     // fill entire width
-    width: 100% !important;
-    display: table;
     margin: 0 !important;
 
     tr {

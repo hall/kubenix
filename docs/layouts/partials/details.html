@@ -9,32 +9,34 @@
         <pre>{{ $name }}</pre>
     </summary>
 
-    <table>
-        <tr>
-            <td>Description</td>
-            <td>{{ $option.description }}</td>
-        </tr>
+    <div class="table-container">
+        <table>
+            <tr>
+                <td>Description</td>
+                <td>{{ $option.description }}</td>
+            </tr>
 
-        <tr>
-            <td>Type</td>
-            <td><pre>{{ $option.type }}</pre></td>
-        </tr>
+            <tr>
+                <td>Type</td>
+                <td><pre>{{ $option.type }}</pre></td>
+            </tr>
 
-        <tr>
-            <td>Default</td>
-            <td>{{ partial "highlight" $option.default }}</td>
-        </tr>
+            <tr>
+                <td>Default</td>
+                <td>{{ partial "highlight" $option.default }}</td>
+            </tr>
 
-        {{ with $option.example }}
-        <tr>
-            <td>Example</td>
-            <td>{{ partial "highlight" . }}</td>
-        </tr>
-        {{ end }}
+            {{ with $option.example }}
+            <tr>
+                <td>Example</td>
+                <td>{{ partial "highlight" . }}</td>
+            </tr>
+            {{ end }}
 
-        <tr>
-            <td>Declared in</td>
-            <td><a href="{{ $repo }}/blob/main/{{ $path }}" target="_blank">{{ $path }}</a></td>
-        </tr>
-    </table>
+            <tr>
+                <td>Declared in</td>
+                <td><a href="{{ $repo }}/blob/main/{{ $path }}" target="_blank">{{ $path }}</a></td>
+            </tr>
+        </table>
+    </div>
 </details>
