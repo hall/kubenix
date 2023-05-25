@@ -64,18 +64,16 @@ details {
     margin: 0 !important;
 
     tr {
+      // fix "extra" line at beginning of code blocks
+      pre code {
+        display: block;
+      }
       // make code blocks a little smaller
       pre {
         margin: 0 !important;
         padding: 0.2rem !important;
 
-        &.highlight {
-          color: $foreground-color;
-          background-color: $background-color;
-        };
-
         code {
-          vertical-align: text-bottom;
           padding-left: 0.2rem !important;
         }
       }

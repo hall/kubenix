@@ -7,4 +7,4 @@
   {{ $text = $text | jsonify (dict "indent" "  ") }}
 {{ end }}
 
-<pre class="highlight"><code>{{ $text }}</code></pre>
+{{- transform.Highlight $text "nix" }}
