@@ -54,9 +54,9 @@
 
     kubernetes = lib.mkMerge [
       # Use instance name as namespace
-      { namespace = name; }
+      {namespace = name;}
       # Create namespace object
-      { resources.namespaces.${name} = {}; }
+      {resources.namespaces.${name} = {};}
       # All resources defined here will use the above namespace
       args.kubernetes
     ];

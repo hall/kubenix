@@ -170,21 +170,25 @@ with lib; let
                           else
                             # make it an attribute set of submodules if only x-kubernetes-patch-merge-key is present, or
                             # x-kubernetes-patch-merge-key == x-kubernetes-list-map-keys.
-                            if hasAttr "properties" swagger.definitions.${refDefinition property.items} &&
-                               hasAttr "name" swagger.definitions.${refDefinition property.items}.properties
+                            if
+                              hasAttr "properties" swagger.definitions.${refDefinition property.items}
+                              && hasAttr "name" swagger.definitions.${refDefinition property.items}.properties
                             then let
                               mergeKey = "name";
                             in {
-                              type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey (if hasAttr "x-kubernetes-list-map-keys" property then property."x-kubernetes-list-map-keys" else []));
+                              type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey (
+                                if hasAttr "x-kubernetes-list-map-keys" property
+                                then property."x-kubernetes-list-map-keys"
+                                else []
+                              ));
                               apply = attrsToList;
                             }
-
-                          else {
-                            type =
-                              if (refDefinition property.items) == _name
-                              then types.unspecified # do not allow self-referential values
-                              else requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
-                          }
+                            else {
+                              type =
+                                if (refDefinition property.items) == _name
+                                then types.unspecified # do not allow self-referential values
+                                else requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
+                            }
                       # in other case it only references a simple type
                       else {
                         type = requiredOrNot (types.listOf (mapType property.items));

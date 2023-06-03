@@ -13,19 +13,13 @@
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    ...
-  } @ inputs:
+  outputs = inputs @ {self, ...}:
     (inputs.flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import inputs.nixpkgs {
-          overlays = [
-            self.overlays.default
-          ];
-          config.allowUnsupportedSystem = true;
           inherit system;
+          overlays = [self.overlays.default];
+          config.allowUnsupportedSystem = true;
         };
 
         inherit (pkgs) lib;

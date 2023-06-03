@@ -335,12 +335,12 @@ in {
     customTypes = mkOption {
       description = "Custom resource types to make API for";
       example = {
-          helmchartconfig = {
-            attrName = "helmchartconfig";
-            kind = "HelmChartConfig";
-            version = "v1";
-            group = "helm.cattle.io";
-          };
+        helmchartconfig = {
+          attrName = "helmchartconfig";
+          kind = "HelmChartConfig";
+          version = "v1";
+          group = "helm.cattle.io";
+        };
       };
       type =
         coerceListOfSubmodulesToAttrs

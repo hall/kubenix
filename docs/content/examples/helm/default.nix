@@ -1,7 +1,7 @@
-{ kubenix ? import ../../../.. }:
+{kubenix ? import ../../../..}:
 kubenix.evalModules.${builtins.currentSystem} {
-  module = { kubenix, ... }: {
-    imports = [ kubenix.modules.helm ];
+  module = {kubenix, ...}: {
+    imports = [kubenix.modules.helm];
     kubernetes.helm.releases.example = {
       chart = kubenix.lib.helm.fetch {
         repo = "https://charts.bitnami.com/bitnami";
