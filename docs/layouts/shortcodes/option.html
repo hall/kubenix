@@ -1,6 +1,12 @@
 {{- $option := .Get 0 -}}
 {{- $module := index (strings.Split $option ".") 0 -}}
 
+{{/* some modules are nested under other modules */}}
+{{- $submodule := index (strings.Split $option ".") 1  -}}
+{{- if eq "helm" $submodule -}}
+  {{ $module = "helm"}}
+{{- end -}}
+
 {{/* should we use markdown instead of html? some envs strip raw html */}}
 {{- $md := .Get 1 | default false -}}
 
