@@ -1,16 +1,16 @@
-{kubenix ? import ../../../..}:
+{ kubenix ? import ../../../.. }:
 kubenix.evalModules.${builtins.currentSystem} {
-  module = {kubenix, ...}: {
-    imports = with kubenix.modules; [helm];
+  module = { kubenix, ... }: {
+    imports = [ kubenix.modules.helm ];
     kubernetes.helm.releases.example = {
       chart = kubenix.lib.helm.fetch {
-        chart = "nginx";
         repo = "https://charts.bitnami.com/bitnami";
-        sha256 = "sha256-wP3tcBnySx+kvZqfW2W9k665oi8KOI50tCcAl0g9cuw=";
+        chart = "nginx";
+        version = "15.0.1";
+        sha256 = "sKVqx99O4SNIq5y8Qo/b/2xIqXqSsZJzrgnYYz/0TKg=";
       };
-      values = {
-        replicaCount = 2;
-      };
+      # arbitrary attrset passed as values to the helm release
+      values.replicaCount = 2;
     };
   };
 }

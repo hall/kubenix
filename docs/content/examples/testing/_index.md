@@ -1,8 +1,8 @@
-Testing is still very much in flux but here's a rough example.
+Testing is still very much in flux (contributions welcome!) but here's a rough example.
 
 {{< source "default.nix" >}}
 
-Where we've defined a might look like:
+Where we've defined a test that might look like:
 
 {{< source "test.nix" >}}
 

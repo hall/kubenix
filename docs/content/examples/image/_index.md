@@ -4,8 +4,8 @@ weight: 30
 
 Instead of deploying a 3rd party image, we can build our own.
 
-We rely on the upstream [`dockerTools`](https://github.com/NixOs/nixpkgs/tree/master/pkgs/built-support/docker) package here.
-Specifically, we can use the `buildImage` function to define our image:
+We rely on the upstream [`dockerTools`](https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools) package here.
+Specifically, we can use the `buildLayeredImage` function to define our image:
 
 {{< source "image.nix" >}}
 
@@ -60,7 +60,5 @@ Render the generated manifests again and see that it now refers to the newly bui
 Of course, to actually deploy, we need to push the image to our registry. The script defined at {{< option "docker.copyScript" >}} does just that.
 
 ```sh
-$(nix build -f . --json config.docker.copyScript | jq -r '.[].outputs.out')
+$(nix build -f . --print-out-paths config.docker.copyScript)
 ```
-
- <!-- TODO: can we make that `nix run -f . config.docker.copyScript` ? -->

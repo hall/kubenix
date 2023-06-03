@@ -1,11 +1,5 @@
-{
-  config,
-  lib,
-  pkgs,
-  kubenix,
-  ...
-}: {
-  imports = with kubenix.modules; [k8s];
+{ kubenix, ... }: {
+  imports = [ kubenix.modules.k8s ];
 
   kubernetes.resources = {
     deployments.nginx.spec = {
@@ -56,13 +50,11 @@
     };
 
     services.nginx.spec = {
-      ports = [
-        {
-          name = "http";
-          port = 80;
-        }
-      ];
       selector.app = "nginx";
+      ports = [{
+        name = "http";
+        port = 80;
+      }];
     };
   };
 }
