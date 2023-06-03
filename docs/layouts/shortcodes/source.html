@@ -1,6 +1,10 @@
 {{- $file := .Get 0 -}}
 <div class="source">
-  <pre class="filename">{{ $file }}</pre>
+    <pre class="filename">
+    <a href="{{ $.Site.Params.BookRepo}}/tree/main/docs/content/{{ .Page.File.Dir }}/{{ $file }}">
+        {{ $file }}
+    </a>
+    </pre>
   {{- $file := path.Join .Page.File.Dir $file -}}
   {{- highlight ($file | readFile | safeHTML) (path.Ext $file) -}}
 </div>
