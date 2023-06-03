@@ -8,6 +8,7 @@ style = "nord"
 [params]
 BookLogo = "logo.svg"
 BookRepo = "https://github.com/hall/kubenix"
+BookEditPath = 'edit/main/docs'
 BookSection = '*'
 # most pages at this time are auto-generated so editing doesn't make sense
 # BookEditPath = 'edit/main/docs'
