@@ -1,5 +1,5 @@
 { kubenix ? import ../../../.. }:
-kubenix.evalModules.${builtins.currentSystem} {
+kubenix.evalModules.x86_64-linux {
   module = { kubenix, ... }: {
     imports = [ kubenix.modules.testing ];
     testing = {
