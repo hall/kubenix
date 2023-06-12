@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-07-07
+
+### Breaking
+
+- removed usage of the `helm` CLI within the `kubenix` CLI
+
+  This simplifies design by removing overlapping responsibilities but means extra functionality provided by the `helm` CLI is no longer available; specifically:
+
+  - hooks are no longer ordered (but can still be excluded with `noHooks`)
+  - `helm` subcommands (e.g., `list` or `rollback`) will not be able to operate on resources
+
+### Added
+
+- the CLI now prunes resources and performs an interactive diff by default
+
 ## [0.1.0] - 2023-07-06
 
 ### Added

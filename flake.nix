@@ -144,10 +144,10 @@
             inherit (pkgs) kubernetes kubectl;
           }
           // {
-            cli = pkgs.callPackage ./pkgs/kubenix.nix {
+            default = pkgs.callPackage ./pkgs/kubenix.nix {
               inherit (self.packages.${system});
+              evalModules = self.evalModules.${system};
             };
-            default = self.packages.${system}.cli;
             docs = import ./docs {
               inherit pkgs;
               options =
