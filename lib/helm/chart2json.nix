@@ -20,6 +20,8 @@ with lib;
     kubeVersion ? null,
     # whether to include CRD
     includeCRDs ? false,
+    # whether to include hooks
+    noHooks ? false,
   }: let
     valuesJsonFile = builtins.toFile "${name}-values.json" (builtins.toJSON values);
   in
@@ -32,6 +34,7 @@ with lib;
           ${optionalString (namespace != null) "--namespace ${namespace}"} \
           ${optionalString (values != {}) "-f ${valuesJsonFile}"} \
           ${optionalString includeCRDs "--include-crds"} \
+          ${optionalString noHooks "--no-hooks"} \
           ${chart} >resources.yaml
 
         # split multy yaml file into multiple files

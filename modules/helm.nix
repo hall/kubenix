@@ -95,6 +95,17 @@ in {
             default = false;
           };
 
+          noHooks = mkOption {
+            description = ''
+              Wether to include Helm hooks.
+
+              Without this all hooks run immediately on apply since we are bypassing the Helm CLI.
+              However, some charts only have minor validation hooks (e.g., upgrade version skew validation) and are safe to ignore.
+            '';
+            type = types.bool;
+            default = false;
+          };
+
           objects = mkOption {
             description = "Generated kubernetes objects";
             type = types.listOf types.attrs;
@@ -109,7 +120,7 @@ in {
         ];
 
         config.objects = importJSON (helm.chart2json {
-          inherit (config) chart name namespace values kubeVersion includeCRDs;
+          inherit (config) chart name namespace values kubeVersion includeCRDs noHooks;
         });
       }));
       default = {};
