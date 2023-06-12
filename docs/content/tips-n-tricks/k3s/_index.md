@@ -5,7 +5,7 @@ As such, on a server node, we can write kubenix's output there.
 ```nix
 {
   # let's write `resultYAML` to an arbitrary file under `/etc`
-  environment.etc."kubenix.yaml".source = 
+  environment.etc."kubenix.yaml".source =
   (kubenix.evalModules.x86_64-linux {
     module = { kubenix, ... }: {
       imports = [ kubenix.modules.k8s ];
@@ -20,6 +20,7 @@ As such, on a server node, we can write kubenix's output there.
   '';
 }
 ```
+
 {{< hint danger >}}
 **WARN**: this will write all manifests to the nix store and is therefore not suitable for inline sensitive data.
 {{< /hint >}}

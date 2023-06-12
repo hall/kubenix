@@ -21,7 +21,7 @@ For example, to patch the deployment created by the release above:
   kubernetes.resources.deployments.nginx = {
     # be sure to match the corresponding namespace as well
     metadata.namespace = "default";
-    # here we can configure anything and are no longer bound by `values.yaml` 
+    # here we can configure anything and are no longer bound by `values.yaml`
     spec.template.spec.containers.nginx.env = [{
       name = "MY_VARIABLE";
       value = "100";

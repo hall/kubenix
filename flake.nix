@@ -13,35 +13,33 @@
     };
   };
 
-  outputs = inputs @ { self, ... }:
+  outputs = inputs @ {self, ...}:
     (inputs.flake-utils.lib.eachDefaultSystem (
-      system:
-      let
+      system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
-          overlays = [ self.overlays.default ];
+          overlays = [self.overlays.default];
           config.allowUnsupportedSystem = true;
         };
 
         inherit (pkgs) lib;
 
         kubenix = {
-          lib = import ./lib { inherit lib pkgs; };
+          lib = import ./lib {inherit lib pkgs;};
           evalModules = self.evalModules.${system};
           modules = self.nixosModules.kubenix;
         };
 
         # evalModules with same interface as lib.evalModules and kubenix as
         # special argument
-        evalModules =
-          attrs @ { module ? null
-          , modules ? [ module ]
-          , ...
-          }:
-          let
-            lib' = lib.extend (lib: _self: import ./lib/upstreamables.nix { inherit lib pkgs; });
-            attrs' = builtins.removeAttrs attrs [ "module" ];
-          in
+        evalModules = attrs @ {
+          module ? null,
+          modules ? [module],
+          ...
+        }: let
+          lib' = lib.extend (lib: _self: import ./lib/upstreamables.nix {inherit lib pkgs;});
+          attrs' = builtins.removeAttrs attrs ["module"];
+        in
           lib'.evalModules (lib.recursiveUpdate
             {
               modules =
@@ -60,8 +58,7 @@
               };
             }
             attrs');
-      in
-      {
+      in {
         inherit evalModules pkgs;
 
         devShells.default = pkgs.mkShell {
@@ -136,9 +133,9 @@
 
         packages =
           inputs.flake-utils.lib.flattenTree
-            {
-              inherit (pkgs) kubernetes kubectl;
-            }
+          {
+            inherit (pkgs) kubernetes kubectl;
+          }
           // {
             cli = pkgs.callPackage ./pkgs/kubenix.nix {
               inherit (self.packages.${system});
@@ -152,25 +149,25 @@
                     # the submodules module currently doesn't evaluate:
                     #     error: No module found ‹name›/latest
                     # not sure how important that documentation is a this time
-                    self.nixosModules.kubenix [ "submodule" "submodules" ]);
-                }).options;
+                    self.nixosModules.kubenix ["submodule" "submodules"]);
+                })
+                .options;
             };
           }
           // import ./jobs {
             inherit pkgs;
           };
 
-        checks =
-          let
-            wasSuccess = suite:
-              if suite.success
-              then pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-succeeded" { } "echo success > $out"
-              else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" { } "exit 1";
-            examples = import ./docs/content/examples;
-            mkK8STests = attrs:
-              (import ./tests { inherit evalModules; })
-                ({ registry = "docker.io/gatehub"; } // attrs);
-          in
+        checks = let
+          wasSuccess = suite:
+            if suite.success
+            then pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-succeeded" {} "echo success > $out"
+            else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" {} "exit 1";
+          examples = import ./docs/content/examples;
+          mkK8STests = attrs:
+            (import ./tests {inherit evalModules;})
+            ({registry = "docker.io/gatehub";} // attrs);
+        in
           {
             # TODO: access "success" derivation with nice testing utils for nice output
             testing = wasSuccess examples.testing.config.testing;
@@ -178,7 +175,7 @@
           // builtins.listToAttrs (builtins.map
             (v: {
               name = "test-k8s-${builtins.replaceStrings ["."] ["_"] v}";
-              value = wasSuccess (mkK8STests { k8sVersion = v; });
+              value = wasSuccess (mkK8STests {k8sVersion = v;});
             })
             (import ./versions.nix).versions);
       }
