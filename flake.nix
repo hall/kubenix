@@ -138,10 +138,9 @@
           }
           // {
             cli = pkgs.callPackage ./pkgs/kubenix.nix {
-              inherit (self.packages.${system}) vals;
+              inherit (self.packages.${system});
             };
             default = self.packages.${system}.cli;
-            vals = pkgs.callPackage ./pkgs/vals.nix {};
             docs = import ./docs {
               inherit pkgs;
               options =
