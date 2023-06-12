@@ -10,7 +10,7 @@ Kubernetes management with Nix
 
 ## Usage
 
-A minimal example flake (build with `nix build`):
+A minimal example `flake.nix` (build with `nix build`):
 
 ```nix
 {
@@ -49,7 +49,7 @@ See the [examples](/examples/pod) for more.
 
 ## CLI
 
-> **NOTE**: this is a WIP CLI which currently reads the `k8s` package on a local flake
+> **NOTE**: this is a WIP CLI which currently reads the `kubenix` package on a local flake
 
 Render all resources with
 
@@ -61,11 +61,11 @@ Render all resources with
 
 The following table gives a general overview of currently supported/planned functionality.
 
-|           | kubectl | kustomize | helm  | helmfile |
-| --------- | :-----: | :-------: | :---: | :------: |
-| render    |    x    |           | x[^2] |          |
-| diff      |    x    |           |   x   |          |
-| apply[^1] |    x    |           |   x   |          |
+|           | kubectl | helm  |
+| --------- | :-----: | :---: |
+| render    |    x    | x[^2] |
+| diff      |    x    |   x   |
+| apply[^1] |    x    |   x   |
 
 [^1]: currently create-only
 [^2]: piping rendered helm charts to kubectl is a lossy process (e.g., [hooks](https://helm.sh/docs/topics/charts_hooks/) will not work)
