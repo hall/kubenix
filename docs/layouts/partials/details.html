@@ -23,10 +23,10 @@
 
             <tr>
                 <td>Default</td>
-                <td>{{ partial "highlight" $option.default }}</td>
+                <td>{{ partial "highlight" $option.default.text  }}</td>
             </tr>
 
-            {{ with $option.example }}
+            {{ with $option.example.text }}
             <tr>
                 <td>Example</td>
                 <td>{{ partial "highlight" . }}</td>
