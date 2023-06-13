@@ -1,14 +1,16 @@
 let
   full = {
     # https://kubernetes.io/releases/patch-releases
-    "1.19.16" = "sha256:15vhl0ibd94rqkq678cf5cl46dxmnanjpq0lmsx15i8l82fnhz35"; # final
-    "1.20.15" = "sha256:0g4hrdkzrr1vgjvakxg5n9165yiizb0vga996a3qjjh3nim4wdf7"; # final
-    "1.21.14" = "sha256:0g3n7q00z89d6li4wilp23z8dxcmdydc3r5g2spmdd82728rav2b"; # final
-    "1.22.17" = "sha256:089rnsdk7lc6n3isvnha26nbwjmm1y4glllqnxhj8g9fd3py5jfw"; # final
-    "1.23.15" = "sha256:0cw93f46gs1yqwdvfjbbm7kgk85hk6x6f1q9nz8mq352kw4m9zqn";
-    "1.24.9" = "sha256:0fp5hbqk2q0imrfi4mwp1ia0bmn0xnl6hcr07y52q2cp41pmfhqd";
-    "1.25.5" = "sha256:0811l7j769fa2a329a1kf5lqkaib0bz4c8pbfzg6si0d7614cdcn";
-    "1.26.0" = "sha256:0q6xymd642fdpjh8qn8bals0k0v9hcclmm0v1ya30mxlvk0mqk50";
+    "1.19.16" = "sha256:15vhl0ibd94rqkq678cf5cl46dxmnanjpq0lmsx15i8l82fnhz35";
+    "1.20.15" = "sha256:0g4hrdkzrr1vgjvakxg5n9165yiizb0vga996a3qjjh3nim4wdf7";
+    "1.21.14" = "sha256:0g3n7q00z89d6li4wilp23z8dxcmdydc3r5g2spmdd82728rav2b";
+    "1.22.17" = "sha256:089rnsdk7lc6n3isvnha26nbwjmm1y4glllqnxhj8g9fd3py5jfw";
+    "1.23.17" = "sha256:1qcp4miw476rrynp10gkw63aibfrh85qypw40pxfvy0rlahyhcc2";
+    # ^ EOL ^
+    "1.24.14" = "sha256:1mm3ah08jvp8ghzglf1ljw6qf3ilbil3wzxzs8jzfhljpsxpk41q";
+    "1.25.10" = "sha256:0hdv3677yr8a1qs3jb72m7r9ih7xsnd8nhs9fp506lzfl5b7lycc";
+    "1.26.5" = "sha256:1dyqvggyvqw3z9sml2x06v1l9kynqcs8bkfrkx8jy81gkvg7qxdi";
+    "1.27.2" = "sha256:1yqcds6lvpnvc5dsv9pnvp5qb3kc5y6cdgx827szljdlwf51wd15";
   };
 in {
   inherit full;

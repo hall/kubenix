@@ -3645,7 +3645,7 @@ let
           type = (types.nullOr types.int);
         };
         "podFailurePolicy" = mkOption {
-          description = "Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.\n\nThis field is alpha-level. To use this field, you must enable the `JobPodFailurePolicy` feature gate (disabled by default).";
+          description = "Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.\n\nThis field is beta-level. It can be used when the `JobPodFailurePolicy` feature gate is enabled (enabled by default).";
           type = (types.nullOr (submoduleOf "io.k8s.api.batch.v1.PodFailurePolicy"));
         };
         "selector" = mkOption {
@@ -6131,7 +6131,7 @@ let
 
       options = {
         "name" = mkOption {
-          description = "The header field name";
+          description = "The header field name. This will be canonicalized upon output, so case-variant names will be understood as the same header.";
           type = types.str;
         };
         "value" = mkOption {
@@ -9013,8 +9013,8 @@ let
 
       options = {
         "claims" = mkOption {
-          description = "Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.\n\nThis is an alpha field and requires enabling the DynamicResourceAllocation feature gate.\n\nThis field is immutable.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ResourceClaim" "name" [ ]));
+          description = "Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.\n\nThis is an alpha field and requires enabling the DynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.";
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ResourceClaim" "name" [ "name" ]));
           apply = attrsToList;
         };
         "limits" = mkOption {
@@ -13494,7 +13494,7 @@ let
         };
         "reservedFor" = mkOption {
           description = "ReservedFor indicates which entities are currently allowed to use the claim. A Pod which references a ResourceClaim which is not reserved for that Pod will not be started.\n\nThere can be at most 32 such reservations. This may get increased in the future, but not reduced.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.resource.v1alpha1.ResourceClaimConsumerReference" "name" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.resource.v1alpha1.ResourceClaimConsumerReference" "name" [ "uid" ]));
           apply = attrsToList;
         };
       };
