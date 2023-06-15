@@ -6,19 +6,19 @@ with lib; let
   self = {
     importYAML = path:
       importJSON (pkgs.runCommand "yaml-to-json" {} ''
-        ${pkgs.remarshal}/bin/remarshal -i ${path} -if yaml -of json > $out
+        ${pkgs.yq}/bin/yq -c . ${path} > $out
       '');
 
     toYAML = config:
       builtins.readFile (pkgs.runCommand "to-yaml" {} ''
-        ${pkgs.remarshal}/bin/remarshal -i ${pkgs.writeText "to-json" (builtins.toJSON config)} -if json -of yaml > $out
+        ${pkgs.yq}/bin/yq -y . ${pkgs.writeText "to-json" (builtins.toJSON config)}  > $out
       '');
 
     toMultiDocumentYaml = name: documents:
       pkgs.runCommand name {}
       (concatMapStringsSep "\necho --- >> $out\n"
         (
-          d: "${pkgs.remarshal}/bin/remarshal -i ${builtins.toFile "doc" (builtins.toJSON d)} -if json -of yaml >> $out"
+          d: "${pkgs.yq}/bin/yq -y . ${pkgs.writeText "to-json" (builtins.toJSON config)} >> $out"
         )
         documents);
 
