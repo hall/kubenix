@@ -1,0 +1,24 @@
+From 0ab4b8ebb392e1dfa6c7067a1728336eae70e8fd Mon Sep 17 00:00:00 2001
+From: Felix Scheinost <fesc@symentis.com>
+Date: Thu, 15 Jun 2023 12:57:46 +0200
+Subject: [PATCH] Workaround for https://github.com/yaml/pyyaml/issues/89
+
+---
+ remarshal.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/remarshal.py b/remarshal.py
+index fdd6fb1..f76786d 100755
+--- a/remarshal.py
++++ b/remarshal.py
+@@ -76,6 +76,8 @@ for loader in loaders:
+         u'tag:yaml.org,2002:timestamp',
+         timestamp_constructor
+     )
++    # Workaround for https://github.com/yaml/pyyaml/issues/89
++    loader.add_constructor('tag:yaml.org,2002:value', yaml.constructor.SafeConstructor.construct_yaml_str)
+ 
+ 
+ # === JSON ===
+-- 
+2.37.1 (Apple Git-137.1)

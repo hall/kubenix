@@ -18,7 +18,7 @@
       system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
-          overlays = [self.overlays.default];
+          overlays = [self.overlays.default self.overlays.fix-remarshal];
           config.allowUnsupportedSystem = true;
         };
 
@@ -182,6 +182,11 @@
     ))
     // {
       nixosModules.kubenix = import ./modules;
+      overlays.fix-remarshal = _final: prev: {
+        remarshal = prev.remarshal.overrideAttrs (finalAttrs: previousAttrs: {
+          patches = [pkgs/development/python-modules/remarshal/workaround-issue-8.patch];
+        });
+      };
       overlays.default = _final: prev: {
         kubenix.evalModules = self.evalModules.${prev.system};
       };
