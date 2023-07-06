@@ -10,7 +10,7 @@
         spec = {
           securityContext.fsGroup = 1000;
           containers.nginx = {
-            image = "nginx";
+            image = "nginx:1.25.1";
             imagePullPolicy = "IfNotPresent";
             volumeMounts = {
               "/etc/nginx".name = "config";
@@ -28,7 +28,6 @@
     configMaps = {
       nginx-config.data."nginx.conf" = ''
         user nginx nginx;
-        daemon off;
         error_log /dev/stdout info;
         pid /dev/null;
         events {}
