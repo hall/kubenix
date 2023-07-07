@@ -6,7 +6,7 @@ Kubernetes management with Nix
   <img src="./docs/static/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
 </p>
 
-> **WARN**: this is a work in progress, expect breaking changes
+> **WARN**: this is a work in progress, expect breaking [changes](./CHANGELOG.md)
 
 ## Usage
 
@@ -20,7 +20,7 @@ A minimal example `flake.nix` (build with `nix build`):
   in {
     packages.${system}.default = (kubenix.evalModules.${system} {
       module = { kubenix, ... }: {
-        imports = with kubenix.modules; [k8s];
+        imports = [ kubenix.modules.k8s ];
         kubernetes.resources.pods.example.spec.containers.nginx.image = "nginx";
       };
     }).config.kubernetes.result;
@@ -33,11 +33,11 @@ Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
 ```nix
 { kubenix ? import (builtins.fetchGit {
   url = "https://github.com/hall/kubenix.git";
-  rev = "aa734afc9cf7a5146a7a9d93fd534e81572c8122";
+  rev = "main";
 }) }:
 (kubenix.evalModules.x86_64-linux {
   module = {kubenix, ... }: {
-    imports = with kubenix.modules; [k8s];
+    imports = [ kubenix.modules.k8s ];
     kubernetes.resources.pods.example.spec.containers.nginx.image = "nginx";
   };
 }).config.kubernetes.result
@@ -45,30 +45,55 @@ Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
 
 Either way the JSON manifests will be written to `./result`.
 
-See the [examples](/examples/pod) for more.
+See the [examples](https://kubenix.org/examples/pod) for more.
 
 ## CLI
 
-> **NOTE**: this is a WIP CLI which currently reads the `kubenix` package on a local flake
+While kubenix is compatible with just about any deployment system, there's a simple builtin CLI which can:
 
-Render all resources with
+- show a diff, prompt for confirmation, then apply
+- prune removed resources
+- pipe manifests through [vals](https://github.com/helmfile/vals) for the ability to inject secrets without writing them to the nix store
 
-    nix run github:hall/kubenix -- render
+To configure this, override the default package, passing the arguments of [evalModules](https://nixos.org/manual/nixpkgs/stable/#module-system-lib-evalModules).
+
+```nix
+{
+  kubenix = inputs.kubenix.packages.${pkgs.system}.default.override {
+    module = import ./cluster;
+    # optional; pass custom values to the kubenix module
+    specialArgs = { flake = self; };
+  };
+}
+```
+
+Then apply the resources with
+
+    nix run '.#kubenix'
+
+which will print a diff and prompt for confirmation:
+
+```diff
+diff -N -u -I ' kubenix/hash: ' -I ' generation: ' /tmp/LIVE-2503962153/apps.v1.Deployment.default.home-assistant /tmp/MERGED-231044561/apps.v1.Deployment.default.home-assistant
+--- /tmp/LIVE-2503962153/apps.v1.Deployment.default.home-assistant      2023-07-06 23:33:29.841771295 -0400
++++ /tmp/MERGED-231044561/apps.v1.Deployment.default.home-assistant     2023-07-06 23:33:29.842771296 -0400
+@@ -43,7 +43,7 @@
+     spec:
+       automountServiceAccountToken: true
+       containers:
+-      - image: homeassistant/home-assistant:2023.5
++      - image: homeassistant/home-assistant:2023.6
+         imagePullPolicy: IfNotPresent
+         livenessProbe:
+           failureThreshold: 3
+apply? [y/N]:
+```
 
 > **HINT**: use ` --help` for more commands
 
-### Support
+Optionally, write the resources to `./result/manifests.json`:
 
-The following table gives a general overview of currently supported/planned functionality.
-
-|           | kubectl | helm  |
-| --------- | :-----: | :---: |
-| render    |    x    | x[^2] |
-| diff      |    x    |   x   |
-| apply[^1] |    x    |   x   |
-
-[^1]: currently create-only
-[^2]: piping rendered helm charts to kubectl is a lossy process (e.g., [hooks](https://helm.sh/docs/topics/charts_hooks/) will not work)
+    nix build '.#kubenix'
 
 ## Attribution
 
