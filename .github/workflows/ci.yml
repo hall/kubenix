@@ -10,16 +10,34 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2.4.0
-    - uses: cachix/install-nix-action@v16
-      with:
-        install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.8.0pre20220311_d532269/install
-        extra_nix_config: |
-          experimental-features = nix-command flakes
-          allow-import-from-derivation = true
+      - name: checkout repo
+        uses: actions/checkout@v3
+  
+      - name: install nix
+        uses: cachix/install-nix-action@v20
 
-    - name: Run Nix Flake Check
-      run: nix -Lv flake check
+      - name: configure cache
+        uses: DeterminateSystems/magic-nix-cache-action@v1
+  
+      - name: check flake
+        run: nix -Lv flake check
+  
+      - name: check nix parsing
+        run: nix -Lv develop -c evalnix
 
-    - name: Check Nix parsing
-      run: nix -Lv develop -c evalnix
+      - name: get latest tag
+        id: latest
+        uses: actions-ecosystem/action-get-latest-tag@v1
+
+      - name: parse changelog
+        id: changelog
+        uses: coditory/changelog-parser@v1
+
+      - name: create release
+        id: release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main' && steps.changelog.outputs.version != steps.latest.outputs.tag
+        with:
+          files: ${{ steps.package.outputs.path }}
+          body: ${{ steps.changelog.outputs.description }}
+          tag_name: ${{ steps.changelog.outputs.version }}

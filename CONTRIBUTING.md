@@ -19,6 +19,11 @@ Do try to format the repo with [treefmt](https://github.com/numtide/treefmt) bef
 
     nix fmt
 
+## Releases
+
+User-facing changes should be reflected in [`CHANGELOG.md`](./CHANGELOG.md).
+When a new entry is added to the default branch, a new release will automatically be tagged.
+
 ## Kubernetes versions
 
 To support a new Kubernetes version:
@@ -31,7 +36,7 @@ To support a new Kubernetes version:
   }
   ```
 
-- Build and copy the updated specs to [`modules/generated/`](./modules/generated/) with
+- Build the updated specs to [`modules/generated/`](./modules/generated/) with
 
       nix run '.#generate'
 
