@@ -101,40 +101,47 @@
           .wrapper;
 
         apps = {
-          docs = inputs.flake-utils.lib.mkApp {
-            drv = pkgs.writeShellScriptBin "gen-docs" ''
-              set -eo pipefail
+          docs = {
+            type = "app";
+            program =
+              (pkgs.writeShellScript "gen-docs" ''
+                set -eo pipefail
 
-              # generate json object of module options
-              nix build '.#docs' -o ./docs/data/options.json
+                # generate json object of module options
+                nix build '.#docs' -o ./docs/data/options.json
 
-              # remove all old module pages
-              rm ./docs/content/modules/[!_]?*.md || true
+                # remove all old module pages
+                rm ./docs/content/modules/[!_]?*.md || true
 
-              # create a page for each module in hugo
-              for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
-                [[ $mod == "base" ]] && mod=kubenix
-                [[ $mod == "k8s" ]] && mod=kubernetes
-                [[ $mod == "submodule"* ]] && continue
-                echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
-              done
+                # create a page for each module in hugo
+                for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
+                  [[ $mod == "base" ]] && mod=kubenix
+                  [[ $mod == "k8s" ]] && mod=kubernetes
+                  [[ $mod == "submodule"* ]] && continue
+                  echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
+                done
 
-              # build the site
-              cd docs && ${pkgs.hugo}/bin/hugo $@
-            '';
+                # build the site
+                cd docs && ${pkgs.hugo}/bin/hugo "$@"
+              '')
+              .outPath;
           };
-          generate = inputs.flake-utils.lib.mkApp {
-            drv = pkgs.writeShellScriptBin "gen-modules" ''
-              set -eo pipefail
-              dir=./modules/generated
 
-              rm -rf $dir
-              mkdir $dir
-              nix build '.#generate-k8s'
-              cp ./result/* $dir/
+          generate = {
+            type = "app";
+            program =
+              (pkgs.writeShellScript "gen-modules" ''
+                set -eo pipefail
+                dir=./modules/generated
 
-              rm result
-            '';
+                rm -rf $dir
+                mkdir $dir
+                nix build '.#generate-k8s'
+                cp ./result/* $dir/
+
+                rm result
+              '')
+              .outPath;
           };
         };
 
