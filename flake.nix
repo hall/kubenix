@@ -139,11 +139,8 @@
         };
 
         packages =
-          inputs.flake-utils.lib.flattenTree
           {
             inherit (pkgs) kubernetes kubectl;
-          }
-          // {
             default = pkgs.callPackage ./pkgs/kubenix.nix {
               inherit (self.packages.${system});
               evalModules = self.evalModules.${system};
@@ -161,9 +158,8 @@
                 .options;
             };
           }
-          // import ./jobs {
-            inherit pkgs;
-          };
+          // pkgs.lib.attrsets.mapAttrs' (name: value: pkgs.lib.attrsets.nameValuePair "generate-${name}" value)
+          (builtins.removeAttrs (pkgs.callPackage ./pkgs/generators {}) ["override" "overrideDerivation"]);
 
         checks = let
           wasSuccess = suite:
