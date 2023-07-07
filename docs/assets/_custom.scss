@@ -46,7 +46,7 @@ details {
   }
 
   &[open] summary:before {
-      @include arrow(45deg);
+    @include arrow(45deg);
   }
 
   .table-container {
@@ -59,7 +59,8 @@ details {
     width: calc(100% - 1px);
   }
 
-  table, tbody {
+  table,
+  tbody {
     // fill entire width
     margin: 0 !important;
 
@@ -101,13 +102,13 @@ aside.book-menu span {
 .source {
   position: relative;
   .filename {
-      position: absolute;
-      right: 0px;
-      margin: 0;
-      line-height: 0;
-      font-size: 0.8rem;
-      background-color: transparent;
-      color: #d8dee9;
+    position: absolute;
+    right: 0px;
+    margin: 0;
+    line-height: 0;
+    font-size: 0.8rem;
+    background-color: transparent;
+    color: #d8dee9;
   }
 }
 

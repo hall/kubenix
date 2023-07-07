@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    treefmt.url = "github:numtide/treefmt-nix";
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -63,14 +64,6 @@
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            # formatters
-            alejandra
-            black
-            nodePackages.prettier
-            nodePackages.prettier-plugin-toml
-            shfmt
-            treefmt
-
             # extra tools
             dive
             fd
@@ -91,7 +84,24 @@
           '';
         };
 
-        formatter = pkgs.treefmt;
+        formatter =
+          (inputs.treefmt.lib.evalModule pkgs {
+            projectRootFile = "flake.nix";
+            programs = {
+              alejandra.enable = true;
+              black.enable = true;
+              prettier.enable = true;
+              shfmt.enable = true;
+            };
+            settings.global.excludes = [
+              "docs/themes/*"
+              "docs/layouts/*"
+              "modules/generated/*"
+            ];
+          })
+          .config
+          .build
+          .wrapper;
 
         apps = {
           docs = inputs.flake-utils.lib.mkApp {
