@@ -7,6 +7,7 @@ on:
     paths:
       - 'docs/**'
       - 'modules/**'
+      - 'README.md'
 
 jobs:
   deploy:
@@ -20,12 +21,11 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v16
-        with:
-          install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.8.0pre20220311_d532269/install
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            allow-import-from-derivation = true
+      - name: install nix
+        uses: cachix/install-nix-action@v20
+
+      - name: configure cache
+        uses: DeterminateSystems/magic-nix-cache-action@v1
 
       - name: build
         run: nix run '.#docs' -- --minify

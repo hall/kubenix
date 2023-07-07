@@ -36,7 +36,7 @@ Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
   rev = "main";
 }) }:
 (kubenix.evalModules.x86_64-linux {
-  module = {kubenix, ... }: {
+  module = { kubenix, ... }: {
     imports = [ kubenix.modules.k8s ];
     kubernetes.resources.pods.example.spec.containers.nginx.image = "nginx";
   };
