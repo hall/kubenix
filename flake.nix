@@ -131,7 +131,6 @@
         };
 
         packages = {
-          inherit (pkgs) kubernetes kubectl;
           default = pkgs.callPackage ./pkgs/kubenix.nix {
             inherit (self.packages.${system});
             evalModules = self.evalModules.${system};
