@@ -55,22 +55,16 @@
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
             dive
-            fd
             k9s
             kube3d
             kubie
-            hugo
           ];
           packages = [
             (pkgs.writeShellScriptBin "evalnix" ''
-              # check nix parsing
-              fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null
+              # check nix parsing (e.g., in CI)
+              ${pkgs.fd}/bin/fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null
             '')
           ];
-          # KUBECONFIG = "kubeconfig.json";
-          shellHook = ''
-            export NODE_PATH="${pkgs.nodePackages.prettier-plugin-toml}/lib/node_modules:$NODE_PATH"
-          '';
         };
       });
 
