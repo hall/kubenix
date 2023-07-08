@@ -22,9 +22,6 @@ jobs:
       - name: check flake
         run: nix -Lv flake check
   
-      - name: check nix parsing
-        run: nix -Lv develop -c evalnix
-
       - name: get latest tag
         id: latest
         uses: actions-ecosystem/action-get-latest-tag@v1

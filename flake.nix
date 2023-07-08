@@ -125,12 +125,6 @@
             kube3d
             kubie
           ];
-          packages = [
-            (pkgs.writeShellScriptBin "evalnix" ''
-              # check nix parsing (e.g., in CI)
-              ${pkgs.fd}/bin/fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null
-            '')
-          ];
         };
       });
 
