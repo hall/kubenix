@@ -1,7 +1,6 @@
-{
-  pkgs ? import <nixpkgs> {},
-  lib ? pkgs.lib,
-  spec ? ./istio-schema.json,
+{ pkgs ? import <nixpkgs> { }
+, lib ? pkgs.lib
+, spec ? ./istio-schema.json
 }:
 with lib; let
   gen = rec {
@@ -20,14 +19,9 @@ with lib; let
       then "null"
       else builtins.toString value;
 
-    removeEmptyLines = str: concatStringsSep "\n" (filter (l: builtins.match "[[:space:]]*" l != []) (splitString "\n" str));
+    removeEmptyLines = str: concatStringsSep "\n" (filter (l: builtins.match "[[:space:]]*" l != [ ]) (splitString "\n" str));
 
-    mkOption = {
-      description ? null,
-      type ? null,
-      default ? null,
-      apply ? null,
-    }:
+    mkOption = { description ? null, type ? null, default ? null, apply ? null }:
       removeEmptyLines ''        mkOption {
                   ${optionalString (description != null) "description = ${builtins.toJSON description};"}
                   ${optionalString (type != null) ''type = ${type};''}
@@ -53,7 +47,7 @@ with lib; let
 
     hasTypeMapping = def:
       hasAttr "type" def
-      && elem def.type ["string" "integer" "boolean"];
+      && elem def.type [ "string" "integer" "boolean" ];
 
     mergeValuesByKey = mergeKey: ''(mergeValuesByKey "${mergeKey}")'';
 
@@ -84,157 +78,152 @@ with lib; let
     refDefinition = attr: head (tail (tail (splitString "/" attr."$ref")));
   };
 
-  fixJSON = replaceStrings ["\\u"] ["u"];
+  fixJSON = replaceStrings [ "\\u" ] [ "u" ];
 
   fetchSpecs = path: builtins.fromJSON (fixJSON (builtins.readFile path));
 
-  genDefinitions = swagger:
-    with gen; (mapAttrs
-      (
-        _name: definition:
-        # if $ref is in definition it means it's an alias of other definition
-          if hasAttr "$ref" definition
-          then definitions."${refDefinition definition}"
-          else if !(hasAttr "properties" definition)
-          then {
-            type = mapType definition;
-          }
-          else {
-            options =
-              mapAttrs
-              (
-                propName: property: let
-                  isRequired = elem propName (definition.required or []);
-                  requiredOrNot = type:
-                    if isRequired
-                    then type
-                    else types.nullOr type;
-                  optionProperties =
-                    # if $ref is in property it references other definition,
-                    # but if other definition does not have properties, then just take it's type
-                    if hasAttr "$ref" property
-                    then
-                      if hasTypeMapping swagger.definitions.${refDefinition property}
-                      then {
-                        type = requiredOrNot (mapType swagger.definitions.${refDefinition property});
-                      }
-                      else {
-                        type = requiredOrNot (submoduleOf definitions (refDefinition property));
-                      }
-                    else if !(hasAttr "type" property)
+  genDefinitions = swagger: with gen; (mapAttrs
+    (_name: definition:
+      # if $ref is in definition it means it's an alias of other definition
+      if hasAttr "$ref" definition
+      then definitions."${refDefinition definition}"
+      else if !(hasAttr "properties" definition)
+      then {
+        type = mapType definition;
+      }
+      else {
+        options = mapAttrs
+          (propName: property:
+            let
+              isRequired = elem propName (definition.required or [ ]);
+              requiredOrNot = type:
+                if isRequired
+                then type
+                else types.nullOr type;
+              optionProperties =
+                # if $ref is in property it references other definition,
+                # but if other definition does not have properties, then just take it's type
+                if hasAttr "$ref" property
+                then
+                  if hasTypeMapping swagger.definitions.${refDefinition property}
+                  then {
+                    type = requiredOrNot (mapType swagger.definitions.${refDefinition property});
+                  }
+                  else {
+                    type = requiredOrNot (submoduleOf definitions (refDefinition property));
+                  }
+                else if !(hasAttr "type" property)
+                then {
+                  type = types.unspecified;
+                }
+                # if property has an array type
+                else if property.type == "array"
+                then
+                # if reference is in items it can reference other type of another
+                # definition
+                  if hasAttr "$ref" property.items
+                  then
+                  # if it is a reference to simple type
+                    if hasTypeMapping swagger.definitions.${refDefinition property.items}
                     then {
-                      type = types.unspecified;
+                      type = requiredOrNot (types.listOf (mapType swagger.definitions.${refDefinition property.items}.type));
                     }
-                    # if property has an array type
-                    else if property.type == "array"
-                    then
-                      # if reference is in items it can reference other type of another
-                      # definition
-                      if hasAttr "$ref" property.items
+                    # if a reference is to complex type
+                    else
+                    # if x-kubernetes-patch-merge-key is set then make it an
+                    # attribute set of submodules
+                      if hasAttr "x-kubernetes-patch-merge-key" property
                       then
-                        # if it is a reference to simple type
-                        if hasTypeMapping swagger.definitions.${refDefinition property.items}
-                        then {
-                          type = requiredOrNot (types.listOf (mapType swagger.definitions.${refDefinition property.items}.type));
+                        let
+                          mergeKey = property."x-kubernetes-patch-merge-key";
+                        in
+                        {
+                          type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey);
+                          apply = attrsToList;
                         }
-                        # if a reference is to complex type
-                        else
-                          # if x-kubernetes-patch-merge-key is set then make it an
-                          # attribute set of submodules
-                          if hasAttr "x-kubernetes-patch-merge-key" property
-                          then let
-                            mergeKey = property."x-kubernetes-patch-merge-key";
-                          in {
-                            type = requiredOrNot (coerceAttrsOfSubmodulesToListByKey (refDefinition property.items) mergeKey);
-                            apply = attrsToList;
-                          }
-                          # in other case it's a simple list
-                          else {
-                            type = requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
-                          }
-                      # in other case it only references a simple type
+                      # in other case it's a simple list
                       else {
-                        type = requiredOrNot (types.listOf (mapType property.items));
+                        type = requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
                       }
-                    else if property.type == "object" && hasAttr "additionalProperties" property
-                    then
-                      # if it is a reference to simple type
-                      if
-                        (
-                          hasAttr "$ref" property.additionalProperties
-                          && hasTypeMapping swagger.definitions.${refDefinition property.additionalProperties}
-                        )
-                      then {
-                        type = requiredOrNot (types.attrsOf (mapType swagger.definitions.${refDefinition property.additionalProperties}));
-                      }
-                      else if hasAttr "$ref" property.additionalProperties
-                      then {
-                        type = requiredOrNot types.attrs;
-                      }
-                      # if is an array
-                      else if property.additionalProperties.type == "array"
-                      then {
-                        type = requiredOrNot (types.loaOf (mapType property.additionalProperties.items));
-                      }
-                      else {
-                        type = requiredOrNot (types.attrsOf (mapType property.additionalProperties));
-                      }
-                    # just a simple property
-                    else {
-                      type = requiredOrNot (mapType property);
-                    };
-                in
-                  mkOption ({
-                      description = property.description or "";
-                    }
-                    // optionProperties)
+                  # in other case it only references a simple type
+                  else {
+                    type = requiredOrNot (types.listOf (mapType property.items));
+                  }
+                else if property.type == "object" && hasAttr "additionalProperties" property
+                then
+                # if it is a reference to simple type
+                  if
+                    (
+                      hasAttr "$ref" property.additionalProperties
+                      && hasTypeMapping swagger.definitions.${refDefinition property.additionalProperties}
+                    )
+                  then {
+                    type = requiredOrNot (types.attrsOf (mapType swagger.definitions.${refDefinition property.additionalProperties}));
+                  }
+                  else if hasAttr "$ref" property.additionalProperties
+                  then {
+                    type = requiredOrNot types.attrs;
+                  }
+                  # if is an array
+                  else if property.additionalProperties.type == "array"
+                  then {
+                    type = requiredOrNot (types.loaOf (mapType property.additionalProperties.items));
+                  }
+                  else {
+                    type = requiredOrNot (types.attrsOf (mapType property.additionalProperties));
+                  }
+                # just a simple property
+                else {
+                  type = requiredOrNot (mapType property);
+                };
+            in
+            mkOption ({
+              description = property.description or "";
+            }
+            // optionProperties)
+          )
+          definition.properties;
+        config =
+          let
+            optionalProps = filterAttrs
+              (propName: _property:
+                !(elem propName (definition.required or [ ]))
               )
               definition.properties;
-            config = let
-              optionalProps =
-                filterAttrs
-                (
-                  propName: _property:
-                    !(elem propName (definition.required or []))
-                )
-                definition.properties;
-            in
-              mapAttrs (_name: _property: mkOverride 1002 null) optionalProps;
-          }
-      )
-      swagger.definitions);
+          in
+          mapAttrs (_name: _property: mkOverride 1002 null) optionalProps;
+      }
+    )
+    swagger.definitions);
 
-  genResources = swagger:
-    (mapAttrsToList
-      (_name: property: rec {
-        splittedType = splitString "." (removePrefix "me.snowdrop.istio.api." property.javaType);
-        group = (concatStringsSep "." (take ((length splittedType) - 2) splittedType)) + ".istio.io";
-        kind = removeSuffix "Spec" (last splittedType);
-        version = last (take ((length splittedType) - 1) splittedType);
-        ref = removePrefix "#/definitions/" property."$ref";
-      })
-      (filterAttrs
-        (
-          _name: property:
-            (hasPrefix "me.snowdrop.istio.api" property.javaType)
-            && hasSuffix "Spec" property.javaType
-        )
-        swagger.properties))
-    ++ (mapAttrsToList
-      (_name: property: rec {
-        splittedType = splitString "." (removePrefix "me.snowdrop.istio.mixer." property.javaType);
-        group = "config.istio.io";
-        version = "v1alpha2";
-        kind = head (tail splittedType);
-        ref = removePrefix "#/definitions/" property."$ref";
-      })
-      (filterAttrs
-        (
-          _name: property:
-            (hasPrefix "me.snowdrop.istio.mixer" property.javaType)
-            && hasSuffix "Spec" property.javaType
-        )
-        swagger.properties));
+  genResources = swagger: (mapAttrsToList
+    (_name: property: rec {
+      splittedType = splitString "." (removePrefix "me.snowdrop.istio.api." property.javaType);
+      group = (concatStringsSep "." (take ((length splittedType) - 2) splittedType)) + ".istio.io";
+      kind = removeSuffix "Spec" (last splittedType);
+      version = last (take ((length splittedType) - 1) splittedType);
+      ref = removePrefix "#/definitions/" property."$ref";
+    })
+    (filterAttrs
+      (_name: property:
+        (hasPrefix "me.snowdrop.istio.api" property.javaType)
+          && hasSuffix "Spec" property.javaType
+      )
+      swagger.properties))
+  ++ (mapAttrsToList
+    (_name: property: rec {
+      splittedType = splitString "." (removePrefix "me.snowdrop.istio.mixer." property.javaType);
+      group = "config.istio.io";
+      version = "v1alpha2";
+      kind = head (tail splittedType);
+      ref = removePrefix "#/definitions/" property."$ref";
+    })
+    (filterAttrs
+      (_name: property:
+        (hasPrefix "me.snowdrop.istio.mixer" property.javaType)
+          && hasSuffix "Spec" property.javaType
+      )
+      swagger.properties));
 
   swagger = fetchSpecs spec;
 
@@ -367,14 +356,14 @@ with lib; let
     }
   '';
 in
-  pkgs.runCommand "istio-gen.nix"
-  {
-    buildInputs = [pkgs.nixpkgs-fmt];
-  } ''
-    cat << 'GENERATED' > ./raw
-    "${generated}"
-    GENERATED
+pkgs.runCommand "istio-gen.nix"
+{
+  buildInputs = [ pkgs.nixpkgs-fmt ];
+} ''
+  cat << 'GENERATED' > ./raw
+  "${generated}"
+  GENERATED
 
-    nixpkgs-fmt ./raw
-    cp ./raw $out
-  ''
+  nixpkgs-fmt ./raw
+  cp ./raw $out
+''

@@ -1,5 +1,5 @@
-{kubenix, ...}: {
-  imports = with kubenix.modules; [test k8s istio];
+{ kubenix, ... }: {
+  imports = with kubenix.modules; [ test k8s istio ];
 
   test = {
     name = "istio-bookinfo";
@@ -17,7 +17,7 @@
               name = "http";
               protocol = "HTTP";
             };
-            hosts = ["*"];
+            hosts = [ "*" ];
           }
         ];
       };
@@ -25,8 +25,8 @@
 
     VirtualService.bookinfo = {
       spec = {
-        hosts = ["*"];
-        gateways = ["bookinfo-gateway"];
+        hosts = [ "*" ];
+        gateways = [ "bookinfo-gateway" ];
         http = [
           {
             match = [

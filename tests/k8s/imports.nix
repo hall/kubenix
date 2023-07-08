@@ -1,14 +1,10 @@
-{
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ config, lib, kubenix, ... }:
 with lib; let
   pod = config.kubernetes.api.resources.core.v1.Pod.test;
   deployment = config.kubernetes.api.resources.apps.v1.Deployment.nginx-deployment;
-in {
-  imports = with kubenix.modules; [test k8s];
+in
+{
+  imports = with kubenix.modules; [ test k8s ];
 
   test = {
     name = "k8s-imports";

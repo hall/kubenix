@@ -1,4 +1,4 @@
 {
-  deployment = import ./deployment {};
-  testing = import ./testing {};
+  deployment = import ./deployment { };
+  testing = import ./testing { };
 }

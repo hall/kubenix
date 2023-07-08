@@ -1,11 +1,5 @@
-{
-  config,
-  lib,
-  pkgs,
-  kubenix,
-  ...
-}: {
-  imports = with kubenix.modules; [submodules k8s];
+{ config, lib, pkgs, kubenix, ... }: {
+  imports = with kubenix.modules; [ submodules k8s ];
 
   # Import submodule.
   submodules.imports = [
@@ -26,12 +20,10 @@
     # Now we can set the args options defined in the submodule.
     args.kubernetes.resources = {
       services.nginx.spec = {
-        ports = [
-          {
-            name = "http";
-            port = 80;
-          }
-        ];
+        ports = [{
+          name = "http";
+          port = 80;
+        }];
         selector.app = "nginx";
       };
     };
@@ -41,12 +33,10 @@
     submodule = "namespaced";
     args.kubernetes.resources = {
       services.nginx.spec = {
-        ports = [
-          {
-            name = "https";
-            port = 443;
-          }
-        ];
+        ports = [{
+          name = "https";
+          port = 443;
+        }];
         selector.app = "nginx";
       };
     };

@@ -1,15 +1,10 @@
-{
-  name,
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ name, config, lib, kubenix, ... }:
 with lib; let
   cfg = config.submodules.instances.instance;
   inherit (cfg.config.submodule) args;
-in {
-  imports = with kubenix.modules; [test submodules];
+in
+{
+  imports = with kubenix.modules; [ test submodules ];
 
   test = {
     name = "submodules-simple";
@@ -45,8 +40,8 @@ in {
   submodules.propagate.enable = true;
   submodules.imports = [
     {
-      module = {submodule, ...}: {
-        imports = [kubenix.modules.submodule];
+      module = { submodule, ... }: {
+        imports = [ kubenix.modules.submodule ];
 
         options.submodule.args = {
           name = mkOption {
@@ -62,7 +57,7 @@ in {
 
         config = {
           submodule.name = "submodule";
-          submodule.tags = ["tag"];
+          submodule.tags = [ "tag" ];
         };
       };
     }

@@ -1,13 +1,12 @@
-{
-  config,
-  kubenix,
-  lib,
-  # Name of submodule instance.
-  name,
-  # This is a shorthand for config.submodule.args and contains
+{ config
+, kubenix
+, lib
+, # Name of submodule instance.
+  name
+, # This is a shorthand for config.submodule.args and contains
   # final values of the args options.
-  args,
-  ...
+  args
+, ...
 }: {
   imports = with kubenix.modules; [
     # This needs to be imported in order to define a submodule.
@@ -25,7 +24,7 @@
       # to set kubernetes options from the k8s module which are already
       # precisely typed.
       type = lib.types.attrs;
-      default = {};
+      default = { };
     };
   };
 
@@ -54,9 +53,9 @@
 
     kubernetes = lib.mkMerge [
       # Use instance name as namespace
-      {namespace = name;}
+      { namespace = name; }
       # Create namespace object
-      {resources.namespaces.${name} = {};}
+      { resources.namespaces.${name} = { }; }
       # All resources defined here will use the above namespace
       args.kubernetes
     ];

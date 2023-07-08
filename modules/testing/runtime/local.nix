@@ -1,9 +1,4 @@
-{
-  lib,
-  config,
-  pkgs,
-  ...
-}:
+{ lib, config, pkgs, ... }:
 with lib; let
   inherit (config) testing;
 
@@ -34,7 +29,8 @@ with lib; let
     echo "--> running tests"
     ${testing.testScript} --kube-config=$KUBECONFIG
   '';
-in {
+in
+{
   options.testing.runtime.local = {
     script = mkOption {
       type = types.package;

@@ -1,14 +1,10 @@
-{
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ config, lib, kubenix, ... }:
 with lib; let
   inherit (config.kubernetes.api.resources.pods) pod1;
   inherit (config.kubernetes.api.resources.pods) pod2;
-in {
-  imports = with kubenix.modules; [test k8s];
+in
+{
+  imports = with kubenix.modules; [ test k8s ];
 
   test = {
     name = "k8s-defaults";
@@ -29,7 +25,7 @@ in {
     ];
   };
 
-  kubernetes.resources.pods.pod1 = {};
+  kubernetes.resources.pods.pod1 = { };
 
   kubernetes.resources.pods.pod2 = {
     metadata.labels.custom-label = "value";
@@ -48,7 +44,7 @@ in {
     }
     {
       resource = "pods";
-      default = {config, ...}: {
+      default = { config, ... }: {
         config.metadata.annotations = mkIf (config.metadata.labels ? "custom-label") {
           conditional-annotation = "value";
         };

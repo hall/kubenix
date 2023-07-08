@@ -1,8 +1,4 @@
-{
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 with lib; {
   options.test = {
     name = mkOption {
@@ -36,13 +32,11 @@ with lib; {
           };
         };
       });
-      default = [];
-      example = [
-        {
-          assertion = false;
-          message = "you can't enable this for some reason";
-        }
-      ];
+      default = [ ];
+      example = [{
+        assertion = false;
+        message = "you can't enable this for some reason";
+      }];
       description = ''
         This option allows modules to express conditions that must
         hold for the evaluation of the system configuration to

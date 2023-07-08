@@ -1,11 +1,4 @@
-{
-  config,
-  lib,
-  kubenix,
-  images,
-  test,
-  ...
-}:
+{ config, lib, kubenix, images, test, ... }:
 with lib; let
   cfg = config.kubernetes.api.resources.deployments.nginx;
   image = images.nginx;
@@ -17,17 +10,16 @@ with lib; let
       inherit (config.kubernetes) namespace;
       name = "curl";
     };
-    spec.containers = [
-      {
-        name = "curl";
-        image = config.docker.images.curl.path;
-        args = ["curl" "--retry" "20" "--retry-connrefused" "http://nginx"];
-      }
-    ];
+    spec.containers = [{
+      name = "curl";
+      image = config.docker.images.curl.path;
+      args = [ "curl" "--retry" "20" "--retry-connrefused" "http://nginx" ];
+    }];
     spec.restartPolicy = "Never";
   });
-in {
-  imports = [kubenix.modules.test kubenix.modules.k8s kubenix.modules.docker];
+in
+{
+  imports = [ kubenix.modules.test kubenix.modules.k8s kubenix.modules.docker ];
 
   test = {
     name = "k8s-deployment";

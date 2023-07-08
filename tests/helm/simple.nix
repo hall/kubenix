@@ -1,11 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  kubenix,
-  helm,
-  ...
-}:
+{ config, lib, pkgs, kubenix, helm, ... }:
 with lib;
 with kubenix.lib;
 with pkgs.dockerTools; let
@@ -35,8 +28,9 @@ with pkgs.dockerTools; let
     finalImageName = "docker.io/bitnami/bitnami-shell";
     finalImageTag = "10";
   };
-in {
-  imports = [kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s kubenix.modules.docker];
+in
+{
+  imports = [ kubenix.modules.test kubenix.modules.helm kubenix.modules.k8s kubenix.modules.docker ];
 
   docker.images = {
     postgresql.image = postgresql;

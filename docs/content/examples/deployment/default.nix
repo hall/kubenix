@@ -1,8 +1,8 @@
-{kubenix ? import ../../../..}:
+{ kubenix ? import ../../../.. }:
 kubenix.evalModules.${builtins.currentSystem} {
-  module = {kubenix, ...}: {
+  module = { kubenix, ... }: {
     # instead of defining everything inline, let's import it
-    imports = [./module.nix];
+    imports = [ ./module.nix ];
 
     # annotate the generated resources with a project name
     kubenix.project = "example";

@@ -1,12 +1,5 @@
 # K8S module defines kubernetes definitions for kubenix
-{
-  options,
-  config,
-  lib,
-  pkgs,
-  k8s,
-  ...
-}:
+{ options, config, lib, pkgs, k8s, ... }:
 with lib; let
   versions = (import ../versions.nix).versions;
   cfg = config.kubernetes;
@@ -15,12 +8,11 @@ with lib; let
 
   getDefaults = resource: group: version: kind:
     catAttrs "default" (filter
-      (
-        default:
-          (resource == null || default.resource == null || default.resource == resource)
-          && (default.group == null || default.group == group)
-          && (default.version == null || default.version == version)
-          && (default.kind == null || default.kind == kind)
+      (default:
+        (resource == null || default.resource == null || default.resource == resource)
+        && (default.group == null || default.group == group)
+        && (default.version == null || default.version == version)
+        && (default.kind == null || default.kind == kind)
       )
       cfg.api.defaults);
 
@@ -31,7 +23,7 @@ with lib; let
     then map moduleToAttrs value
     else value;
 
-  apiOptions = {config, ...}: {
+  apiOptions = { config, ... }: {
     options = {
       definitions = mkOption {
         description = "Attribute set of kubernetes definitions";
@@ -74,18 +66,17 @@ with lib; let
             default = mkOption {
               description = "Default to apply";
               type = types.unspecified;
-              default = {};
+              default = { };
             };
           };
         }));
-        default = [];
+        default = [ ];
         apply = unique;
       };
 
       types = mkOption {
         description = "List of registered kubernetes types";
-        type =
-          coerceListOfSubmodulesToAttrs
+        type = coerceListOfSubmodulesToAttrs
           {
             options = {
               group = mkOption {
@@ -115,7 +106,7 @@ with lib; let
             };
           }
           gvkKeyFn;
-        default = {};
+        default = { };
       };
     };
 
@@ -133,20 +124,21 @@ with lib; let
         else -1)
       lst));
 
-  compareVersions = ver1: ver2: let
-    getVersion = substring 1 10;
-    splittedVer1 = builtins.splitVersion (getVersion ver1);
-    splittedVer2 = builtins.splitVersion (getVersion ver2);
+  compareVersions = ver1: ver2:
+    let
+      getVersion = substring 1 10;
+      splittedVer1 = builtins.splitVersion (getVersion ver1);
+      splittedVer2 = builtins.splitVersion (getVersion ver2);
 
-    v1 =
-      if length splittedVer1 == 1
-      then "${getVersion ver1}prod"
-      else getVersion ver1;
-    v2 =
-      if length splittedVer2 == 1
-      then "${getVersion ver2}prod"
-      else getVersion ver2;
-  in
+      v1 =
+        if length splittedVer1 == 1
+        then "${getVersion ver1}prod"
+        else getVersion ver1;
+      v2 =
+        if length splittedVer2 == 1
+        then "${getVersion ver2}prod"
+        else getVersion ver2;
+    in
     builtins.compareVersions v1 v2;
 
   customResourceTypesByAttrName = zipAttrs (mapAttrsToList
@@ -155,23 +147,20 @@ with lib; let
     })
     cfg.customTypes);
 
-  customResourceTypesByAttrNameSortByVersion =
-    mapAttrs
-    (
-      _: resourceTypes:
-        reverseList (sort
-          (
-            r1: r2:
-              compareVersions r1.version r2.version > 0
-          )
-          resourceTypes)
+  customResourceTypesByAttrNameSortByVersion = mapAttrs
+    (_: resourceTypes:
+      reverseList (sort
+        (
+          r1: r2:
+            compareVersions r1.version r2.version > 0
+        )
+        resourceTypes)
     )
     customResourceTypesByAttrName;
 
-  latestCustomResourceTypes =
-    mapAttrsToList (_: last) customResourceTypesByAttrNameSortByVersion;
+  latestCustomResourceTypes = mapAttrsToList (_: last) customResourceTypesByAttrNameSortByVersion;
 
-  customResourceModuleForType = config: ct: {name, ...}: {
+  customResourceModuleForType = config: ct: { name, ... }: {
     imports = getDefaults ct.name ct.group ct.version ct.kind;
     options = {
       apiVersion = mkOption {
@@ -192,7 +181,7 @@ with lib; let
       spec = mkOption {
         description = "Module spec";
         type = types.either types.attrs (types.submodule ct.module);
-        default = {};
+        default = { };
       };
     };
 
@@ -203,73 +192,74 @@ with lib; let
     };
   };
 
-  customResourceOptions =
-    (mapAttrsToList
-      (_: ct: {config, ...}: let
+  customResourceOptions = (mapAttrsToList
+    (_: ct: { config, ... }:
+      let
         module = customResourceModuleForType config ct;
-      in {
+      in
+      {
         options.resources.${ct.group}.${ct.version}.${ct.kind} = mkOption {
           inherit (ct) description;
           type = types.attrsOf (types.submodule module);
-          default = {};
+          default = { };
         };
       })
-      cfg.customTypes)
-    ++ (map
-      (ct: {
-        options,
-        config,
-        ...
-      }: let
+    cfg.customTypes)
+  ++ (map
+    (ct: { options, config, ... }:
+      let
         module = customResourceModuleForType config ct;
-      in {
+      in
+      {
         options.resources.${ct.attrName} = mkOption {
           inherit (ct) description;
           type = types.attrsOf (types.submodule module);
-          default = {};
+          default = { };
         };
 
         config.resources.${ct.group}.${ct.version}.${ct.kind} =
           mkAliasDefinitions options.resources.${ct.attrName};
       })
-      latestCustomResourceTypes);
+    latestCustomResourceTypes);
 
-  coerceListOfSubmodulesToAttrs = submodule: keyFn: let
-    mergeValuesByFn = keyFn: values:
-      listToAttrs (map
-        (
-          value:
+  coerceListOfSubmodulesToAttrs = submodule: keyFn:
+    let
+      mergeValuesByFn = keyFn: values:
+        listToAttrs (map
+          (value:
             nameValuePair (toString (keyFn value)) value
-        )
-        values);
+          )
+          values);
 
-    # Either value of type `finalType` or `coercedType`, the latter is
-    # converted to `finalType` using `coerceFunc`.
-    coercedTo = coercedType: coerceFunc: finalType:
-      mkOptionType rec {
-        name = "coercedTo";
-        description = "${finalType.description} or ${coercedType.description}";
-        check = x: finalType.check x || coercedType.check x;
-        merge = loc: defs: let
-          coerceVal = val:
-            if finalType.check val
-            then val
-            else let coerced = coerceFunc val; in assert finalType.check coerced; coerced;
-        in
-          finalType.merge loc (map (def: def // {value = coerceVal def.value;}) defs);
-        inherit (finalType) getSubOptions;
-        inherit (finalType) getSubModules;
-        substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
-        typeMerge = _t1: _t2: null;
-        functor = (defaultFunctor name) // {wrapped = finalType;};
-      };
-  in
+      # Either value of type `finalType` or `coercedType`, the latter is
+      # converted to `finalType` using `coerceFunc`.
+      coercedTo = coercedType: coerceFunc: finalType:
+        mkOptionType rec {
+          name = "coercedTo";
+          description = "${finalType.description} or ${coercedType.description}";
+          check = x: finalType.check x || coercedType.check x;
+          merge = loc: defs:
+            let
+              coerceVal = val:
+                if finalType.check val
+                then val
+                else let coerced = coerceFunc val; in assert finalType.check coerced; coerced;
+            in
+            finalType.merge loc (map (def: def // { value = coerceVal def.value; }) defs);
+          inherit (finalType) getSubOptions;
+          inherit (finalType) getSubModules;
+          substSubModules = m: coercedTo coercedType coerceFunc (finalType.substSubModules m);
+          typeMerge = _t1: _t2: null;
+          functor = (defaultFunctor name) // { wrapped = finalType; };
+        };
+    in
     coercedTo
-    (types.listOf (types.submodule submodule))
-    (mergeValuesByFn keyFn)
-    (types.attrsOf (types.submodule submodule));
-in {
-  imports = [./base.nix];
+      (types.listOf (types.submodule submodule))
+      (mergeValuesByFn keyFn)
+      (types.attrsOf (types.submodule submodule));
+in
+{
+  imports = [ ./base.nix ];
 
   options.kubernetes = {
     kubeconfig = mkOption {
@@ -296,7 +286,7 @@ in {
     customResources = mkOption {
       description = "Setup custom resources";
       type = types.listOf types.attrs;
-      default = [];
+      default = [ ];
     };
 
     resourceOrder = mkOption {
@@ -310,25 +300,24 @@ in {
 
     api = mkOption {
       type = types.submodule {
-        imports =
-          [
-            ./generated/v${cfg.version}.nix
-            apiOptions
-          ]
-          ++ customResourceOptions;
+        imports = [
+          ./generated/v${cfg.version}.nix
+          apiOptions
+        ]
+        ++ customResourceOptions;
       };
-      default = {};
+      default = { };
     };
 
     imports = mkOption {
       type = types.listOf (types.either types.package types.path);
       description = "List of resources to import";
-      default = [];
+      default = [ ];
     };
 
     resources = mkOption {
       description = "Alias for `config.kubernetes.api.resources` options";
-      default = {};
+      default = { };
       type = types.attrsOf types.attrs;
     };
 
@@ -342,8 +331,7 @@ in {
           group = "helm.cattle.io";
         };
       };
-      type =
-        coerceListOfSubmodulesToAttrs
+      type = coerceListOfSubmodulesToAttrs
         {
           options = {
             group = mkOption {
@@ -385,12 +373,12 @@ in {
             module = mkOption {
               description = "Custom type module";
               type = types.unspecified;
-              default = {};
+              default = { };
             };
           };
         }
         gvkKeyFn;
-      default = {};
+      default = { };
     };
 
     objects = mkOption {
@@ -398,16 +386,15 @@ in {
       type = types.listOf types.attrs;
       apply = items:
         sort
-        (
-          r1: r2:
+          (r1: r2:
             if elem r1.kind cfg.resourceOrder && elem r2.kind cfg.resourceOrder
             then indexOf cfg.resourceOrder r1.kind < indexOf cfg.resourceOrder r2.kind
             else if elem r1.kind cfg.resourceOrder
             then true
             else false
-        )
-        (unique items);
-      default = [];
+          )
+          (unique items);
+      default = [ ];
     };
 
     generated = mkOption {
@@ -428,12 +415,12 @@ in {
 
   config = {
     # features that module is defining
-    _m.features = ["k8s"];
+    _m.features = [ "k8s" ];
 
     # module propagation options
     _m.propagate = [
       {
-        features = ["k8s"];
+        features = [ "k8s" ];
         module = _: {
           # propagate kubernetes version and namespace
           kubernetes.version = mkDefault cfg.version;
@@ -441,8 +428,8 @@ in {
         };
       }
       {
-        features = ["k8s" "submodule"];
-        module = {config, ...}: {
+        features = [ "k8s" "submodule" ];
+        module = { config, ... }: {
           # set module defaults
           kubernetes.api.defaults =
             (filter (default: default.propagate) cfg.api.defaults)
@@ -460,40 +447,37 @@ in {
     ];
 
     # expose k8s helper methods as module argument
-    _module.args.k8s = import ../lib/k8s {inherit lib;};
+    _module.args.k8s = import ../lib/k8s { inherit lib; };
 
     kubernetes.api = mkMerge ([
-        {
-          # register custom types
-          types =
-            mapAttrsToList
-            (_: cr: {
-              inherit (cr) name group version kind attrName;
-            })
-            cfg.customTypes;
+      {
+        # register custom types
+        types = mapAttrsToList
+          (_: cr: {
+            inherit (cr) name group version kind attrName;
+          })
+          cfg.customTypes;
 
-          defaults = [
-            {
-              default = {
-                # set default kubernetes namespace to all resources
-                metadata.namespace =
-                  mkIf (config.kubernetes.namespace != null)
-                  (mkDefault config.kubernetes.namespace);
+        defaults = [{
+          default = {
+            # set default kubernetes namespace to all resources
+            metadata.namespace = mkIf (config.kubernetes.namespace != null)
+              (mkDefault config.kubernetes.namespace);
 
-                # set project name to all resources
-                metadata.annotations = {
-                  "kubenix/project-name" = config.kubenix.project;
-                  "kubenix/k8s-version" = cfg.version;
-                };
-              };
-            }
-          ];
-        }
-      ]
-      ++
-      # import of yaml files
-      (map
-        (i: let
+            # set project name to all resources
+            metadata.annotations = {
+              "kubenix/project-name" = config.kubenix.project;
+              "kubenix/k8s-version" = cfg.version;
+            };
+          };
+        }];
+      }
+    ]
+    ++
+    # import of yaml files
+    (map
+      (i:
+        let
           # load yaml file
           object = importYAML i;
           groupVersion = splitString "/" object.apiVersion;
@@ -504,15 +488,15 @@ in {
             then "core"
             else head groupVersion;
           inherit (object) kind;
-        in {
+        in
+        {
           resources.${group}.${version}.${kind}.${name} = object;
         })
-        cfg.imports));
+      cfg.imports));
 
     kubernetes.objects = flatten (mapAttrsToList
-      (
-        _: type:
-          mapAttrsToList (_name: moduleToAttrs)
+      (_: type:
+        mapAttrsToList (_name: moduleToAttrs)
           cfg.api.resources.${type.group}.${type.version}.${type.kind}
       )
       cfg.api.types);

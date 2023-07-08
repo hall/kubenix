@@ -1,27 +1,22 @@
-{
-  name,
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ name, config, lib, kubenix, ... }:
 with lib; let
-  submodule = {name, ...}: {
-    imports = [kubenix.modules.submodule];
+  submodule = { name, ... }: {
+    imports = [ kubenix.modules.submodule ];
 
     config.submodule = {
       name = "subm";
       passthru.global.${name} = "true";
     };
   };
-in {
-  imports = with kubenix.modules; [test submodules];
+in
+{
+  imports = with kubenix.modules; [ test submodules ];
 
   options = {
     global = mkOption {
       description = "Global value";
       type = types.attrs;
-      default = {};
+      default = { };
     };
   };
 
@@ -45,11 +40,9 @@ in {
       ];
     };
 
-    submodules.imports = [
-      {
-        modules = [submodule];
-      }
-    ];
+    submodules.imports = [{
+      modules = [ submodule ];
+    }];
 
     submodules.instances.inst1 = {
       submodule = "subm";

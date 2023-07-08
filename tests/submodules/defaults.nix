@@ -1,10 +1,4 @@
-{
-  name,
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ name, config, lib, kubenix, ... }:
 with lib; let
   inherit (config.submodules.instances) instance1;
   inherit (config.submodules.instances) instance2;
@@ -13,8 +7,8 @@ with lib; let
   inherit (config.submodules.instances) instance5;
   inherit (config.submodules.instances) versioned-submodule;
 
-  submodule = {...}: {
-    imports = [kubenix.modules.submodule];
+  submodule = { ... }: {
+    imports = [ kubenix.modules.submodule ];
 
     options.submodule.args = {
       value = mkOption {
@@ -28,8 +22,9 @@ with lib; let
       };
     };
   };
-in {
-  imports = with kubenix.modules; [test submodules];
+in
+{
+  imports = with kubenix.modules; [ test submodules ];
 
   test = {
     name = "submodules-defaults";
@@ -80,7 +75,7 @@ in {
         {
           submodule = {
             name = "submodule1";
-            tags = ["tag1"];
+            tags = [ "tag1" ];
           };
         }
       ];
@@ -91,7 +86,7 @@ in {
         {
           submodule = {
             name = "submodule2";
-            tags = ["tag2"];
+            tags = [ "tag2" ];
           };
         }
       ];
@@ -102,7 +97,7 @@ in {
         {
           submodule = {
             name = "submodule3";
-            tags = ["tag2"];
+            tags = [ "tag2" ];
           };
         }
       ];
@@ -146,11 +141,11 @@ in {
       default.submodule.args.defaultValue = mkDefault "value";
     }
     {
-      tags = ["tag1"];
+      tags = [ "tag1" ];
       default.submodule.args.value = mkDefault "value1";
     }
     {
-      tags = ["tag2"];
+      tags = [ "tag2" ];
       default.submodule.args.value = mkDefault "value2";
     }
     {
@@ -158,7 +153,7 @@ in {
       default.submodule.args.value = mkDefault "value4";
     }
     {
-      default = {config, ...}: {
+      default = { config, ... }: {
         submodule.args.defaultValue = mkIf (config.submodule.args.value == "custom-value") "my-custom-value";
       };
     }

@@ -1,21 +1,20 @@
-{
-  stdenv,
-  lib,
-  fetchFromGitHub,
-  removeReferencesTo,
-  which,
-  go,
-  makeWrapper,
-  rsync,
-  installShellFiles,
-  components ? [
+{ stdenv
+, lib
+, fetchFromGitHub
+, removeReferencesTo
+, which
+, go
+, makeWrapper
+, rsync
+, installShellFiles
+, components ? [
     "cmd/kubelet"
     "cmd/kube-apiserver"
     "cmd/kube-controller-manager"
     "cmd/kube-proxy"
     "cmd/kube-scheduler"
     "test/e2e/e2e.test"
-  ],
+  ]
 }:
 stdenv.mkDerivation rec {
   pname = "kubernetes";
@@ -28,11 +27,11 @@ stdenv.mkDerivation rec {
     hash = "sha256-r9Clwr+87Ns4VXUW9F6cgks+LknY39ngbQgZ5UMZ0Vo=";
   };
 
-  nativeBuildInputs = [removeReferencesTo makeWrapper which go rsync installShellFiles];
+  nativeBuildInputs = [ removeReferencesTo makeWrapper which go rsync installShellFiles ];
 
-  outputs = ["out" "man" "pause"];
+  outputs = [ "out" "man" "pause" ];
 
-  patches = [./fixup-addonmanager-lib-path.patch];
+  patches = [ ./fixup-addonmanager-lib-path.patch ];
 
   postPatch = ''
     # go env breaks the sandbox
@@ -48,10 +47,10 @@ stdenv.mkDerivation rec {
   '';
 
   WHAT = lib.concatStringsSep " " ([
-      "cmd/kubeadm"
-      "cmd/kubectl"
-    ]
-    ++ components);
+    "cmd/kubeadm"
+    "cmd/kubectl"
+  ]
+  ++ components);
 
   postBuild = ''
     ./hack/update-generated-docs.sh
@@ -84,7 +83,7 @@ stdenv.mkDerivation rec {
     description = "Production-Grade Container Scheduling and Management";
     license = licenses.asl20;
     homepage = "https://kubernetes.io";
-    maintainers = with maintainers; [johanot offline saschagrunert];
+    maintainers = with maintainers; [ johanot offline saschagrunert ];
     platforms = platforms.unix;
   };
 }

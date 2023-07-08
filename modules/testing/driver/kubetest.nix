@@ -1,23 +1,15 @@
-{
-  lib,
-  config,
-  pkgs,
-  ...
-}:
+{ lib, config, pkgs, ... }:
 with lib; let
   inherit (config) testing;
   cfg = testing.driver.kubetest;
 
-  kubetest = import ./kubetestdrv.nix {inherit pkgs;};
+  kubetest = import ./kubetestdrv.nix { inherit pkgs; };
 
-  pythonEnv = pkgs.python38.withPackages (ps:
-    with ps;
-      [
-        pytest
-        kubetest
-        kubernetes
-      ]
-      ++ cfg.extraPackages);
+  pythonEnv = pkgs.python38.withPackages (ps: with ps; [
+    pytest
+    kubetest
+    kubernetes
+  ] ++ cfg.extraPackages);
 
   toTestScript = t:
     if isString t.script
@@ -28,26 +20,29 @@ with lib; let
       ''
     else t.script;
 
-  tests = let
-    # make sure tests are prefixed so that alphanumerical
-    # sorting reproduces them in the same order as they
-    # have been declared in the list.
-    seive = t: t.script != null && t.enabled;
-    allEligibleTests = filter seive testing.tests;
-    listLengthPadding = builtins.length (
-      lib.stringToCharacters (
-        builtins.toString (
-          builtins.length allEligibleTests
+  tests =
+    let
+      # make sure tests are prefixed so that alphanumerical
+      # sorting reproduces them in the same order as they
+      # have been declared in the list.
+      seive = t: t.script != null && t.enabled;
+      allEligibleTests = filter seive testing.tests;
+      listLengthPadding = builtins.length (
+        lib.stringToCharacters (
+          builtins.toString (
+            builtins.length allEligibleTests
+          )
         )
-      )
-    );
-    op = i: t: {
-      path = toTestScript t;
-      name = let
-        prefix = lib.fixedWidthNumber listLengthPadding i;
-      in "${prefix}_${t.name}_test.py";
-    };
-  in
+      );
+      op = i: t: {
+        path = toTestScript t;
+        name =
+          let
+            prefix = lib.fixedWidthNumber listLengthPadding i;
+          in
+          "${prefix}_${t.name}_test.py";
+      };
+    in
     pkgs.linkFarm "${testing.name}-tests" (
       lib.imap0 op allEligibleTests
     );
@@ -56,7 +51,8 @@ with lib; let
     #!/usr/bin/env bash
     ${pythonEnv}/bin/pytest -p no:cacheprovider ${tests} $@
   '';
-in {
+in
+{
   options.testing.driver.kubetest = {
     defaultHeader = mkOption {
       type = types.lines;
@@ -69,7 +65,7 @@ in {
     extraPackages = mkOption {
       type = types.listOf types.package;
       description = "Extra packages to pass to tests";
-      default = [];
+      default = [ ];
     };
   };
 

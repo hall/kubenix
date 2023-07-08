@@ -1,12 +1,6 @@
 # helm defines kubenix module with options for using helm charts
 # with kubenix
-{
-  config,
-  lib,
-  pkgs,
-  helm,
-  ...
-}:
+{ config, lib, pkgs, helm, ... }:
 with lib; let
   cfg = config.kubernetes.helm;
 
@@ -16,29 +10,28 @@ with lib; let
     name = "recursive-attrs";
     description = "recursive attribute set";
     check = isAttrs;
-    merge = _loc: foldl' (res: def: recursiveUpdate res def.value) {};
+    merge = _loc: foldl' (res: def: recursiveUpdate res def.value) { };
   };
 
-  parseApiVersion = apiVersion: let
-    splitted = splitString "/" apiVersion;
-  in {
-    group =
-      if length splitted == 1
-      then "core"
-      else head splitted;
-    version = last splitted;
-  };
-in {
-  imports = [./k8s.nix];
+  parseApiVersion = apiVersion:
+    let
+      splitted = splitString "/" apiVersion;
+    in
+    {
+      group =
+        if length splitted == 1
+        then "core"
+        else head splitted;
+      version = last splitted;
+    };
+in
+{
+  imports = [ ./k8s.nix ];
 
   options.kubernetes.helm = {
     releases = mkOption {
       description = "Attribute set of helm releases";
-      type = types.attrsOf (types.submodule ({
-        config,
-        name,
-        ...
-      }: {
+      type = types.attrsOf (types.submodule ({ config, name, ... }: {
         options = {
           name = mkOption {
             description = "Helm release name";
@@ -60,7 +53,7 @@ in {
           values = mkOption {
             description = "Values to pass to chart";
             type = recursiveAttrs;
-            default = {};
+            default = { };
           };
 
           kubeVersion = mkOption {
@@ -72,7 +65,7 @@ in {
           overrides = mkOption {
             description = "Overrides to apply to all chart resources";
             type = types.listOf types.unspecified;
-            default = [];
+            default = [ ];
           };
 
           overrideNamespace = mkOption {
@@ -109,42 +102,40 @@ in {
           objects = mkOption {
             description = "Generated kubernetes objects";
             type = types.listOf types.attrs;
-            default = [];
+            default = [ ];
           };
         };
 
-        config.overrides = mkIf (config.overrideNamespace && config.namespace != null) [
-          {
-            metadata.namespace = config.namespace;
-          }
-        ];
+        config.overrides = mkIf (config.overrideNamespace && config.namespace != null) [{
+          metadata.namespace = config.namespace;
+        }];
 
         config.objects = importJSON (helm.chart2json {
           inherit (config) chart name namespace values kubeVersion includeCRDs noHooks;
         });
       }));
-      default = {};
+      default = { };
     };
   };
 
   config = {
     # expose helm helper methods as module argument
-    _module.args.helm = import ../lib/helm {inherit pkgs;};
+    _module.args.helm = import ../lib/helm { inherit pkgs; };
 
     kubernetes.api.resources = mkMerge (flatten (mapAttrsToList
-      (
-        _: release:
-          map
-          (object: let
+      (_: release: map
+        (object:
+          let
             apiVersion = parseApiVersion object.apiVersion;
             inherit (object.metadata) name;
-          in {
+          in
+          {
             "${apiVersion.group}"."${apiVersion.version}".${object.kind}."${name}" = mkMerge ([
-                object
-              ]
-              ++ release.overrides);
+              object
+            ]
+            ++ release.overrides);
           })
-          release.objects
+        release.objects
       )
       cfg.releases));
   };

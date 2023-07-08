@@ -1,13 +1,6 @@
-{
-  name,
-  config,
-  lib,
-  kubenix,
-  images,
-  ...
-}:
+{ name, config, lib, kubenix, images, ... }:
 with lib; {
-  imports = with kubenix.modules; [test submodules k8s docker];
+  imports = with kubenix.modules; [ test submodules k8s docker ];
 
   test = {
     name = "k8s-submodule";
@@ -26,41 +19,33 @@ with lib; {
 
   kubernetes.namespace = "test-namespace";
 
-  submodules.imports = [
-    {
-      module = {
-        name,
-        config,
-        ...
-      }: {
-        imports = with kubenix.modules; [submodule k8s docker];
+  submodules.imports = [{
+    module = { name, config, ... }: {
+      imports = with kubenix.modules; [ submodule k8s docker ];
 
-        config = {
-          submodule = {
-            name = "test-submodule";
-            passthru = {
-              kubernetes.objects = config.kubernetes.objects;
-              docker.images = config.docker.images;
-            };
+      config = {
+        submodule = {
+          name = "test-submodule";
+          passthru = {
+            kubernetes.objects = config.kubernetes.objects;
+            docker.images = config.docker.images;
           };
-
-          kubernetes.resources.pods.nginx = {
-            metadata.name = name;
-            spec.containers.nginx.image = config.docker.images.nginx.path;
-          };
-
-          docker.images.nginx.image = images.nginx;
         };
-      };
-    }
-  ];
 
-  kubernetes.api.defaults = [
-    {
-      propagate = true;
-      default.metadata.labels.my-label = "my-value";
-    }
-  ];
+        kubernetes.resources.pods.nginx = {
+          metadata.name = name;
+          spec.containers.nginx.image = config.docker.images.nginx.path;
+        };
+
+        docker.images.nginx.image = images.nginx;
+      };
+    };
+  }];
+
+  kubernetes.api.defaults = [{
+    propagate = true;
+    default.metadata.labels.my-label = "my-value";
+  }];
 
   submodules.instances.passthru = {
     submodule = "test-submodule";

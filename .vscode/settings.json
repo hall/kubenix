@@ -1,6 +1,6 @@
 {
     "git.detectSubmodules": false,
-    "nix.formatterPath": "alejandra",
+    "nix.enableLanguageServer": true,
     "search.exclude": {
         "docs/themes": true
     }

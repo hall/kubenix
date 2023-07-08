@@ -1,4 +1,4 @@
-{lib, ...}:
+{ lib, ... }:
 with lib; {
   options = {
     kubenix.project = mkOption {
@@ -10,7 +10,7 @@ with lib; {
     _m.features = mkOption {
       description = "List of features exposed by module";
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
     };
 
     _m.propagate = mkOption {
@@ -20,17 +20,17 @@ with lib; {
           features = mkOption {
             description = "List of features that submodule has to have to propagate module";
             type = types.listOf types.str;
-            default = [];
+            default = [ ];
           };
 
           module = mkOption {
             description = "Module to propagate";
             type = types.unspecified;
-            default = {};
+            default = { };
           };
         };
       }));
-      default = [];
+      default = [ ];
     };
   };
 }

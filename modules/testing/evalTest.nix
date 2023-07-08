@@ -1,10 +1,4 @@
-{
-  lib,
-  config,
-  testing,
-  kubenix,
-  ...
-}:
+{ lib, config, testing, kubenix, ... }:
 with lib; let
   modules = [
     # testing module
@@ -29,13 +23,9 @@ with lib; let
 
   # eval without checking
   evaled' = kubenix.evalModules {
-    modules =
-      modules
-      ++ [
-        {
-          _module.args.check = false;
-        }
-      ];
+    modules = modules ++ [{
+      _module.args.check = false;
+    }];
   };
 
   # test configuration
@@ -45,13 +35,11 @@ with lib; let
   testFeatures = evaled'.config._m.features;
 
   # common options that can be applied on this test
-  commonOpts =
-    filter
-    (
-      d:
-        (intersectLists d.features testFeatures)
-        == d.features
-        || (length d.features) == 0
+  commonOpts = filter
+    (d:
+      (intersectLists d.features testFeatures)
+      == d.features
+      || (length d.features) == 0
     )
     testing.common;
 
@@ -59,17 +47,19 @@ with lib; let
   modulesWithCommonOptions = modules ++ (map (d: d.options) commonOpts);
 
   # evaled test
-  evaled = let
-    evaled' = kubenix.evalModules {
-      modules = modulesWithCommonOptions;
-    };
-  in
+  evaled =
+    let
+      evaled' = kubenix.evalModules {
+        modules = modulesWithCommonOptions;
+      };
+    in
     if testing.doThrowError
     then evaled'
     else if (builtins.tryEval evaled'.config.test.assertions).success
     then evaled'
     else null;
-in {
+in
+{
   options = {
     module = mkOption {
       description = "Module defining kubenix test";
@@ -112,7 +102,7 @@ in {
       description = "Test result";
       type = types.unspecified;
       internal = true;
-      default = [];
+      default = [ ];
     };
 
     script = mkOption {

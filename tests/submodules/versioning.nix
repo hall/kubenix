@@ -1,17 +1,11 @@
-{
-  name,
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ name, config, lib, kubenix, ... }:
 with lib; let
   inst-exact = config.submodules.instances.inst-exact.config;
   inst-regex = config.submodules.instances.inst-regex.config;
   inst-latest = config.submodules.instances.inst-latest.config;
 
   submodule = {
-    imports = [kubenix.modules.submodule];
+    imports = [ kubenix.modules.submodule ];
 
     options.version = mkOption {
       type = types.str;
@@ -20,8 +14,9 @@ with lib; let
 
     config.submodule.name = "subm";
   };
-in {
-  imports = with kubenix.modules; [test submodules];
+in
+{
+  imports = with kubenix.modules; [ test submodules ];
 
   test = {
     name = "submodules-versioning";

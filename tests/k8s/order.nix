@@ -1,11 +1,6 @@
-{
-  config,
-  lib,
-  kubenix,
-  ...
-}:
+{ config, lib, kubenix, ... }:
 with lib; {
-  imports = with kubenix.modules; [test k8s];
+  imports = with kubenix.modules; [ test k8s ];
 
   test = {
     name = "k8s-order";
@@ -39,7 +34,7 @@ with lib; {
         plural = "crontabs";
         singular = "crontab";
         kind = "CronTab";
-        shortNames = ["ct"];
+        shortNames = [ "ct" ];
       };
     };
   };
@@ -62,7 +57,7 @@ with lib; {
     }
   ];
 
-  kubernetes.resources.namespaces.test = {};
+  kubernetes.resources.namespaces.test = { };
 
   kubernetes.resources."stable.example.com"."v1".CronTab.crontab.spec.schedule = "* * * * *";
 }

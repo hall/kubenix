@@ -12,19 +12,17 @@ let
     "1.26.5" = "sha256:1dyqvggyvqw3z9sml2x06v1l9kynqcs8bkfrkx8jy81gkvg7qxdi";
     "1.27.2" = "sha256:1yqcds6lvpnvc5dsv9pnvp5qb3kc5y6cdgx827szljdlwf51wd15";
   };
-in {
+in
+{
   inherit full;
   # sorted list of major.minor version numbers
   # NOTE: avoiding pulling in lib here (not for any good reason)
-  versions =
-    map (v: let
-      arr = builtins.splitVersion v;
-    in (
-      builtins.concatStringsSep "."
-      [
-        (builtins.elemAt arr 0)
-        (builtins.elemAt arr 1)
+  versions = with builtins; map
+    (v: (
+      concatStringsSep "." [
+        (elemAt (splitVersion v) 0)
+        (elemAt (splitVersion v) 1)
       ]
     ))
-    (builtins.attrNames full);
+    (attrNames full);
 }

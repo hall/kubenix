@@ -1,10 +1,5 @@
 # nixos-k8s implements nixos kubernetes testing runtime
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ config, pkgs, lib, ... }:
 with lib; let
   inherit (config) testing;
   # kubeconfig = "/etc/${config.services.kubernetes.pki.etcClusterAdminKubeconfig}";
@@ -12,15 +7,15 @@ with lib; let
   kubecerts = "/var/lib/kubernetes/secrets";
 
   # how we differ from the standard configuration of mkKubernetesBaseTest
-  extraConfiguration = {config, ...}: {
+  extraConfiguration = { config, ... }: {
     virtualisation = {
       memorySize = 2048;
     };
 
     networking = {
-      nameservers = ["10.0.0.254"];
+      nameservers = [ "10.0.0.254" ];
       firewall = {
-        trustedInterfaces = ["docker0" "cni0"];
+        trustedInterfaces = [ "docker0" "cni0" ];
       };
     };
 
@@ -29,26 +24,22 @@ with lib; let
       kubelet = {
         seedDockerImages = testing.docker.images;
         networkPlugin = "cni";
-        cni.config = [
-          {
-            name = "mynet";
-            type = "bridge";
-            bridge = "cni0";
-            addIf = true;
-            ipMasq = true;
-            isGateway = true;
-            ipam = {
-              type = "host-local";
-              subnet = "10.1.0.0/16";
-              gateway = "10.1.0.1";
-              routes = [
-                {
-                  dst = "0.0.0.0/0";
-                }
-              ];
-            };
-          }
-        ];
+        cni.config = [{
+          name = "mynet";
+          type = "bridge";
+          bridge = "cni0";
+          addIf = true;
+          ipMasq = true;
+          isGateway = true;
+          ipam = {
+            type = "host-local";
+            subnet = "10.1.0.0/16";
+            gateway = "10.1.0.1";
+            routes = [{
+              dst = "0.0.0.0/0";
+            }];
+          };
+        }];
       };
     };
 
@@ -58,8 +49,8 @@ with lib; let
       services.copy-certs = {
         description = "Share k8s certificates with host";
         script = "cp -rf ${kubecerts} /tmp/xchg/; cp -f ${kubeconfig} /tmp/xchg/;";
-        after = ["kubernetes.target"];
-        wantedBy = ["multi-user.target"];
+        after = [ "kubernetes.target" ];
+        wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
@@ -72,16 +63,18 @@ with lib; let
     machine1.succeed("${testing.testScript} --kube-config=${kubeconfig}")
   '';
 
-  test = with import "${pkgs.path}/nixos/tests/kubernetes/base.nix" {
-    inherit pkgs;
-    inherit (pkgs) system;
-  };
+  test = with import "${pkgs.path}/nixos/tests/kubernetes/base.nix"
+    {
+      inherit pkgs;
+      inherit (pkgs) system;
+    };
     mkKubernetesSingleNodeTest {
       inherit extraConfiguration;
       inherit (config.testing) name;
       test = script;
     };
-in {
+in
+{
   options.testing.runtime.nixos-k8s = {
     driver = mkOption {
       description = "Test driver";

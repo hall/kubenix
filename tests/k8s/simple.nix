@@ -1,11 +1,9 @@
-{
-  config,
-  kubenix,
-  ...
-}: let
+{ config, kubenix, ... }:
+let
   cfg = config.kubernetes.api.resources.pods.nginx;
-in {
-  imports = [kubenix.modules.test kubenix.modules.k8s];
+in
+{
+  imports = [ kubenix.modules.test kubenix.modules.k8s ];
 
   test = {
     name = "k8s-simple";
@@ -22,5 +20,5 @@ in {
     ];
   };
 
-  kubernetes.resources.pods.nginx = {};
+  kubernetes.resources.pods.nginx = { };
 }
