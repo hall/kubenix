@@ -19,6 +19,12 @@
         (system: f inputs.nixpkgs.legacyPackages.${system});
     in
     {
+      nixosModules.kubenix = import ./modules;
+
+      overlays.default = _final: prev: {
+        kubenix.evalModules = self.evalModules.${prev.system};
+      };
+
       # evalModules with same interface as lib.evalModules and kubenix as special argument
       evalModules = eachSystem (pkgs:
         attrs @ { module ? null, modules ? [ module ], ... }:
@@ -51,37 +57,24 @@
           attrs')
       );
 
-      devShells = eachSystem (pkgs: {
-        default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            dive
-            k9s
-            kube3d
-            kubie
-          ];
-          packages = [
-            (pkgs.writeShellScriptBin "evalnix" ''
-              # check nix parsing (e.g., in CI)
-              ${pkgs.fd}/bin/fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null
-            '')
-          ];
+      packages = eachSystem (pkgs: {
+        default = pkgs.callPackage ./pkgs/kubenix.nix {
+          inherit (self.packages.${system});
+          evalModules = self.evalModules.${pkgs.system};
         };
-      });
-
-      formatter = eachSystem (pkgs: (inputs.treefmt.lib.evalModule pkgs {
-        projectRootFile = "flake.nix";
-        programs = {
-          nixpkgs-fmt.enable = true;
-          black.enable = true;
-          prettier.enable = true;
-          shfmt.enable = true;
+        docs = import ./docs {
+          inherit pkgs;
+          options = (self.evalModules.${pkgs.system} {
+            modules = builtins.attrValues (builtins.removeAttrs
+              # the submodules module currently doesn't evaluate:
+              #     error: No module found ‹name›/latest
+              # not sure how important that documentation is at this time
+              self.nixosModules.kubenix [ "submodule" "submodules" ]);
+          }).options;
         };
-        settings.global.excludes = [
-          "docs/themes/*"
-          "docs/layouts/*"
-          "modules/generated/*"
-        ];
-      }).config.build.wrapper);
+      } // pkgs.lib.attrsets.mapAttrs' (name: value: pkgs.lib.attrsets.nameValuePair "generate-${name}" value)
+        (builtins.removeAttrs (pkgs.callPackage ./pkgs/generators { }) [ "override" "overrideDerivation" ])
+      );
 
       apps = eachSystem (pkgs: {
         docs = {
@@ -124,25 +117,37 @@
         };
       });
 
-      packages = eachSystem (pkgs: {
-        default = pkgs.callPackage ./pkgs/kubenix.nix {
-          inherit (self.packages.${system});
-          evalModules = self.evalModules.${pkgs.system};
+      devShells = eachSystem (pkgs: {
+        default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            dive
+            k9s
+            kube3d
+            kubie
+          ];
+          packages = [
+            (pkgs.writeShellScriptBin "evalnix" ''
+              # check nix parsing (e.g., in CI)
+              ${pkgs.fd}/bin/fd --extension nix --exec nix-instantiate --parse --quiet {} >/dev/null
+            '')
+          ];
         };
-        docs = import ./docs {
-          inherit pkgs;
-          options = (self.evalModules.${pkgs.system} {
-            modules = builtins.attrValues (builtins.removeAttrs
-              # the submodules module currently doesn't evaluate:
-              #     error: No module found ‹name›/latest
-              # not sure how important that documentation is a this time
-              self.nixosModules.kubenix [ "submodule" "submodules" ]);
-          }).options;
+      });
+
+      formatter = eachSystem (pkgs: (inputs.treefmt.lib.evalModule pkgs {
+        projectRootFile = "flake.nix";
+        programs = {
+          nixpkgs-fmt.enable = true;
+          black.enable = true;
+          prettier.enable = true;
+          shfmt.enable = true;
         };
-      }
-      // pkgs.lib.attrsets.mapAttrs' (name: value: pkgs.lib.attrsets.nameValuePair "generate-${name}" value)
-        (builtins.removeAttrs (pkgs.callPackage ./pkgs/generators { }) [ "override" "overrideDerivation" ])
-      );
+        settings.global.excludes = [
+          "docs/themes/*"
+          "docs/layouts/*"
+          "modules/generated/*"
+        ];
+      }).config.build.wrapper);
 
       checks = eachSystem (pkgs:
         let
@@ -165,11 +170,5 @@
           })
           (import ./versions.nix).versions)
       );
-
-      nixosModules.kubenix = import ./modules;
-
-      overlays.default = _final: prev: {
-        kubenix.evalModules = self.evalModules.${prev.system};
-      };
     };
 }
