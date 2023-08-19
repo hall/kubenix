@@ -62,6 +62,23 @@ with lib; rec {
       } // labels;
     };
 
+  # Returns "<name>-<hash(data)>"
+  mkNameHash = { name, data, length ? 10 }:
+    "${name}-${builtins.substring 0 length (builtins.hashString "sha1" (builtins.toJSON data))}";
+
+  # Returns the same resources with addition of injected (or overwritten) metadata.name with hashed data
+  # name of the resource in Nix does not change for reference reasons
+  # useful for the ConfigMap and Secret resources
+  injectHashedNames = attrs:
+    lib.mapAttrs
+      (name: o:
+        recursiveUpdate o {
+          metadata.name = mkNameHash { inherit name; data = o.data; };
+        }
+      )
+      attrs;
+
+
   inherit (lib) toBase64;
   inherit (lib) octalToDecimal;
 }
