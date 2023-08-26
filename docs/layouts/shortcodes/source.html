@@ -2,7 +2,7 @@
 <div class="source">
     <pre class="filename">
     <a href="{{ $.Site.Params.BookRepo}}/tree/main/docs/content/{{ .Page.File.Dir }}/{{ $file }}">
-        {{ $file }}
+        {{- $file -}}
     </a>
     </pre>
   {{- $file := path.Join .Page.File.Dir $file -}}
