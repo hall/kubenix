@@ -177,13 +177,7 @@ with lib; let
         description = "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.";
         type = types.nullOr (types.submodule config.definitions."io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta");
       };
-
-      spec = mkOption {
-        description = "Module spec";
-        type = types.either types.attrs (types.submodule ct.module);
-        default = { };
-      };
-    };
+    } // (ct.module or {});
 
     config = {
       apiVersion = mkOptionDefault "${ct.group}/${ct.version}";
