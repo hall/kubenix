@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- add `optionalHashedNames` to inject hashed names for referencing inside modules
+
 ### Changed
 
 - removed local `kubectl` and `kubernetes` packages in lieu of those from nixpkgs

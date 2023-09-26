@@ -257,6 +257,39 @@ with lib; let
       (types.listOf (types.submodule submodule))
       (mergeValuesByFn keyFn)
       (types.attrsOf (types.submodule submodule));
+
+  # inject hashed names for referencing inside modules, example:
+  # pod = {
+  #   containers.nginx = {
+  #     image = "nginx:1.25.1";
+  #     volumeMounts = {
+  #       "/etc/nginx".name = "config";
+  #       "/var/lib/html".name = "static";
+  #     };
+  #   };
+  #   volumes = {
+  #     config.configMap.name = config.kubernetes.resources.configMaps.nginx-config.metadata.name;
+  #     static.configMap.name = config.kubernetes.resources.configMaps.nginx-static.metadata.name;
+  #   };
+  # };
+  optionalHashedNames = object:
+    if cfg.enableHashedNames then
+      recursiveUpdate object
+        (mapAttrs
+          (ks: v:
+            if builtins.elem ks [ "configMaps" "secrets" ] then
+              k8s.injectHashedNames v
+            else
+              v
+          )
+          object)
+    else object;
+
+  # inject hashed names in the output
+  optionalHashedNames' = object: kind:
+    if cfg.enableHashedNames && elem kind [ "ConfigMap" "Secret" ] then
+      k8s.injectHashedNames object
+    else object;
 in
 {
   imports = [ ./base.nix ];
@@ -319,6 +352,7 @@ in
       description = "Alias for `config.kubernetes.api.resources` options";
       default = { };
       type = types.attrsOf types.attrs;
+      apply = optionalHashedNames;
     };
 
     customTypes = mkOption {
@@ -411,6 +445,12 @@ in
       description = "Genrated kubernetes YAML file";
       type = types.package;
     };
+
+    enableHashedNames = mkOption {
+      description = "Enable hashing of resource (ConfigMap,Secret) names";
+      type = types.bool;
+      default = false;
+    };
   };
 
   config = {
@@ -497,7 +537,7 @@ in
     kubernetes.objects = flatten (mapAttrsToList
       (_: type:
         mapAttrsToList (_name: moduleToAttrs)
-          cfg.api.resources.${type.group}.${type.version}.${type.kind}
+          (optionalHashedNames' cfg.api.resources.${type.group}.${type.version}.${type.kind} type.kind)
       )
       cfg.api.types);
 
