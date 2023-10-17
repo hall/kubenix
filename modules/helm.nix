@@ -99,6 +99,17 @@ in
             default = false;
           };
 
+          apiVersions = mkOption {
+            description = ''
+              Inform Helm about which CRDs are available in the cluster (`--api-versions` option).
+              This is useful for charts which contain `.Capabilities.APIVersions.Has` checks.
+              If you use `kubernetes.customTypes` to make kubenix aware of CRDs, it will include those as well by default. 
+            '';
+            type = types.listOf types.str;
+            default = builtins.map (customType: "${customType.group}/${customType.version}")
+              (builtins.attrValues globalConfig.kubernetes.customTypes);
+          };
+
           objects = mkOption {
             description = "Generated kubernetes objects";
             type = types.listOf types.attrs;
@@ -111,7 +122,7 @@ in
         }];
 
         config.objects = importJSON (helm.chart2json {
-          inherit (config) chart name namespace values kubeVersion includeCRDs noHooks;
+          inherit (config) chart name namespace values kubeVersion includeCRDs noHooks apiVersions;
         });
       }));
       default = { };

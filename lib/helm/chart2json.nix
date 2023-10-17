@@ -15,12 +15,15 @@ with lib;
 , includeCRDs ? false
   # whether to include hooks
 , noHooks ? false
+  # Kubernetes api versions used for Capabilities.APIVersions (--api-versions)
+, apiVersions ? null
 }:
 let
   valuesJsonFile = builtins.toFile "${name}-values.json" (builtins.toJSON values);
   # The `helm template` and YAML -> JSON steps are separate `runCommand` derivations for easier debuggability
   resourcesYaml = runCommand "${name}.yaml" { nativeBuildInputs = [ kubernetes-helm ]; } ''
     helm template "${name}" \
+        ${optionalString (apiVersions != null && apiVersions != []) "--api-versions ${lib.strings.concatStringsSep "," apiVersions}"} \
         ${optionalString (kubeVersion != null) "--kube-version ${kubeVersion}"} \
         ${optionalString (namespace != null) "--namespace ${namespace}"} \
         ${optionalString (values != {}) "-f ${valuesJsonFile}"} \
