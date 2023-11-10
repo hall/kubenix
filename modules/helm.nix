@@ -106,7 +106,12 @@ in
               If you use `kubernetes.customTypes` to make kubenix aware of CRDs, it will include those as well by default. 
             '';
             type = types.listOf types.str;
-            default = builtins.map (customType: "${customType.group}/${customType.version}")
+            default = builtins.concatMap
+              (customType:
+                [
+                  "${customType.group}/${customType.version}"
+                  "${customType.group}/${customType.version}/${customType.kind}"
+                ])
               (builtins.attrValues globalConfig.kubernetes.customTypes);
           };
 
