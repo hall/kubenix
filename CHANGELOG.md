@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- default `kubernetes.kubeconfig` to `$HOME/.kube/config`
 - removed local `kubectl` and `kubernetes` packages in lieu of those from nixpkgs
 - pin Bash version of Kubenix CLI script
 
