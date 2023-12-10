@@ -298,7 +298,7 @@ in
     kubeconfig = mkOption {
       description = "path to kubeconfig file (default: use $KUBECONFIG)";
       type = types.nullOr types.str;
-      default = null;
+      default = "$HOME/.kube/config";
       example = "/run/secrets/kubeconfig";
     };
 

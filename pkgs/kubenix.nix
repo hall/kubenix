@@ -14,7 +14,7 @@ let
 in
 runCommand "kubenix"
 {
-  kubeconfig = kubernetes.kubeconfig or "";
+  inherit (kubernetes) kubeconfig;
   result = kubernetes.result or "";
 
   # kubectl does some parsing which removes the -I flag so
