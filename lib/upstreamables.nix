@@ -15,7 +15,7 @@ with lib; let
       pkgs.runCommand name { }
         (concatMapStringsSep "\necho --- >> $out\n"
           (
-            d: "${pkgs.yq}/bin/yq -y . ${pkgs.writeText "to-json" (builtins.toJSON config)} >> $out"
+            d: "${pkgs.yq}/bin/yq -y . ${pkgs.writeText "to-json" (builtins.toJSON d)} >> $out"
           )
           documents);
 
