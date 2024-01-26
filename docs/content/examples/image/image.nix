@@ -1,5 +1,5 @@
 { dockerTools, nginx }:
-dockerTools.buildLayeredImage {
+dockerTools.streamLayeredImage {
   name = "nginx";
   contents = [ nginx ];
   extraCommands = ''
