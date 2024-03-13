@@ -59,7 +59,6 @@
 
       packages = eachSystem (pkgs: {
         default = pkgs.callPackage ./pkgs/kubenix.nix {
-          inherit (self.packages.${system});
           evalModules = self.evalModules.${pkgs.system};
         };
         docs = import ./docs {
