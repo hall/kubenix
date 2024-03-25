@@ -1,4 +1,5 @@
 { kubectl
+, bash
 , vals
 , colordiff
 , evalModules
@@ -32,6 +33,7 @@ runCommand "kubenix"
 
   # create a script for `nix run`
   cat <<EOF> $out/bin/kubenix
+  #!${bash}/bin/bash
     set -uo pipefail
 
     export KUBECONFIG=$kubeconfig
