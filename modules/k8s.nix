@@ -16,12 +16,24 @@ with lib; let
       )
       cfg.api.defaults);
 
-  moduleToAttrs = value:
-    if isAttrs value
-    then mapAttrs (_n: moduleToAttrs) (filterAttrs (n: v: v != null && !(hasPrefix "_" n)) value)
-    else if isList value
-    then map moduleToAttrs value
-    else value;
+  moduleToAttrs = objType: propertyPath: value:
+    if isAttrs value then
+      let
+        # Fix https://github.com/hall/kubenix/issues/44
+        # The check for names starting with leading '_' has been here since forever.
+        # Not sure where it makes sense, but it definitely doesn't make sense for ConfigMap -> data/binaryData
+        # => To get a minimal invasive fix we added `objType` and `propertyPath` to make `moduleToAttrs` "context-aware".
+        #    This way we can allow names with leading underscore exactly for ConfigMap -> data/binaryData 
+        allowLeadingUnderscore = objType.group == "core" && objType.version == "v1" && objType.kind == "ConfigMap" &&
+          (propertyPath == [ "data" ] || propertyPath == [ "binaryData" ]);
+        filterName = name: allowLeadingUnderscore || !(hasPrefix "_" name);
+        filteredAttrs = filterAttrs (n: v: v != null && filterName n) value;
+      in
+      mapAttrs (_n: moduleToAttrs objType (propertyPath ++ [ _n ])) filteredAttrs
+    else if isList value then
+      map (moduleToAttrs objType propertyPath) value
+    else
+      value;
 
   apiOptions = { config, ... }: {
     options = {
@@ -536,7 +548,7 @@ in
 
     kubernetes.objects = flatten (mapAttrsToList
       (_: type:
-        mapAttrsToList (_name: moduleToAttrs)
+        mapAttrsToList (_name: moduleToAttrs type [ ])
           (optionalHashedNames' cfg.api.resources.${type.group}.${type.version}.${type.kind} type.kind)
       )
       cfg.api.types);
