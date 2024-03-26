@@ -14,7 +14,7 @@ let
 in
 runCommand "kubenix"
 {
-  kubeconfig = kubernetes.kubeconfig or "";
+  inherit (kubernetes) kubeconfig;
   result = kubernetes.result or "";
 
   # kubectl does some parsing which removes the -I flag so
@@ -34,7 +34,7 @@ runCommand "kubenix"
   cat <<EOF> $out/bin/kubenix
     set -uo pipefail
 
-    export KUBECONFIG=$kubeconfig
+    export KUBECONFIG=\''${KUBECONFIG:-$kubeconfig}
     export KUBECTL_EXTERNAL_DIFF=$diff
 
     function _help() {
