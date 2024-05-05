@@ -33,6 +33,8 @@ symlinkJoin {
   name = "kubenix";
   paths = [ script vals kubectl ];
   buildInputs = [ makeWrapper ];
+  passthru.manifest = result;
+
   postBuild = ''
     export DIFF="${diff}"
     wrapProgram $out/bin/kubenix \
