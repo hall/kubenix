@@ -15,7 +15,7 @@ let
     inherit module specialArgs;
   }).config.kubernetes or { };
 
-  kubeconfig = "/home/pim/.kube/config"; # kubernetes.kubeconfig or "";
+  kubeconfig = kubernetes.kubeconfig or "";
   result = kubernetes.result or "";
 
   # kubectl does some parsing which removes the -I flag so
