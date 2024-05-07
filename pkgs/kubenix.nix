@@ -36,11 +36,10 @@ symlinkJoin {
   passthru.manifest = result;
 
   postBuild = ''
-    export DIFF="${diff}"
     wrapProgram $out/bin/kubenix \
       --set PATH "$out/bin" \
-      --set KUBECONFIG "${kubeconfig}" \
-      --set KUBECTL_EXTERNAL_DIFF "''${DIFF}" \
-      --set MANIFEST "${result}"
+      --run 'export KUBECONFIG=${kubeconfig}' \
+      --set KUBECTL_EXTERNAL_DIFF '${diff}' \
+      --set MANIFEST '${result}'
   '';
 }
