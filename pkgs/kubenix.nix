@@ -38,7 +38,7 @@ symlinkJoin {
   postBuild = ''
     wrapProgram $out/bin/kubenix \
       --set PATH "$out/bin" \
-      --run 'export KUBECONFIG=${kubeconfig}' \
+      --run 'export KUBECONFIG=''${KUBECONFIG:-${kubeconfig}}' \
       --set KUBECTL_EXTERNAL_DIFF '${diff}' \
       --set MANIFEST '${result}'
   '';
