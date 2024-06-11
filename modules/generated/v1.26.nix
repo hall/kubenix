@@ -3823,13 +3823,14 @@ let
         };
         "onPodConditions" = mkOption {
           description = "Represents the requirement on the pod conditions. The requirement is represented as a list of pod condition patterns. The requirement is satisfied if at least one pattern matches an actual pod condition. At most 20 elements are allowed.";
-          type = (types.listOf (submoduleOf "io.k8s.api.batch.v1.PodFailurePolicyOnPodConditionsPattern"));
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.batch.v1.PodFailurePolicyOnPodConditionsPattern")));
         };
       };
 
 
       config = {
         "onExitCodes" = mkOverride 1002 null;
+        "onPodConditions" = mkOverride 1002 null;
       };
 
     };
