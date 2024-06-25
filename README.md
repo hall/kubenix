@@ -33,7 +33,7 @@ Or, if you're not using flakes, a `default.nix` file (build with `nix-build`):
 ```nix
 { kubenix ? import (builtins.fetchGit {
   url = "https://github.com/hall/kubenix.git";
-  rev = "main";
+  ref = "main";
 }) }:
 (kubenix.evalModules.x86_64-linux {
   module = { kubenix, ... }: {
