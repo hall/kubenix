@@ -6,7 +6,7 @@ Kubernetes management with Nix
   <img src="./docs/static/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
 </p>
 
-> **WARN**: this is a work in progress, expect breaking [changes](./CHANGELOG.md)
+> **WARN**: this is a work in progress, expect breaking [changes](https://github.com/hall/kubenix/blob/main/CHANGELOG.md)
 
 ## Usage
 
