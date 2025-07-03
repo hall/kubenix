@@ -82,7 +82,10 @@
             set -eo pipefail
 
             # generate json object of module options
-            nix build '.#docs' -o ./docs/data/options.json
+            nix build '.#docs'
+
+            # copy file to avoid symlink in resulting build artifacts
+            cp ./result ./docs/data/options.json
 
             # remove all old module pages
             rm ./docs/content/modules/[!_]?*.md || true
