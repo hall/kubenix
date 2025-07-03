@@ -39,9 +39,6 @@ jobs:
       - name: install nix
         uses: cachix/install-nix-action@v31
 
-      - name: configure cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: build
         run: nix run '.#docs' -- --minify
 
