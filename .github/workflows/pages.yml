@@ -2,12 +2,23 @@ name: pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [$default-branch]
     paths:
       - 'docs/**'
       - 'modules/**'
       - 'README.md'
+
+  # allow manual execution
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -20,6 +31,10 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+
+      - name: setup pages
+        id: pages
+        uses: actions/configure-pages@v5
 
       - name: install nix
         uses: cachix/install-nix-action@v31
@@ -38,9 +53,4 @@ jobs:
       - name: deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
