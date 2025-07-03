@@ -9,11 +9,14 @@ let
     "1.24.17" = "sha256:1mm3ah08jvp8ghzglf1ljw6qf3ilbil3wzxzs8jzfhljpsxpk41q";
     "1.25.16" = "sha256:0whvanzhf0sv73xarbdskzfc9glh61y17bivm8zi7pigkschlifl";
     "1.26.15" = "sha256:0psn4hxla8m90gw8qk3dw6vvqas7sng6c010xn6bwajl6038bbch";
-    # ^ EOL ^
     "1.27.14" = "sha256:148v1lxp4rmv0pgl41yyz5sjlsk6lr5185nk3qf9nh2gjn1pbw9g";
     "1.28.10" = "sha256:14pvc7ys1x4p6gzmdgabmncl6iwaf2fj0a2j58rv00wndfh62vng";
     "1.29.5" = "sha256:1shik1cbi415cq9ddn564xd1d73g2rzfrna85aqskxavncagkscb";
-    "1.30.1" = "sha256:1d7pqf6bkqpkr5jgh716wmzfcyanpm9ybdn3ix1ywvwxbq45dgzj";
+    "1.30.11" = "sha256:1jy72pkr6pzmgf4d2m40c85ws7pcrv62xnnya0qslv0lgw4j4zqk";
+    # ^ EOL ^
+    "1.31.9" = "sha256:13bz4jjfix2dnc4bvrcil8np2i5zlz9qfqxmmlgrz1457mf3vjyx";
+    "1.32.5" = "sha256:11byhg4hjl22zfvwgn3wxryhgp82ix6v2r310qh5py4xyzkv8d93";
+    "1.33.1" = "sha256:1xkykxxhk72n3x01df0jm9pmw24q2rzizwqnwncibbslhpwspx9a";
   };
 in
 {
