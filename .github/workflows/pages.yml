@@ -32,10 +32,6 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: setup pages
-        id: pages
-        uses: actions/configure-pages@v5
-
       - name: install nix
         uses: cachix/install-nix-action@v31
 
@@ -43,9 +39,8 @@ jobs:
         run: nix run '.#docs' -- --minify
 
       - name: upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
           path: './docs/public'
 
       - name: deploy
