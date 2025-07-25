@@ -446,6 +446,16 @@ in
       type = types.package;
     };
 
+    addHashLabel = mkOption {
+      description = ''
+        Disable adding 'kubenix/hash' label to every object. 
+        Note: When disabling this, you may want to use `enableHashedNames`. 
+        See https://github.com/hall/kubenix/pull/33.
+      '';
+      type = types.bool;
+      default = true;
+    };
+
     enableHashedNames = mkOption {
       description = "Enable hashing of resource (ConfigMap,Secret) names";
       type = types.bool;
@@ -541,11 +551,19 @@ in
       )
       cfg.api.types);
 
-    kubernetes.generated = k8s.mkHashedList {
-      items = config.kubernetes.objects;
-      labels."kubenix/project-name" = config.kubenix.project;
-      labels."kubenix/k8s-version" = config.kubernetes.version;
-    };
+    kubernetes.generated =
+      let
+        mkList =
+          if cfg.addHashLabel then
+            k8s.mkHashedList
+          else
+            k8s.mkList;
+      in
+      mkList {
+        items = config.kubernetes.objects;
+        labels."kubenix/project-name" = config.kubenix.project;
+        labels."kubenix/k8s-version" = config.kubernetes.version;
+      };
 
     kubernetes.result =
       pkgs.writeText "${config.kubenix.project}-generated.json" (builtins.toJSON cfg.generated);
