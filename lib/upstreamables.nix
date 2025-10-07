@@ -8,14 +8,14 @@ with lib; let
 
     toYAML = config:
       builtins.readFile (pkgs.runCommand "to-yaml" { } ''
-        ${pkgs.yq-go}/bin/yq --output-format=yaml . ${pkgs.writeText "to-json" (builtins.toJSON config)}  > $out
+        ${pkgs.yq-go}/bin/yq --prettyPrint --output-format=yaml . ${pkgs.writeText "to-json" (builtins.toJSON config)}  > $out
       '');
 
     toMultiDocumentYaml = name: documents:
       pkgs.runCommand name { }
         (concatMapStringsSep "\necho --- >> $out\n"
           (
-            d: "${pkgs.yq-go}/bin/yq --output-format=yaml . ${pkgs.writeText "to-json" (builtins.toJSON d)} >> $out"
+            d: "${pkgs.yq-go}/bin/yq --prettyPrint --output-format=yaml . ${pkgs.writeText "to-json" (builtins.toJSON d)} >> $out"
           )
           documents);
 
