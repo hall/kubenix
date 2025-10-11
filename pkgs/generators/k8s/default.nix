@@ -277,7 +277,7 @@ with lib; let
         version = version';
         kind = kind';
         inherit (swagger.definitions.${ref}) description;
-        defintion = refDefinition (head path.post.parameters).schema;
+        definition = refDefinition (head path.post.parameters).schema;
       })
     (filterAttrs
       (
@@ -442,7 +442,7 @@ with lib; let
             kind = mkOptionDefault kind;
             apiVersion = mkOptionDefault apiVersion;
 
-            # metdata.name cannot use option default, due deep config
+            # metadata.name cannot use option default, due deep config
             metadata.name = mkOptionDefault name;
           }
         ];

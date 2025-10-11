@@ -103,7 +103,7 @@ in
             description = ''
               Inform Helm about which CRDs are available in the cluster (`--api-versions` option).
               This is useful for charts which contain `.Capabilities.APIVersions.Has` checks.
-              If you use `kubernetes.customTypes` to make kubenix aware of CRDs, it will include those as well by default. 
+              If you use `kubernetes.customTypes` to make kubenix aware of CRDs, it will include those as well by default.
             '';
             type = types.listOf types.str;
             default = builtins.concatMap
