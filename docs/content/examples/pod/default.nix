@@ -1,4 +1,4 @@
-# let's creata a function whose only input is the kubenix package
+# let's create a function whose only input is the kubenix package
 { kubenix ? import ../../../.. }:
 # evalModules is our main entrypoint
 kubenix.evalModules.${builtins.currentSystem} {

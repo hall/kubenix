@@ -35,7 +35,7 @@ in
           else cfg.apiVersion == "apps/v1";
       }
       {
-        message = "should have corrent kind set";
+        message = "should have correct kind set";
         assertion = cfg.kind == "Deployment";
       }
       {

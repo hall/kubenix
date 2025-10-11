@@ -41,7 +41,7 @@
 
       # NOTE: passthru has not effect if given options are not defined
       # in the parent context. Therefore in this case we are expecting that
-      # parent imports kubinex.k8s module.
+      # parent imports kubenix.k8s module.
 
       # Here we set kubernetes.objects.
       # This is a list so even if distinct instances of the submodule contain

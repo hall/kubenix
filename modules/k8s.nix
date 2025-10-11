@@ -85,7 +85,7 @@ with lib; let
               };
 
               version = mkOption {
-                description = "Resoruce type version";
+                description = "Resource type version";
                 type = types.str;
               };
 
@@ -323,7 +323,7 @@ in
     };
 
     resourceOrder = mkOption {
-      description = "Preffered resource order";
+      description = "Preferred resource order";
       type = types.listOf types.str;
       default = [
         "CustomResourceDefinition"
@@ -442,7 +442,7 @@ in
     };
 
     resultYAML = mkOption {
-      description = "Genrated kubernetes YAML file";
+      description = "Generated kubernetes YAML file";
       type = types.package;
     };
 
@@ -474,7 +474,7 @@ in
           kubernetes.api.defaults =
             (filter (default: default.propagate) cfg.api.defaults)
             ++ [
-              # set module name and version for all kuberentes resources
+              # set module name and version for all kubernetes resources
               {
                 default.metadata.labels = {
                   "kubenix/module-name" = config.submodule.name;

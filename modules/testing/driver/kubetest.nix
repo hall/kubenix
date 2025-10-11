@@ -25,8 +25,8 @@ with lib; let
       # make sure tests are prefixed so that alphanumerical
       # sorting reproduces them in the same order as they
       # have been declared in the list.
-      seive = t: t.script != null && t.enabled;
-      allEligibleTests = filter seive testing.tests;
+      sieve = t: t.script != null && t.enabled;
+      allEligibleTests = filter sieve testing.tests;
       listLengthPadding = builtins.length (
         lib.stringToCharacters (
           builtins.toString (
