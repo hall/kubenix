@@ -1,5 +1,5 @@
-{ config, lib, kubenix, images, test, ... }:
-with lib; let
+{ config, kubenix, images, test, ... }:
+let
   cfg = config.kubernetes.api.resources.deployments.nginx;
   image = images.nginx;
 

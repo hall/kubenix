@@ -1,5 +1,5 @@
-{ pkgs, dockerTools, lib, ... }:
-with lib; {
+{ pkgs, dockerTools, ... }:
+{
   curl = dockerTools.buildLayeredImage {
     name = "curl";
     tag = "latest";

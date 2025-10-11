@@ -1,4 +1,4 @@
-{ config, lib, pkgs, kubenix, ... }: {
+{ kubenix, ... }: {
   imports = with kubenix.modules; [ submodules k8s ];
 
   # Import submodule.
