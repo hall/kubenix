@@ -4,7 +4,7 @@
 {{/* get base directory */}}
 {{- $dir := $.Page.File.Dir -}}
 
-{{- $loc := path.Join $.Site.Params.BookRepo "blob" "main" "docs" "content" $.Page.File.Dir -}}
+{{- $loc := urls.JoinPath $.Site.Params.BookRepo "blob" "main" "docs" "content" $.Page.File.Dir -}}
 
 {{/* create a list of nix files */}}
 {{- $files := slice -}}
@@ -22,7 +22,7 @@
 {{- else  }}
 └──
 {{- end -}}
-&nbsp;<a href="{{ path.Join $loc $file.Name }}" >{{ $file.Name }}</a>
+&nbsp;<a href="{{ urls.JoinPath $loc $file.Name }}" >{{ $file.Name }}</a>
 {{- end -}}
 </pre>
 
