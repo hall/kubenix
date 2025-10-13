@@ -13,7 +13,7 @@
         <table>
             <tr>
                 <td>Description</td>
-                <td>{{ safeHTML (replace $option.description "\n\n" "<br/><br/>") }}</td>
+                <td>{{ markdownify $option.description }}</td>
             </tr>
 
             <tr>
