@@ -24,6 +24,8 @@ in
 stdenvNoCC.mkDerivation {
   name = "${cleanName chart}-${ if version == null then "dev" else version }";
 
+  impureEnvVars = lib.fetchers.proxyImpureEnvVars;
+
   buildCommand = ''
     export HOME="$PWD"
     echo "adding helm repo"
