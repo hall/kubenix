@@ -24,6 +24,15 @@ in
 stdenvNoCC.mkDerivation {
   name = "${cleanName chart}-${ if version == null then "dev" else version }";
 
+  impureEnvVars = [
+    "HTTP_PROXY"
+    "HTTPS_PROXY"
+    "NO_PROXY"
+    "http_proxy"
+    "https_proxy"
+    "no_proxy"
+  ];
+
   buildCommand = ''
     export HOME="$PWD"
     echo "adding helm repo"
