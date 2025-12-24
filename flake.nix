@@ -64,11 +64,7 @@
         docs = import ./docs {
           inherit pkgs;
           options = (self.evalModules.${pkgs.system} {
-            modules = builtins.attrValues (builtins.removeAttrs
-              # the submodules module currently doesn't evaluate:
-              #     error: No module found ‹name›/latest
-              # not sure how important that documentation is at this time
-              self.nixosModules.kubenix [ "submodule" "submodules" ]);
+            modules = builtins.attrValues self.nixosModules.kubenix;
           }).options;
         };
       } // pkgs.lib.attrsets.mapAttrs' (name: value: pkgs.lib.attrsets.nameValuePair "generate-${name}" value)
@@ -94,7 +90,6 @@
             for mod in ${builtins.toString (builtins.attrNames self.nixosModules.kubenix)}; do
               [[ $mod == "base" ]] && mod=kubenix
               [[ $mod == "k8s" ]] && mod=kubernetes
-              [[ $mod == "submodule"* ]] && continue
               echo "&nbsp; {{< options >}}" > ./docs/content/modules/$mod.md
             done
 

@@ -227,6 +227,7 @@ in
                     description = "List of modules defining submodule";
                     type = types.listOf types.unspecified;
                     default = [ config.module ];
+                    defaultText = lib.literalExpression "[ config.module ]";
                   };
 
                   features = mkOption {
@@ -321,6 +322,7 @@ in
                   submodule.args = mkAliasDefinitions options.args;
                 })
                 specialArgs;
+              visible = "shallow";
               default = { };
             };
 
