@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 with lib; {
   options.test = {
     name = mkOption {

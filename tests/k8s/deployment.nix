@@ -1,5 +1,5 @@
-{ config, lib, kubenix, images, test, ... }:
-with lib; let
+{ config, kubenix, images, test, ... }:
+let
   cfg = config.kubernetes.api.resources.deployments.nginx;
   image = images.nginx;
 
@@ -35,7 +35,7 @@ in
           else cfg.apiVersion == "apps/v1";
       }
       {
-        message = "should have corrent kind set";
+        message = "should have correct kind set";
         assertion = cfg.kind == "Deployment";
       }
       {

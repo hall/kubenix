@@ -128,7 +128,7 @@ let
           kind = mkOptionDefault kind;
           apiVersion = mkOptionDefault apiVersion;
 
-          # metdata.name cannot use option default, due deep config
+          # metadata.name cannot use option default, due deep config
           metadata.name = mkOptionDefault name;
         }
       ];

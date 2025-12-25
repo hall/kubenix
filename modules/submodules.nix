@@ -364,7 +364,7 @@ in
     }
 
     (mkIf cfg.propagate.enable {
-      # if propagate is enabled and submodule has submodules included propagage defaults and imports
+      # if propagate is enabled and submodule has submodules included propagate defaults and imports
       submodules.defaults = [{
         features = [ "submodules" ];
         default = {

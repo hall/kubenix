@@ -309,7 +309,7 @@ with lib; let
               kind = mkOptionDefault kind;
               apiVersion = mkOptionDefault version;
 
-              # metdata.name cannot use option default, due deep config
+              # metadata.name cannot use option default, due deep config
               metadata.name = mkOptionDefault name;
             }
           ] ++ (config.defaults.''${resource} or [])
@@ -340,7 +340,7 @@ with lib; let
         };
       '')
       definitions)}
-      } // (import ./overrides.nix {inheirt definitions lib;}));
+      } // (import ./overrides.nix {inherit definitions lib;}));
     in {
       kubernetes.customResources = [
       ${concatMapStrings

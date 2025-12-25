@@ -7,7 +7,7 @@ in
 
   test = {
     name = "k8s-simple";
-    description = "Simple k8s testing wheter name, apiVersion and kind are preset";
+    description = "Simple k8s testing whether name, apiVersion and kind are preset";
     assertions = [
       {
         message = "should have apiVersion and kind set";

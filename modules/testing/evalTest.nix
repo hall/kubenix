@@ -67,13 +67,13 @@ in
     };
 
     evaled = mkOption {
-      description = "Test evaulation result";
+      description = "Test evaluation result";
       type = types.nullOr types.attrs;
       internal = true;
     };
 
     success = mkOption {
-      description = "Whether test assertions were successfull";
+      description = "Whether test assertions were successful";
       type = types.bool;
       internal = true;
       default = false;
@@ -122,7 +122,7 @@ in
     (mkIf (config.evaled != null) {
       inherit (evaled.config.test) assertions script;
 
-      # if all assertions are true, test is successfull
+      # if all assertions are true, test is successful
       success = all (el: el.assertion) config.assertions;
     })
   ];

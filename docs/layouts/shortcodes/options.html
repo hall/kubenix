@@ -11,9 +11,9 @@
 
      {{/* only show options for the current module */}}
      {{/* but don't list _all_ kubernetes resources */}}
-     {{ if and 
+     {{ if and
          (not (hasPrefix $name "kubernetes.api.resources."))
-         (hasPrefix $name (print $module ".")) 
+         (hasPrefix $name (print $module "."))
      }}
          {{ partial "details" (dict "name" $name "option" $option "repo" $repo) }}
      {{ end }}

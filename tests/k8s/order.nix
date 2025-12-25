@@ -4,7 +4,7 @@ with lib; {
 
   test = {
     name = "k8s-order";
-    description = "test tesing k8s resource order";
+    description = "test testing k8s resource order";
     assertions = [
       {
         message = "should have correct order of resources";

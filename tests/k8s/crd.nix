@@ -7,7 +7,7 @@ in
 
   test = {
     name = "k8s-crd";
-    description = "Simple test tesing CRD";
+    description = "Simple test testing CRD";
     enable = builtins.compareVersions config.kubernetes.version "1.8" >= 0;
     assertions = [{
       message = "Custom resource should have correct version set";
@@ -23,7 +23,7 @@ in
           kube.get_crds()
           crds = kube.get_crds()
           crontabs_crd = crds.get('crontabs')
-          assert contrabs_crd is not None
+          assert crontabs_crd is not None
 
           # TODO: verify
           # kubectl get crontabs | grep -i versioned
