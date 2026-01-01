@@ -4,6 +4,7 @@
   submodules = ./submodules.nix;
   submodule = ./submodule.nix;
   helm = ./helm.nix;
+  files = ./files.nix;
   docker = ./docker.nix;
   testing = ./testing;
   test = ./testing/test-options.nix;
