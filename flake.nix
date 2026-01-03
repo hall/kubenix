@@ -119,7 +119,7 @@
           buildInputs = with pkgs; [
             dive
             k9s
-            kube3d
+            k3d
             kubie
           ];
         };
