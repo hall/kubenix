@@ -48,6 +48,7 @@ with lib; {
       '';
       type = types.submodule { };
       visible = "shallow";
+      default = { };
     };
   };
 
