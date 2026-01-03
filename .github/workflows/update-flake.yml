@@ -1,0 +1,33 @@
+name: Update Flake Inputs
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Run every Sunday at midnight
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-flake:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Update flake inputs
+        run: nix flake update
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update flake inputs"
+          title: "chore: update flake inputs"
+          body: "Automated update of flake inputs."
+          branch: "update-flake-inputs"
+          base: "main"
+          delete-branch: true
