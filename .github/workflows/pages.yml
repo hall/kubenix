@@ -4,9 +4,9 @@ on:
   push:
     branches: [$default-branch]
     paths:
-      - 'docs/**'
-      - 'modules/**'
-      - 'README.md'
+      - "docs/**"
+      - "modules/**"
+      - "README.md"
 
   # allow manual execution
   workflow_dispatch:
@@ -41,9 +41,8 @@ jobs:
       - name: upload
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs/public'
+          path: "./docs/public"
 
       - name: deploy
         id: deployment
         uses: actions/deploy-pages@v4
-

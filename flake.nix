@@ -142,7 +142,7 @@
         };
       });
 
-      formatter = eachSystem (pkgs: (inputs.treefmt.lib.evalModule pkgs {
+      treefmtEval = eachSystem (pkgs: inputs.treefmt.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
         programs = {
           nixpkgs-fmt.enable = true;
@@ -155,7 +155,9 @@
           "docs/layouts/*"
           "modules/generated/*"
         ];
-      }).config.build.wrapper);
+      });
+
+      formatter = eachSystem (pkgs: (self.treefmtEval.${pkgs.system}).config.build.wrapper);
 
       checks = eachSystem (pkgs:
         let
@@ -169,6 +171,7 @@
               ({ registry = "docker.io/gatehub"; } // attrs);
         in
         {
+          formatting = (self.treefmtEval.${pkgs.system}).config.build.check self;
           # TODO: access "success" derivation with nice testing utils for nice output
           testing = wasSuccess examples.testing.config.testing;
         } // builtins.listToAttrs (builtins.map
