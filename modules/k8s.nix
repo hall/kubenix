@@ -173,7 +173,19 @@ with lib; let
   latestCustomResourceTypes = mapAttrsToList (_: last) customResourceTypesByAttrNameSortByVersion;
 
   customResourceModuleForType = config: ct: { name, ... }: {
-    imports = getDefaults ct.name ct.group ct.version ct.kind;
+    imports = (getDefaults ct.name ct.group ct.version ct.kind)
+      ++ (
+      if cfg.customTypesModuleDefinesCRDSpec
+      then [{
+        options.spec = mkOption {
+          description = "Module spec";
+          type = types.submodule ct.module;
+          default = { };
+        };
+      }]
+      else [ ct.module ]
+    );
+
     options = {
       apiVersion = mkOption {
         description = "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources";
@@ -188,12 +200,6 @@ with lib; let
       metadata = mkOption {
         description = "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.";
         type = types.nullOr (types.submodule config.definitions."io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta");
-      };
-
-      spec = mkOption {
-        description = "Module spec";
-        type = types.either types.attrs (types.submodule ct.module);
-        default = { };
       };
     };
 
@@ -343,6 +349,12 @@ in
       ];
     };
 
+    customTypesModuleDefinesCRDSpec = mkOption {
+      description = "Whether customTypes.module defines the CRD spec or the whole CRD module";
+      type = types.bool;
+      default = true;
+    };
+
     api = mkOption {
       type = types.submodule {
         imports = [
@@ -418,8 +430,9 @@ in
 
             module = mkOption {
               description = "Custom type module";
-              type = types.unspecified;
-              default = { };
+              type = types.deferredModule;
+              default = { freeformType = types.attrs; };
+              defaultText = "freeformType = types.attrs";
             };
           };
         }
