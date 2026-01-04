@@ -22,7 +22,7 @@
       nixosModules.kubenix = import ./modules;
 
       overlays.default = _final: prev: {
-        kubenix.evalModules = self.evalModules.${prev.system};
+        kubenix.evalModules = self.evalModules.${prev.stdenv.hostPlatform.system};
       };
 
       # evalModules with same interface as lib.evalModules and kubenix as special argument
@@ -42,14 +42,14 @@
             }];
             specialArgs = {
               pkgs = import inputs.nixpkgs {
-                inherit (pkgs) system;
+                inherit (pkgs.stdenv.hostPlatform) system;
                 overlays = [ self.overlays.default ];
                 config.allowUnsupportedSystem = true;
               };
 
               kubenix = {
                 lib = import ./lib { inherit pkgs; inherit (pkgs) lib; };
-                evalModules = self.evalModules.${pkgs.system};
+                evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
                 modules = self.nixosModules.kubenix;
               };
             };
@@ -59,11 +59,11 @@
 
       packages = eachSystem (pkgs: {
         default = pkgs.callPackage ./pkgs/kubenix.nix {
-          evalModules = self.evalModules.${pkgs.system};
+          evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
         };
         docs = import ./docs {
           inherit pkgs;
-          options = (self.evalModules.${pkgs.system} {
+          options = (self.evalModules.${pkgs.stdenv.hostPlatform.system} {
             modules = builtins.attrValues self.nixosModules.kubenix;
           }).options;
         };
@@ -78,13 +78,16 @@
         ]
           (name: pkgs.lib.nameValuePair
             ("example-" + name)
-            (self.packages.${pkgs.system}.default.override {
+            (self.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
               module = ./docs/content/examples + "/${name}/module.nix";
             }))
       ));
       apps = eachSystem (pkgs: {
         docs = {
           type = "app";
+          meta = {
+            description = "Generate and build the Kubenix documentation site using Hugo";
+          };
           program = (pkgs.writeShellScript "gen-docs" ''
             set -eo pipefail
 
@@ -111,6 +114,9 @@
 
         generate = {
           type = "app";
+          meta = {
+            description = "Generate Nix modules from Kubernetes specifications and CRDs";
+          };
           program = (pkgs.writeShellScript "gen-modules" ''
             set -eo pipefail
             dir=./modules/generated
@@ -155,11 +161,11 @@
         let
           wasSuccess = suite:
             if suite.success
-            then pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-succeeded" { } "echo success > $out"
-            else pkgs.runCommandNoCC "testing-suite-config-assertions-for-${suite.name}-failed" { } "exit 1";
+            then pkgs.runCommand "testing-suite-config-assertions-for-${suite.name}-succeeded" { } "echo success > $out"
+            else pkgs.runCommand "testing-suite-config-assertions-for-${suite.name}-failed" { } "exit 1";
           examples = import ./docs/content/examples;
           mkK8STests = attrs:
-            (import ./tests { evalModules = self.evalModules.${pkgs.system}; })
+            (import ./tests { evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system}; })
               ({ registry = "docker.io/gatehub"; } // attrs);
         in
         {

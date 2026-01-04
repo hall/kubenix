@@ -89,7 +89,7 @@ let
     lib.compareLists cmp a.loc b.loc < 0;
 
   prefixesToStrip = map (p: "${toString p}/") ([ ../../.. ] ++ extraSources);
-  stripAnyPrefixes = lib.flip (lib.fold lib.removePrefix) prefixesToStrip;
+  stripAnyPrefixes = lib.flip (lib.foldr lib.removePrefix) prefixesToStrip;
 
   ###############################################################################
 
