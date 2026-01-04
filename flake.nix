@@ -75,6 +75,7 @@
         pkgs.lib.attrsets.genAttrs' [
           "namespaces"
           "deployment"
+          "custom-resources"
         ]
           (name: pkgs.lib.nameValuePair
             ("example-" + name)
