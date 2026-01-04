@@ -12,13 +12,13 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
-  
+
       - name: install nix
         uses: cachix/install-nix-action@v31
-  
+
       - name: check flake
         run: nix -Lv flake check
-  
+
       - name: get latest tag
         id: latest
         uses: actions-ecosystem/action-get-latest-tag@v1
@@ -35,4 +35,3 @@ jobs:
           files: ${{ steps.package.outputs.path }}
           body: ${{ steps.changelog.outputs.description }}
           tag_name: ${{ steps.changelog.outputs.version }}
-
