@@ -22,6 +22,7 @@ let
             ./k8s/order.nix
             ./k8s/submodule.nix
             ./k8s/configmap.nix
+            ./k8s/custom-types-switch.nix
             # TODO: `importYaml` uses IFD which fails during `nix flake check` as it evaluates
             # for all systems, not only the current one: https://github.com/hall/kubenix/issues/12
             # ./k8s/imports.nix
