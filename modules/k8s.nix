@@ -594,6 +594,6 @@ in
       pkgs.writeText "${config.kubenix.project}-generated.json" (builtins.toJSON cfg.generated);
 
     kubernetes.resultYAML =
-      toMultiDocumentYaml "${config.kubenix.project}-generated.yaml" config.kubernetes.objects;
+      toMultiDocumentYaml "${config.kubenix.project}-generated.yaml" config.kubernetes.generated.items;
   };
 }

@@ -16,6 +16,8 @@ let
           name = "kubenix-${k8sVersion}";
           tests = [
             ./k8s/simple.nix
+            ./k8s/hash-label.nix
+            ./k8s/no-hash-label.nix
             ./k8s/deployment.nix
             ./k8s/crd.nix # flaky
             ./k8s/defaults.nix
