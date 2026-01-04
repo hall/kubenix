@@ -1,7 +1,7 @@
 {
-    "git.detectSubmodules": false,
-    "nix.enableLanguageServer": true,
-    "search.exclude": {
-        "docs/themes": true
-    }
+  "git.detectSubmodules": false,
+  "nix.enableLanguageServer": true,
+  "search.exclude": {
+    "docs/themes": true
+  }
 }
