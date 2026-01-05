@@ -140,7 +140,7 @@ with lib; let
                       # if it is a reference to simple type
                         if hasTypeMapping swagger.definitions.${refDefinition property.items}
                         then {
-                          type = requiredOrNot (types.listOf (mapType swagger.definitions.${refDefinition property.items}.type));
+                          type = requiredOrNot (types.listOf (mapType swagger.definitions.${refDefinition property.items}));
                         }
                         # if a reference is to complex type
                         else
