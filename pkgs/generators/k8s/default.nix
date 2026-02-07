@@ -399,9 +399,14 @@ with lib; let
             else
               # generate merge key for list elements if it's not present
               "__kubenix_list_merge_key_" + (concatStringsSep "" (map (key:
-                if isAttrs value.''${key}
-                then toString value.''${key}.content
-                else (toString value.''${key})
+	        # set key to default value if unset.
+		let
+		  value' = if (!(value ? key) && key == "protocol")
+		    then value // {protocol = "TCP";}
+		    else value;
+		in if isAttrs value'.''${key}
+                  then toString value'.''${key}.content
+                  else (toString value'.''${key})
               ) listMergeKeys))
           ) (value // { _priority = i; }))
         values);
