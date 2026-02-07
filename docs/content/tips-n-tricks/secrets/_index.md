@@ -38,19 +38,16 @@ pkgs.writeShellScript "apply" ''
 **NOTE**: the builtin `kubenix` CLI uses this approach so it's not _necessary_ to implement yourself
 {{< /hint >}}
 
-
 ## runtime
 
 A more robust option is to resolve secrets from _within_ the cluster itself.
 
 This can be done with tools that either
 
-- reference external sources 
+- reference external sources
 
-    similar to the deploy time example; instead, resolving secrets with a controller running inside the cluster (e.g., [external-secrets](https://github.com/external-secrets/external-secrets))
+  similar to the deploy time example; instead, resolving secrets with a controller running inside the cluster (e.g., [external-secrets](https://github.com/external-secrets/external-secrets))
 
 - decrypt inline secrets
 
-    values can be decrypted by a controller within the cluster itself (e.g., [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets)) or using external keys (e.g., [sops](https://github.com/getsops/sops))
-
-    
+  values can be decrypted by a controller within the cluster itself (e.g., [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets)) or using external keys (e.g., [sops](https://github.com/getsops/sops))
