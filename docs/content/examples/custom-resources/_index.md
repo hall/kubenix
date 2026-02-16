@@ -14,7 +14,7 @@ To register a CRD, add an entry to the `kubernetes.customTypes` list. Each entry
 
 ## Example
 
-{{< file "module.nix" >}}
+{{< source "module.nix" >}}
 
 ## Instantiation
 
