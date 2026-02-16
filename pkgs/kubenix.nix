@@ -11,9 +11,10 @@
 , specialArgs ? { }
 }:
 let
-  kubernetes = (evalModules {
+  config = (evalModules {
     inherit module specialArgs;
-  }).config.kubernetes or { };
+  }).config or { };
+  kubernetes = config.kubernetes or { };
 
   kubeconfig = kubernetes.kubeconfig or "";
   result = kubernetes.result or "";
@@ -34,6 +35,7 @@ symlinkJoin {
   paths = [ script vals kubectl ];
   buildInputs = [ makeWrapper ];
   passthru.manifest = result;
+  passthru.config = config;
 
   postBuild = ''
     wrapProgram $out/bin/kubenix \
