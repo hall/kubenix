@@ -2,9 +2,7 @@
 
 Kubernetes management with Nix
 
-<p align="center" style="margin: 2em auto;">
-  <img src="./docs/static/logo.svg" alt="nixos logo in kubernetes blue" width="350"/>
-</p>
+{{< figure src="/logo.svg" alt="nixos logo in kubernetes blue" width="350" class="text-center" >}}
 
 > **WARN**: this is a work in progress, expect breaking [changes](https://github.com/hall/kubenix/blob/main/CHANGELOG.md)
 

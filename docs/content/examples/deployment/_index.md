@@ -1,3 +1,7 @@
+---
+title: "Deployment"
+---
+
 As a more complete example, let's define some high-level variables and then split our module out into another file as we start to grow.
 
 {{< source "default.nix" >}}
