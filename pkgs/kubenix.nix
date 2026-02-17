@@ -3,9 +3,7 @@
 , colordiff
 , evalModules
 , writeShellScript
-, writeScriptBin
-, makeWrapper
-, symlinkJoin
+, writeShellApplication
 , lib
 , module ? { }
 , specialArgs ? { }
@@ -26,22 +24,21 @@ let
     ${lib.getExe colordiff} --nobanner -N -u -I ' kubenix/hash: ' -I ' generation: ' $@
   '';
 
-  script = (writeScriptBin "kubenix" (builtins.readFile ./kubenix.sh)).overrideAttrs (old: {
-    buildCommand = "${old.buildCommand}\npatchShebangs $out";
-  });
 in
-symlinkJoin {
+writeShellApplication {
   name = "kubenix";
-  paths = [ script vals kubectl ];
-  buildInputs = [ makeWrapper ];
-  passthru.manifest = result;
-  passthru.config = config;
-
-  postBuild = ''
-    wrapProgram $out/bin/kubenix \
-      --suffix PATH : "$out/bin" \
-      --run 'export KUBECONFIG=''${KUBECONFIG:-${toString kubeconfig}}' \
-      --set KUBECTL_EXTERNAL_DIFF '${diff}' \
-      --set MANIFEST '${result}'
-  '';
+  runtimeInputs = [ vals kubectl ];
+  text = builtins.readFile ./kubenix.sh;
+  bashOptions = [ "u" "o pipefail" ];
+  runtimeEnv = {
+    KUBECONFIG = toString kubeconfig;
+    KUBECTL_EXTERNAL_DIFF = toString diff;
+    MANIFEST = toString result;
+  };
+  derivationArgs = {
+    passthru = {
+      manifest = result;
+      config = config;
+    };
+  };
 }
