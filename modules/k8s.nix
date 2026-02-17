@@ -504,7 +504,7 @@ in
       }
       {
         features = [ "k8s" "submodule" ];
-        module = { config, ... }: {
+        module = { config, name, ... }: {
           # set module defaults
           kubernetes.api.defaults =
             (filter (default: default.propagate) cfg.api.defaults)
@@ -512,6 +512,7 @@ in
               # set module name and version for all kubernetes resources
               {
                 default.metadata.labels = {
+                  "kubenix/module-instance" = name;
                   "kubenix/module-name" = config.submodule.name;
                   "kubenix/module-version" = config.submodule.version;
                 };

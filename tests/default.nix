@@ -23,6 +23,7 @@ let
             ./k8s/defaults.nix
             ./k8s/order.nix
             ./k8s/submodule.nix
+            ./k8s/module-instance-label.nix
             ./k8s/configmap.nix
             ./k8s/custom-types-switch.nix
             # TODO: `importYaml` uses IFD which fails during `nix flake check` as it evaluates
