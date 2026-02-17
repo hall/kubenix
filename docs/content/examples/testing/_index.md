@@ -1,3 +1,7 @@
+---
+title: "Testing"
+---
+
 Testing is still very much in flux (contributions welcome!) but here's a rough example.
 
 {{< source "default.nix" >}}

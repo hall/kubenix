@@ -1,3 +1,7 @@
+---
+title: "Helm"
+---
+
 To define a Helm release, use the {{< option "kubernetes.helm.releases" >}} option.
 
 {{< source "default.nix" >}}

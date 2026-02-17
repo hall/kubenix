@@ -1,3 +1,7 @@
+---
+title: "Namespaces"
+---
+
 This example demonstrates the use of kubenix submodules, which are built atop of nixos submodule system, to create resources in multiple namespaces.
 
 {{< source "default.nix" >}}
