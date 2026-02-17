@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -uo pipefail
-
 function _help() {
   echo "
   kubenix - Kubernetes management with Nix
@@ -18,7 +16,7 @@ function _help() {
 }
 
 function _kubectl() {
-  vals eval -fail-on-missing-key-in-map <$MANIFEST | kubectl $@
+  vals eval -fail-on-missing-key-in-map <"$MANIFEST" | kubectl "$@"
 }
 
 # if no args given, add empty string
@@ -36,24 +34,24 @@ while test $# -gt 0; do
   "")
     _kubectl diff -f - --prune
     if [[ $? -eq 1 ]]; then
-      read -p 'apply? [y/N]: ' response
+      read -r -p 'apply? [y/N]: ' response
       [[ $response == "y" ]] && _kubectl apply -f - --prune --all
     fi
     shift
     ;;
 
   render)
-    vals eval <$MANIFEST
+    vals eval <"$MANIFEST"
     shift
     ;;
 
   apply | diff)
-    _kubectl $@ -f - --prune
+    _kubectl "$@" -f - --prune
     shift
     ;;
 
   *)
-    _kubectl $@
+    _kubectl "$@"
     shift
     ;;
 
