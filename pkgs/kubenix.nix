@@ -14,7 +14,7 @@ let
   }).config or { };
   kubernetes = config.kubernetes or { };
 
-  kubeconfig = kubernetes.kubeconfig or "";
+  kubeconfig = kubernetes.kubeconfig or null;
   result = kubernetes.result or "";
 
   # kubectl does some parsing which removes the -I flag so
@@ -29,11 +29,11 @@ writeShellApplication {
   name = "kubenix";
   runtimeInputs = [ vals kubectl ];
   text = builtins.readFile ./kubenix.sh;
-  bashOptions = [ "u" "o pipefail" ];
   runtimeEnv = {
-    KUBECONFIG = toString kubeconfig;
     KUBECTL_EXTERNAL_DIFF = toString diff;
     MANIFEST = toString result;
+  } // lib.optionalAttrs (kubeconfig != null) {
+    KUBECONFIG = toString kubeconfig;
   };
   derivationArgs = {
     passthru = {
