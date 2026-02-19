@@ -175,6 +175,9 @@
           formatting = (self.treefmtEval.${pkgs.system}).config.build.check self;
           # TODO: access "success" derivation with nice testing utils for nice output
           testing = wasSuccess examples.testing.config.testing;
+          label-filtering = pkgs.callPackage ./tests/label-filtering.nix {
+            kubenix = self.packages.${pkgs.system}.default;
+          };
         } // builtins.listToAttrs (builtins.map
           (v: {
             name = "test-k8s-${builtins.replaceStrings ["."] ["_"] v}";
