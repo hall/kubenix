@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 function _help() {
   echo "
@@ -19,41 +20,27 @@ function _kubectl() {
   vals eval -fail-on-missing-key-in-map <"$MANIFEST" | kubectl "$@"
 }
 
-# if no args given, add empty string
-[ $# -eq 0 ] && set -- ""
+case "${1:-}" in
+-h | --help)
+  _help
+  ;;
 
-# parse arguments
-while test $# -gt 0; do
-  case "$1" in
+"")
+  _kubectl diff -f - --prune || (
+    read -r -p 'apply? [y/N]: ' response
+    [[ $response == "y" ]] && _kubectl apply -f - --prune --all
+  )
+  ;;
 
-  -h | --help)
-    _help
-    exit 0
-    ;;
+render)
+  vals eval <"$MANIFEST"
+  ;;
 
-  "")
-    _kubectl diff -f - --prune
-    if [[ $? -eq 1 ]]; then
-      read -r -p 'apply? [y/N]: ' response
-      [[ $response == "y" ]] && _kubectl apply -f - --prune --all
-    fi
-    shift
-    ;;
+apply | diff)
+  _kubectl "$@" -f - --prune
+  ;;
 
-  render)
-    vals eval <"$MANIFEST"
-    shift
-    ;;
-
-  apply | diff)
-    _kubectl "$@" -f - --prune
-    shift
-    ;;
-
-  *)
-    _kubectl "$@"
-    shift
-    ;;
-
-  esac
-done
+*)
+  _kubectl "$@"
+  ;;
+esac

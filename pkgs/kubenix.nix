@@ -29,7 +29,6 @@ writeShellApplication {
   name = "kubenix";
   runtimeInputs = [ vals kubectl ];
   text = builtins.readFile ./kubenix.sh;
-  bashOptions = [ "u" "o pipefail" ];
   runtimeEnv = {
     KUBECTL_EXTERNAL_DIFF = toString diff;
     MANIFEST = toString result;
