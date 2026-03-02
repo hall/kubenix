@@ -39,7 +39,7 @@ let
           ];
 
           args = { images = pkgs.callPackage ./images.nix { }; };
-          docker.registryUrl = registry;
+          docker.registryHost = registry;
 
           common = [{
             features = [ "k8s" ];

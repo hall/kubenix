@@ -1,15 +1,32 @@
 { config, lib, pkgs, docker, ... }:
 with lib; let
   cfg = config.docker;
+  protocols = [
+    "containers-storage:"
+    "dir:"
+    "docker://"
+    "docker-archive:"
+    "docker-daemon:"
+    "oci:"
+    "oci-archive:"
+  ];
 in
 {
   imports = [ ./base.nix ];
 
   options.docker = {
-    registry.url = mkOption {
-      description = "Default registry url where images are published";
-      type = types.str;
-      default = "";
+    registry = {
+      protocol = mkOption {
+        description = "Default registry protocol where images are published";
+        type = types.enum protocols;
+        default = "docker://";
+      };
+
+      host = mkOption {
+        description = "Default registry host where images are published";
+        type = types.str;
+        default = "";
+      };
     };
 
     images = mkOption {
@@ -40,19 +57,38 @@ in
               else "";
           };
 
-          registry = mkOption {
-            description = "Docker registry url where image is published";
-            type = types.str;
-            default = cfg.registry.url;
+          registry = {
+            protocol = mkOption {
+              description = "Default registry protocol where this image is published";
+              type = types.enum protocols;
+              default = cfg.registry.protocol;
+            };
+
+            host = mkOption {
+              description = "Default registry host where this image is published";
+              type = types.str;
+              default = cfg.registry.host;
+            };
           };
 
           path = mkOption {
             description = "Full docker image path";
             type = types.str;
-            default =
-              if config.registry != ""
-              then "${config.registry}/${config.name}:${config.tag}"
-              else "${config.name}:${config.tag}";
+            default = lib.concatStrings [
+              (if config.registry == "" then "" else "${config.registry.host}/")
+              config.name
+              ":"
+              config.tag
+            ];
+          };
+
+          uri = mkOption {
+            description = "Full docker image URI";
+            type = types.str;
+            default = lib.concatStrings [
+              config.registry.protocol
+              config.path
+            ];
           };
         };
       }));
@@ -69,8 +105,7 @@ in
       description = "Image copy script";
       type = types.package;
       default = docker.copyDockerImages {
-        dest = "docker://${cfg.registry.url}";
-        images = cfg.export;
+        images = builtins.attrValues cfg.images;
       };
     };
   };
