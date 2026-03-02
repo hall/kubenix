@@ -1,19 +1,42 @@
-{ lib, pkgs }:
-with lib; {
-  copyDockerImages = { images, dest, args ? "" }:
-    pkgs.writeScript "copy-docker-images.sh" (concatMapStrings
-      (image:
-        let
-          prefix = optionalString (image.isExe or false) "${image} | ${pkgs.gzip}/bin/gzip --fast |";
-          src = if image.isExe or false then "/dev/stdin" else image;
-        in
-        ''
-          #!${pkgs.runtimeShell}
-
-          set -e
-
-          echo "copying '${image.imageName}:${image.imageTag}' to '${dest}/${image.imageName}:${image.imageTag}'"
-          ${prefix} ${pkgs.skopeo}/bin/skopeo copy ${args} $@ docker-archive:${src} ${dest}/${image.imageName}:${image.imageTag}
-        '')
-      images);
+{ lib
+, pkgs
+,
+}: {
+  copyDockerImages =
+    { images
+    , args ? ""
+    ,
+    }:
+    pkgs.writeShellApplication {
+      name = "kubenix-push-images";
+      excludeShellChecks = [
+        "SC2005"
+        "SC2016"
+        "SC2089"
+        "SC2090"
+      ];
+      runtimeEnv = {
+        copyOne = ''
+        '';
+      };
+      runtimeInputs = [
+        pkgs.gzip
+        pkgs.skopeo
+        pkgs.vals
+      ];
+      text =
+        lib.concatMapStrings
+          ({ image
+           , uri
+           , prefix ? lib.optionalString (image.isExe or false) "${image} | gzip --fast |"
+           , src ? if image.isExe or false
+             then "/dev/stdin"
+             else image
+           , ...
+           }: ''
+            echo "copying '${image.imageName}:${image.imageTag}' to '$(vals get ${lib.escapeShellArg uri})'"
+            ${prefix} skopeo copy ${args} "$@" docker-archive:${lib.escapeShellArg src} "$(vals get ${lib.escapeShellArg uri})"
+          '')
+          images;
+    };
 }

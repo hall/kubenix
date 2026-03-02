@@ -1,4 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config
+, lib
+, pkgs
+, ...
+}:
 with lib;
 with import ../../lib/docker { inherit lib pkgs; }; let
   inherit (config) testing;
@@ -9,8 +13,8 @@ with import ../../lib/docker { inherit lib pkgs; }; let
 in
 {
   options.testing.docker = {
-    registryUrl = mkOption {
-      description = "Docker registry url";
+    registryHost = mkOption {
+      description = "Docker registry host";
       type = types.str;
     };
 
@@ -30,15 +34,16 @@ in
 
     copyScript = copyDockerImages {
       inherit (cfg) images;
-      dest = "docker://" + cfg.registryUrl;
     };
   };
 
-  config.testing.common = [{
-    features = [ "docker" ];
-    options = {
-      _file = "testing.docker.registryUrl";
-      docker.registry.url = cfg.registryUrl;
-    };
-  }];
+  config.testing.common = [
+    {
+      features = [ "docker" ];
+      options = {
+        _file = "testing.docker.registryHost";
+        docker.registry.host = cfg.registryHost;
+      };
+    }
+  ];
 }
