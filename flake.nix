@@ -178,6 +178,12 @@
           label-filtering = pkgs.callPackage ./tests/label-filtering.nix {
             kubenix = self.packages.${pkgs.system}.default;
           };
+          docker-multiple-registries = import ./tests/docker/multiple-registries.nix {
+            inherit pkgs;
+            inherit (self.nixosModules) kubenix;
+            evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
+            images = pkgs.callPackage ./tests/images.nix { };
+          };
         } // builtins.listToAttrs (builtins.map
           (v: {
             name = "test-k8s-${builtins.replaceStrings ["."] ["_"] v}";
