@@ -5,6 +5,7 @@
   copyDockerImages =
     { images
     , args ? ""
+    , useVals ? true
     ,
     }:
     pkgs.writeShellApplication {
@@ -12,6 +13,7 @@
       excludeShellChecks = [
         "SC2005"
         "SC2016"
+        "SC2046"
         "SC2089"
         "SC2090"
       ];
@@ -22,8 +24,7 @@
       runtimeInputs = [
         pkgs.gzip
         pkgs.skopeo
-        pkgs.vals
-      ];
+      ] ++ lib.optionals useVals [ pkgs.vals ];
       text =
         lib.concatMapStrings
           ({ image
@@ -33,10 +34,14 @@
              then "/dev/stdin"
              else image
            , ...
-           }: ''
-            echo "copying '${image.imageName}:${image.imageTag}' to '$(vals get ${lib.escapeShellArg uri})'"
-            ${prefix} skopeo copy ${args} "$@" docker-archive:${lib.escapeShellArg src} "$(vals get ${lib.escapeShellArg uri})"
-          '')
+           }:
+            let
+              resolvedUri = if useVals then "$(vals get ${lib.escapeShellArg uri})" else lib.escapeShellArg uri;
+            in
+            ''
+              echo "copying '${image.imageName}:${image.imageTag}' to '${resolvedUri}'"
+              ${prefix} skopeo copy ${args} "$@" docker-archive:${lib.escapeShellArg src} ${resolvedUri}
+            '')
           images;
     };
 }
