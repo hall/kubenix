@@ -184,6 +184,12 @@
             evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
             images = pkgs.callPackage ./tests/images.nix { };
           };
+          docker-image-from-package = import ./tests/docker/image-from-package.nix {
+            inherit pkgs;
+            inherit (self.nixosModules) kubenix;
+            evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
+            images = pkgs.callPackage ./tests/images.nix { };
+          };
         } // builtins.listToAttrs (builtins.map
           (v: {
             name = "test-k8s-${builtins.replaceStrings ["."] ["_"] v}";

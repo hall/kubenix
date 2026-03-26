@@ -5,6 +5,7 @@
   submodule = ./submodule.nix;
   helm = ./helm.nix;
   docker = ./docker.nix;
+  docker-image-from-package = ./docker-image-from-package.nix;
   testing = ./testing;
   test = ./testing/test-options.nix;
   base = ./base.nix;

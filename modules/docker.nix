@@ -75,7 +75,7 @@ in
             description = "Full docker image path";
             type = types.str;
             default = lib.concatStrings [
-              (if config.registry == "" then "" else "${config.registry.host}/")
+              (if config.registry.host == "" then "" else "${config.registry.host}/")
               config.name
               ":"
               config.tag
@@ -101,10 +101,24 @@ in
       default = [ ];
     };
 
+    useVals = mkOption {
+      description = "Whether to use vals for expanding image URIs at runtime in the copy script. Disable for air-gapped environments or when URIs contain no dynamic values.";
+      type = types.bool;
+      default = true;
+    };
+
+    copyScriptArgs = mkOption {
+      description = "Additional arguments to pass to skopeo copy in the copy script";
+      type = types.str;
+      default = "";
+    };
+
     copyScript = mkOption {
       description = "Image copy script";
       type = types.package;
       default = docker.copyDockerImages {
+        inherit (cfg) useVals;
+        args = cfg.copyScriptArgs;
         images = builtins.attrValues cfg.images;
       };
     };
@@ -128,6 +142,6 @@ in
 
     # list of exported docker images
     docker.export = mapAttrsToList (_: i: i.image)
-      (filterAttrs (_: i: i.registry != null) config.docker.images);
+      (filterAttrs (_: i: i.image != null) config.docker.images);
   };
 }
