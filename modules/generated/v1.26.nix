@@ -66,24 +66,20 @@ let
 
   mkOptionDefault = mkOverride 1001;
 
-  mergeValuesByKey = attrMergeKey: listMergeKeys: values:
+  mergeValuesByKey = mergeKey: listMapKeys: values:
     listToAttrs (imap0
       (i: value: nameValuePair
         (
-          if hasAttr attrMergeKey value
-          then
-            if isAttrs value.${attrMergeKey}
-            then toString value.${attrMergeKey}.content
-            else (toString value.${attrMergeKey})
-          else
-          # generate merge key for list elements if it's not present
-            "__kubenix_list_merge_key_" + (concatStringsSep "" (map
-              (key:
+          (concatStringsSep "" (map
+            (key:
+              if value ? ${key}
+              then
                 if isAttrs value.${key}
                 then toString value.${key}.content
                 else (toString value.${key})
-              )
-              listMergeKeys))
+              else ""
+            )
+            (unique ([ mergeKey ] ++ listMapKeys))))
         )
         (value // { _priority = i; }))
       values);
@@ -106,12 +102,7 @@ let
         _priority = mkOption { type = types.nullOr types.int; default = null; };
       };
       config = definitions."${ref}".config // {
-        ${mergeKey} = mkOverride 1002 (
-          # use name as mergeKey only if it is not coming from mergeValuesByKey
-          if (!hasPrefix "__kubenix_list_merge_key_" name)
-          then convertName name
-          else null
-        );
+        ${mergeKey} = mkOverride 1002 (convertName name);
       };
     });
 
@@ -134,10 +125,10 @@ let
       ];
     });
 
-  coerceAttrsOfSubmodulesToListByKey = ref: attrMergeKey: listMergeKeys: (types.coercedTo
+  coerceAttrsOfSubmodulesToListByKey = ref: mergeKey: listMapKeys: (types.coercedTo
     (types.listOf (submoduleOf ref))
-    (mergeValuesByKey attrMergeKey listMergeKeys)
-    (types.attrsOf (submoduleWithMergeOf ref attrMergeKey))
+    (mergeValuesByKey mergeKey listMapKeys)
+    (types.attrsOf (submoduleWithMergeOf ref mergeKey))
   );
 
   definitions = {
@@ -3081,7 +3072,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "conditions is the set of conditions required for this autoscaler to scale its target, and indicates whether or not those conditions are met.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerCondition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerCondition" "type" [ "type" ]));
           apply = attrsToList;
         };
         "currentMetrics" = mkOption {
@@ -3494,8 +3485,7 @@ let
       options = {
         "active" = mkOption {
           description = "A list of pointers to currently running jobs.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ObjectReference" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.ObjectReference")));
         };
         "lastScheduleTime" = mkOption {
           description = "Information when was the last time the job was successfully scheduled.";
@@ -4919,7 +4909,7 @@ let
         };
         "ports" = mkOption {
           description = "List of ports to expose from the container. Not specifying a port here DOES NOT prevent that port from being exposed. Any port which is listening on the default \"0.0.0.0\" address inside a container will be accessible from the network. Modifying this array with strategic merge patch may corrupt the data. For more information See https://github.com/kubernetes/kubernetes/issues/108255. Cannot be updated.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerPort" "name" [ "containerPort" "protocol" ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerPort" "containerPort" [ "containerPort" "protocol" ]));
           apply = attrsToList;
         };
         "readinessProbe" = mkOption {
@@ -5376,8 +5366,7 @@ let
         };
         "ports" = mkOption {
           description = "Port numbers available on the related IP addresses.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.EndpointPort" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.EndpointPort")));
         };
       };
 
@@ -5569,7 +5558,7 @@ let
         };
         "ports" = mkOption {
           description = "Ports are not allowed for ephemeral containers.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerPort" "name" [ "containerPort" "protocol" ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerPort" "containerPort" [ "containerPort" "protocol" ]));
           apply = attrsToList;
         };
         "readinessProbe" = mkOption {
@@ -6102,8 +6091,7 @@ let
         };
         "httpHeaders" = mkOption {
           description = "Custom headers to set in the request. HTTP allows repeated headers.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.HTTPHeader" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.HTTPHeader")));
         };
         "path" = mkOption {
           description = "Path to access on the HTTP server.";
@@ -7060,8 +7048,7 @@ let
         };
         "volumesAttached" = mkOption {
           description = "List of volumes that are attached to the node.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.AttachedVolume" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.AttachedVolume")));
         };
         "volumesInUse" = mkOption {
           description = "List of attachable volumes in use (mounted) by the node.";
@@ -7848,8 +7835,7 @@ let
         };
         "options" = mkOption {
           description = "A list of DNS resolver options. This will be merged with the base options generated from DNSPolicy. Duplicated entries will be removed. Resolution options given in Options will override those that appear in the base DNSPolicy.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodDNSConfigOption" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.PodDNSConfigOption")));
         };
         "searches" = mkOption {
           description = "A list of DNS search domains for host-name lookup. This will be appended to the base search paths generated from DNSPolicy. Duplicated search paths will be removed.";
@@ -8024,8 +8010,7 @@ let
         };
         "sysctls" = mkOption {
           description = "Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. Note that this field cannot be set when spec.os.name is windows.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.Sysctl" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.Sysctl")));
         };
         "windowsOptions" = mkOption {
           description = "The Windows specific settings applied to all containers. If unspecified, the options within a container's SecurityContext will be used. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Note that this field cannot be set when spec.os.name is linux.";
@@ -8154,7 +8139,7 @@ let
         };
         "resourceClaims" = mkOption {
           description = "ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name.\n\nThis is an alpha field and requires enabling the DynamicResourceAllocation feature gate.\n\nThis field is immutable.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodResourceClaim" "name" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodResourceClaim" "name" [ "name" ]));
           apply = attrsToList;
         };
         "restartPolicy" = mkOption {
@@ -8171,7 +8156,7 @@ let
         };
         "schedulingGates" = mkOption {
           description = "SchedulingGates is an opaque list of values that if specified will block scheduling the pod. More info:  https://git.k8s.io/enhancements/keps/sig-scheduling/3521-pod-scheduling-readiness.\n\nThis is an alpha-level feature enabled by PodSchedulingReadiness feature gate.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodSchedulingGate" "name" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.PodSchedulingGate" "name" [ "name" ]));
           apply = attrsToList;
         };
         "securityContext" = mkOption {
@@ -8208,7 +8193,8 @@ let
         };
         "topologySpreadConstraints" = mkOption {
           description = "TopologySpreadConstraints describes how a group of pods ought to spread across topology domains. Scheduler will schedule pods in a way which abides by the constraints. All topologySpreadConstraints are ANDed.";
-          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.TopologySpreadConstraint")));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.TopologySpreadConstraint" "topologyKey" [ "topologyKey" "whenUnsatisfiable" ]));
+          apply = attrsToList;
         };
         "volumes" = mkOption {
           description = "List of volumes that can be mounted by containers belonging to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes";
@@ -8270,13 +8256,11 @@ let
         };
         "containerStatuses" = mkOption {
           description = "The list has one entry per container in the manifest. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerStatus" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.ContainerStatus")));
         };
         "ephemeralContainerStatuses" = mkOption {
           description = "Status for any ephemeral containers that have run in this pod.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerStatus" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.ContainerStatus")));
         };
         "hostIP" = mkOption {
           description = "IP address of the host to which the pod is assigned. Empty if not yet scheduled.";
@@ -8284,8 +8268,7 @@ let
         };
         "initContainerStatuses" = mkOption {
           description = "The list has one entry per init container in the manifest. The most recent successful init container will have ready = true, the most recently started container will have startTime set. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ContainerStatus" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.ContainerStatus")));
         };
         "message" = mkOption {
           description = "A human readable message indicating details about why the pod is in this condition.";
@@ -9015,8 +8998,7 @@ let
       options = {
         "claims" = mkOption {
           description = "Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.\n\nThis is an alpha field and requires enabling the DynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ResourceClaim" "name" [ "name" ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.ResourceClaim")));
         };
         "limits" = mkOption {
           description = "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/";
@@ -9543,8 +9525,7 @@ let
         };
         "imagePullSecrets" = mkOption {
           description = "ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images in pods that reference this ServiceAccount. ImagePullSecrets are distinct from Secrets because Secrets can be mounted in the pod, but ImagePullSecrets are only accessed by the kubelet. More info: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.LocalObjectReference" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.core.v1.LocalObjectReference")));
         };
         "kind" = mkOption {
           description = "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds";
@@ -9750,7 +9731,7 @@ let
         };
         "ports" = mkOption {
           description = "The list of ports that are exposed by this service. More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ServicePort" "name" [ "port" "protocol" ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.core.v1.ServicePort" "port" [ "port" "protocol" ]));
           apply = attrsToList;
         };
         "publishNotReadyAddresses" = mkOption {
@@ -9804,7 +9785,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "Current service state";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type" [ "type" ]));
           apply = attrsToList;
         };
         "loadBalancer" = mkOption {
@@ -10548,8 +10529,7 @@ let
       options = {
         "forZones" = mkOption {
           description = "forZones indicates the zone(s) this endpoint should be consumed by to enable topology aware routing.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.discovery.v1.ForZone" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.discovery.v1.ForZone")));
         };
       };
 
@@ -10614,8 +10594,7 @@ let
         };
         "ports" = mkOption {
           description = "ports specifies the list of network ports exposed by each endpoint in this slice. Each port must have a unique name. When ports is empty, it indicates that there are no defined ports. When a port is defined with a nil port value, it indicates \"all ports\". Each slice may include a maximum of 100 ports.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.discovery.v1.EndpointPort" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.discovery.v1.EndpointPort")));
         };
       };
 
@@ -11477,7 +11456,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "`conditions` is a list of the current states of FlowSchema.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.flowcontrol.v1beta3.FlowSchemaCondition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.flowcontrol.v1beta3.FlowSchemaCondition" "type" [ "type" ]));
           apply = attrsToList;
         };
       };
@@ -11727,7 +11706,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "`conditions` is the current state of \"request-priority\".";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationCondition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationCondition" "type" [ "type" ]));
           apply = attrsToList;
         };
       };
@@ -12460,7 +12439,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "Conditions holds an array of metav1.Condition that describe the state of the NetworkPolicy. Current service state";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type" [ "type" ]));
           apply = attrsToList;
         };
       };
@@ -12811,7 +12790,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "Conditions contain conditions for PDB. The disruption controller sets the DisruptionAllowed condition. The following are known values for the reason field (additional reasons could be added in the future): - SyncFailed: The controller encountered an error and wasn't able to compute\n              the number of allowed disruptions. Therefore no disruptions are\n              allowed and the status of the condition will be False.\n- InsufficientPods: The number of pods are either at or below the number\n                    required by the PodDisruptionBudget. No disruptions are\n                    allowed and the status of the condition will be False.\n- SufficientPods: There are more pods than required by the PodDisruptionBudget.\n                  The condition will be True, and the number of allowed\n                  disruptions are provided by the disruptionsAllowed property.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.Condition" "type" [ "type" ]));
           apply = attrsToList;
         };
         "currentHealthy" = mkOption {
@@ -12919,8 +12898,7 @@ let
         };
         "subjects" = mkOption {
           description = "Subjects holds references to the objects the role applies to.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.rbac.v1.Subject" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.rbac.v1.Subject")));
         };
       };
 
@@ -13076,8 +13054,7 @@ let
         };
         "subjects" = mkOption {
           description = "Subjects holds references to the objects the role applies to.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.rbac.v1.Subject" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.rbac.v1.Subject")));
         };
       };
 
@@ -13310,8 +13287,7 @@ let
       options = {
         "resourceClaims" = mkOption {
           description = "ResourceClaims describes resource availability for each pod.spec.resourceClaim entry where the corresponding ResourceClaim uses \"WaitForFirstConsumer\" allocation mode.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.resource.v1alpha1.ResourceClaimSchedulingStatus" "name" [ "name" ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.resource.v1alpha1.ResourceClaimSchedulingStatus")));
         };
       };
 
@@ -13495,8 +13471,7 @@ let
         };
         "reservedFor" = mkOption {
           description = "ReservedFor indicates which entities are currently allowed to use the claim. A Pod which references a ResourceClaim which is not reserved for that Pod will not be started.\n\nThere can be at most 32 such reservations. This may get increased in the future, but not reduced.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.resource.v1alpha1.ResourceClaimConsumerReference" "name" [ "uid" ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.api.resource.v1alpha1.ResourceClaimConsumerReference")));
         };
       };
 
@@ -14599,8 +14574,7 @@ let
         };
         "versions" = mkOption {
           description = "versions is the list of all API versions of the defined custom resource. Version names are used to compute the order in which served versions are listed in API discovery. If the version string is \"kube-like\", it will sort above non \"kube-like\" version strings, which are ordered lexicographically. \"Kube-like\" versions start with a \"v\", then are followed by a number (the major version), then optionally the string \"alpha\" or \"beta\" and another number (the minor version). These are sorted first by GA > beta > alpha (where GA is a version with no suffix such as beta or alpha), and then by comparing major version, then minor version. An example sorted list of versions: v10, v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.";
-          type = (coerceAttrsOfSubmodulesToListByKey "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionVersion" "name" [ ]);
-          apply = attrsToList;
+          type = (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionVersion"));
         };
       };
 
@@ -14641,8 +14615,7 @@ let
       options = {
         "additionalPrinterColumns" = mkOption {
           description = "additionalPrinterColumns specifies additional columns returned in Table output. See https://kubernetes.io/docs/reference/using-api/api-concepts/#receiving-resources-as-tables for details. If no columns are specified, a single column displaying the age of the custom resource is used.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceColumnDefinition" "name" [ ]));
-          apply = attrsToList;
+          type = (types.nullOr (types.listOf (submoduleOf "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceColumnDefinition")));
         };
         "deprecated" = mkOption {
           description = "deprecated indicates this version of the custom resource API is deprecated. When set to true, API requests to this version receive a warning header in the server response. Defaults to false.";
@@ -14941,7 +14914,7 @@ let
         };
         "x-kubernetes-validations" = mkOption {
           description = "x-kubernetes-validations describes a list of validation rules written in the CEL expression language. This field is an alpha-level. Using this field requires the feature gate `CustomResourceValidationExpressions` to be enabled.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.ValidationRule" "rule" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.ValidationRule" "rule" [ "rule" ]));
           apply = attrsToList;
         };
       };
@@ -15137,8 +15110,7 @@ let
         };
         "groups" = mkOption {
           description = "groups is a list of APIGroup.";
-          type = (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup" "name" [ ]);
-          apply = attrsToList;
+          type = (types.listOf (submoduleOf "io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup"));
         };
         "kind" = mkOption {
           description = "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds";
@@ -15225,8 +15197,7 @@ let
         };
         "resources" = mkOption {
           description = "resources contains the name of the resources and if they are namespaced.";
-          type = (coerceAttrsOfSubmodulesToListByKey "io.k8s.apimachinery.pkg.apis.meta.v1.APIResource" "name" [ ]);
-          apply = attrsToList;
+          type = (types.listOf (submoduleOf "io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"));
         };
       };
 
@@ -15967,7 +15938,7 @@ let
       options = {
         "conditions" = mkOption {
           description = "Current service state of apiService.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceCondition" "type" [ ]));
+          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceCondition" "type" [ "type" ]));
           apply = attrsToList;
         };
       };

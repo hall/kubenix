@@ -2,6 +2,7 @@
 with lib; let
   inherit (config.kubernetes.api.resources.pods) pod1;
   inherit (config.kubernetes.api.resources.pods) pod2;
+  inherit (config.kubernetes.api.resources.pods) pod3;
 in
 {
   imports = with kubenix.modules; [ test k8s ];
@@ -22,6 +23,10 @@ in
         message = "Should have conditional annotation set";
         assertion = pod2.metadata.annotations.conditional-annotation == "value";
       }
+      {
+        message = "Should have protocol UDP";
+        assertion = (elemAt (head pod3.spec.containers).ports 1).protocol == "UDP";
+      }
     ];
   };
 
@@ -29,6 +34,18 @@ in
 
   kubernetes.resources.pods.pod2 = {
     metadata.labels.custom-label = "value";
+  };
+
+  kubernetes.resources.pods.pod3 = {
+    spec.containers.container1.ports = [
+      {
+        containerPort = 80;
+      }
+      {
+        containerPort = 80;
+        protocol = "UDP";
+      }
+    ];
   };
 
   kubernetes.api.defaults = [
