@@ -27,15 +27,20 @@
       ] ++ lib.optionals useVals [ pkgs.vals ];
       text =
         lib.concatMapStrings
-          ({ image
-           , uri
-           , prefix ? lib.optionalString (image.isExe or false) "${image} | gzip --fast |"
-           , src ? if image.isExe or false
-             then "/dev/stdin"
-             else image
-           , ...
-           }:
+          (imgSpec:
             let
+              inherit (imgSpec) image uri;
+              imagePath = builtins.toString image;
+              # In newer nixpkgs, buildLayeredImage propagates isExe = true from
+              # its internal streamLayeredImage passthru, even though its output is
+              # a tarball. Guard against this by checking the output path suffix.
+              isTarball =
+                lib.hasSuffix ".tar.gz" imagePath
+                || lib.hasSuffix ".tar.zst" imagePath
+                || lib.hasSuffix ".tar" imagePath;
+              isExe = (image.isExe or false) && !isTarball;
+              prefix = imgSpec.prefix or (lib.optionalString isExe "${image} | gzip --fast |");
+              src = imgSpec.src or (if isExe then "/dev/stdin" else image);
               resolvedUri = if useVals then "$(vals get ${lib.escapeShellArg uri})" else lib.escapeShellArg uri;
             in
             ''
