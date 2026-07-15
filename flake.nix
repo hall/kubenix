@@ -28,38 +28,6 @@
     {
       nixosModules.kubenix = import ./modules;
 
-      # evalModules with same interface as lib.evalModules and kubenix as special argument
-      evalModules = eachSystem (pkgs:
-        attrs @ { module ? null, modules ? [ module ], ... }:
-        let
-          lib' = pkgs.lib.extend (lib: _self: import ./lib/upstreamables.nix { inherit lib pkgs; });
-          attrs' = builtins.removeAttrs attrs [ "module" ];
-        in
-        lib'.evalModules (pkgs.lib.recursiveUpdate
-          {
-            modules = modules ++ [{
-              config._module.args = {
-                inherit pkgs;
-                name = "default";
-              };
-            }];
-            specialArgs = {
-              pkgs = import inputs.nixpkgs {
-                inherit (pkgs.stdenv.hostPlatform) system;
-                overlays = [ self.overlays.default ];
-                config.allowUnsupportedSystem = true;
-              };
-
-              kubenix = {
-                lib = import ./lib { inherit pkgs; inherit (pkgs) lib; };
-                evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
-                modules = self.nixosModules.kubenix;
-              };
-            };
-          }
-          attrs')
-      );
-
       packages = eachSystem (pkgs: {
         default = pkgs.callPackage ./pkgs/kubenix.nix {
           evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
