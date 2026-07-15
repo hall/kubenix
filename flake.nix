@@ -5,11 +5,14 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
+    systems.url = "github:nix-systems/default";
+
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
     };
-    treefmt = {
+
+    treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -147,7 +150,7 @@
         };
       });
 
-      treefmtEval = eachSystem (pkgs: inputs.treefmt.lib.evalModule pkgs {
+      treefmtEval = eachSystem (pkgs: inputs.treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
         programs = {
           nixpkgs-fmt.enable = true;

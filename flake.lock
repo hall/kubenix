@@ -87,7 +87,7 @@
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
         "systems": "systems",
-        "treefmt": "treefmt"
+        "treefmt-nix": "treefmt-nix"
       }
     },
     "systems": {
@@ -100,11 +100,12 @@
         "type": "github"
       },
       "original": {
-        "id": "systems",
-        "type": "indirect"
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
       }
     },
-    "treefmt": {
+    "treefmt-nix": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
