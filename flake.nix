@@ -28,17 +28,6 @@
     {
       nixosModules.kubenix = import ./modules;
 
-      devShells = eachSystem (pkgs: {
-        default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            dive
-            k9s
-            k3d
-            kubie
-          ];
-        };
-      });
-
       treefmtEval = eachSystem (pkgs: inputs.treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
         programs = {
