@@ -28,23 +28,6 @@
     {
       nixosModules.kubenix = import ./modules;
 
-      treefmtEval = eachSystem (pkgs: inputs.treefmt-nix.lib.evalModule pkgs {
-        projectRootFile = "flake.nix";
-        programs = {
-          nixpkgs-fmt.enable = true;
-          black.enable = true;
-          prettier.enable = true;
-          shfmt.enable = true;
-        };
-        settings.global.excludes = [
-          "docs/themes/*"
-          "docs/layouts/*"
-          "modules/generated/*"
-        ];
-      });
-
-      formatter = eachSystem (pkgs: (self.treefmtEval.${pkgs.system}).config.build.wrapper);
-
       checks = eachSystem (pkgs:
         let
           wasSuccess = suite:
@@ -57,7 +40,6 @@
               ({ registry = "docker.io/gatehub"; } // attrs);
         in
         {
-          formatting = (self.treefmtEval.${pkgs.system}).config.build.check self;
           # TODO: access "success" derivation with nice testing utils for nice output
           testing = wasSuccess examples.testing.config.testing;
           label-filtering = pkgs.callPackage ./tests/label-filtering.nix {
