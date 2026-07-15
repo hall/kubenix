@@ -28,32 +28,6 @@
     {
       nixosModules.kubenix = import ./modules;
 
-      packages = eachSystem (pkgs: {
-        default = pkgs.callPackage ./pkgs/kubenix.nix {
-          evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
-        };
-        docs = import ./docs {
-          inherit pkgs;
-          options = (self.evalModules.${pkgs.stdenv.hostPlatform.system} {
-            modules = builtins.attrValues self.nixosModules.kubenix;
-          }).options;
-        };
-      } // pkgs.lib.attrsets.mapAttrs' (name: value: pkgs.lib.attrsets.nameValuePair "generate-${name}" value)
-        (builtins.removeAttrs (pkgs.callPackage ./pkgs/generators { }) [ "override" "overrideDerivation" ])
-      // (
-        # TODO: fix default.nix in all examples so they don't rely on inpure builtins.currentSystem
-        #   and then we can add all of them here.
-        pkgs.lib.attrsets.genAttrs' [
-          "namespaces"
-          "deployment"
-          "custom-resources"
-        ]
-          (name: pkgs.lib.nameValuePair
-            ("example-" + name)
-            (self.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-              module = ./docs/content/examples + "/${name}/module.nix";
-            }))
-      ));
       apps = eachSystem (pkgs: {
         docs = {
           type = "app";
