@@ -28,10 +28,6 @@
     {
       nixosModules.kubenix = import ./modules;
 
-      overlays.default = _final: prev: {
-        kubenix.evalModules = self.evalModules.${prev.stdenv.hostPlatform.system};
-      };
-
       # evalModules with same interface as lib.evalModules and kubenix as special argument
       evalModules = eachSystem (pkgs:
         attrs @ { module ? null, modules ? [ module ], ... }:
