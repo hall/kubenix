@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
@@ -13,7 +15,9 @@
     };
   };
 
-  outputs = inputs@{ self, systems, ... }:
+  outputs = inputs@{ self, systems, flake-parts, import-tree, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./flake)
+    // (
     let
       eachSystem = f: inputs.nixpkgs.lib.genAttrs (import systems)
         (system: f inputs.nixpkgs.legacyPackages.${system});
@@ -197,5 +201,5 @@
           })
           (import ./versions.nix).versions)
       );
-    };
+    });
 }
