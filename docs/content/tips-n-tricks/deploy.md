@@ -37,6 +37,7 @@ As such, on a server node, we can write kubenix's output there.
   # now we can link our file into the appropriate directory
   # and k3s will handle the rest
   system.activationScripts.kubenix.text = ''
+    mkdir -p /var/lib/rancher/k3s/server/manifests
     ln -sf /etc/kubenix.yaml /var/lib/rancher/k3s/server/manifests/kubenix.yaml
   '';
 }
