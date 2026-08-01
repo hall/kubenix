@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `kubernetes.customTypesModuleDefinesCRDSpec` option to control whether `customTypes.*.module` defines just the CRD spec or the whole module.
 - Submodule instances now get an automatic `kubenix/module-instance` label derived from the instance name.
 - The evaluated `config` is now exposed as a `passthru.config` attribute on the built `kubenix` package.
+- `nix run .#vulnix`, a whitelist-gated CVE scan of the package and devshell closures, run from CI on manual dispatch.
 
 ### Changed
 

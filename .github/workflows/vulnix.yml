@@ -1,0 +1,19 @@
+name: vulnix
+
+on:
+  workflow_dispatch:
+
+jobs:
+  vulnix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1, 2025-12-02
+
+      - uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34, 2025-09-24
+
+      # No NVD feed cache: a cold scan downloads six year-feeds in well under a
+      # minute, less than restoring and re-uploading the ~165 MB database costs.
+      - name: Vulnerability scan
+        run: nix run ".#vulnix"
