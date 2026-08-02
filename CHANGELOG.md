@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `overlays.default` now evaluates modules against the package set it extends. It previously returned the flake's own `evalModules.<system>`, which is pinned to kubenix's nixpkgs, so overlays and `config` applied by the consumer were discarded; it also only resolved for systems kubenix itself declares.
 - ConfigMap `data` and `binaryData` keys with a leading underscore are no longer stripped (#44).
 - Custom resources are no longer assumed to have a `spec` field.
 - `resultYAML` now includes hash labels by building from `kubernetes.generated.items`.

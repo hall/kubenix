@@ -16,17 +16,14 @@ let
       message = "the overlay provides pkgs.kubenix.evalModules";
       assertion = (overlaid ? kubenix) && builtins.isFunction overlaid.kubenix.evalModules;
     }
-    # TODO: re-enable once the overlay binds evalModules to the package set it extends. Today it
-    #   returns the flake's own `evalModules.<system>`, which is pinned to kubenix's nixpkgs and
-    #   discards whatever the overlay was applied to.
-    # {
-    #   message = "the overlay's evalModules evaluates modules against the extended package set";
-    #   assertion = (overlaid.kubenix.evalModules {
-    #     module = { pkgs, lib, ... }: {
-    #       options.marker = lib.mkOption { default = pkgs.kubenixOverlayMarker or null; };
-    #     };
-    #   }).config.marker == marker;
-    # }
+    {
+      message = "the overlay's evalModules evaluates modules against the extended package set";
+      assertion = (overlaid.kubenix.evalModules {
+        module = { pkgs, lib, ... }: {
+          options.marker = lib.mkOption { default = pkgs.kubenixOverlayMarker or null; };
+        };
+      }).config.marker == marker;
+    }
   ];
 
   failures = map (a: a.message) (builtins.filter (a: !a.assertion) assertions);
