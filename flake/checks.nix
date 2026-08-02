@@ -14,6 +14,15 @@
     in
     {
       checks = {
+        # Pins the interface that `evalModules` and the `kubenix` special argument expose to
+        # module authors, so refactors of the evaluator have something to be measured against.
+        eval-modules = import ../tests/eval-modules.nix { inherit pkgs evalModules; };
+
+        overlay = import ../tests/overlay.nix {
+          inherit pkgs;
+          overlay = self.overlays.default;
+        };
+
         # Check that all packages build
         # TODO: impure examples (helm/image/pod) aren't packages yet; once their default.nix
         #   is pure they join `self'.packages` and build here automatically (matches packages.nix).
