@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `lib/eval-modules.nix`, the module evaluator as a plain function of `pkgs`, so consumers without flake machinery (nixpkgs, for one) can evaluate modules with `import <kubenix>/lib/eval-modules.nix { inherit pkgs; }`.
 - Image registry, name, and tag can now use `vals` syntax for dynamic/secret expansion at runtime.
 - Customizable registry protocol (`docker.registry.protocol` and `docker.images.*.registry.protocol`).
 - Support for Kubernetes 1.28 through 1.36.

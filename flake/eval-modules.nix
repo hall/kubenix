@@ -1,34 +1,8 @@
 { inputs, config, ... }:
 let
-  # evalModules with same interface as lib.evalModules and kubenix as special argument
-  mkEvalModules = pkgs:
-    let
-      evalModules = attrs @ { module ? null, modules ? [ module ], ... }:
-        let
-          lib' = pkgs.lib.extend (lib: _self: import ../lib/upstreamables.nix { inherit lib pkgs; });
-          attrs' = builtins.removeAttrs attrs [ "module" ];
-        in
-        lib'.evalModules (pkgs.lib.recursiveUpdate
-          {
-            modules = modules ++ [{
-              config._module.args = {
-                inherit pkgs;
-                name = "default";
-              };
-            }];
-            specialArgs = {
-              inherit pkgs;
-
-              kubenix = {
-                lib = import ../lib { inherit pkgs; inherit (pkgs) lib; };
-                inherit evalModules;
-                modules = import ../modules;
-              };
-            };
-          }
-          attrs');
-    in
-    evalModules;
+  # Kept in lib/ so consumers without flake machinery, such as nixpkgs, can import the evaluator
+  # directly. The flake only binds it to a package set per system.
+  mkEvalModules = pkgs: import ../lib/eval-modules.nix { inherit pkgs; };
 in
 {
   flake.evalModules = inputs.nixpkgs.lib.genAttrs config.systems (

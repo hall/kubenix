@@ -16,7 +16,12 @@
       checks = {
         # Pins the interface that `evalModules` and the `kubenix` special argument expose to
         # module authors, so refactors of the evaluator have something to be measured against.
-        eval-modules = import ../tests/eval-modules.nix { inherit pkgs evalModules; };
+        eval-modules = import ../tests/eval-modules.nix {
+          inherit pkgs;
+          # Imported directly rather than taken from perSystem, so this check covers the entry
+          # point a non-flake consumer uses. Every other check reaches it through the flake.
+          evalModules = import ../lib/eval-modules.nix { inherit pkgs; };
+        };
 
         overlay = import ../tests/overlay.nix {
           inherit pkgs;
