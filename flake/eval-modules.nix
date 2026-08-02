@@ -1,10 +1,8 @@
 { inputs, config, ... }:
 let
   # evalModules with same interface as lib.evalModules and kubenix as special argument
-  mkEvalModules = system:
+  mkEvalModules = pkgs:
     let
-      pkgs = inputs.nixpkgs.legacyPackages.${system};
-
       evalModules = attrs @ { module ? null, modules ? [ module ], ... }:
         let
           lib' = pkgs.lib.extend (lib: _self: import ../lib/upstreamables.nix { inherit lib pkgs; });
@@ -33,10 +31,12 @@ let
     evalModules;
 in
 {
-  flake.evalModules = inputs.nixpkgs.lib.genAttrs config.systems mkEvalModules;
+  flake.evalModules = inputs.nixpkgs.lib.genAttrs config.systems (
+    system: mkEvalModules inputs.nixpkgs.legacyPackages.${system}
+  );
 
   # Share this system's evalModules with the other perSystem modules.
   perSystem = { system, ... }: {
-    _module.args.evalModules = mkEvalModules system;
+    _module.args.evalModules = mkEvalModules inputs.nixpkgs.legacyPackages.${system};
   };
 }
