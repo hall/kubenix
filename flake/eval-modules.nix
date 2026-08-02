@@ -28,7 +28,7 @@ let
           kubenix = {
             lib = import ../lib { inherit pkgs; inherit (pkgs) lib; };
             evalModules = self.evalModules.${pkgs.stdenv.hostPlatform.system};
-            modules = self.nixosModules.kubenix;
+            modules = import ../modules;
           };
         };
       }
