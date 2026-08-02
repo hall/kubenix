@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you don't want `vals` expansion when pushing images (e.g., in air-gapped environments), set `docker.useVals = false`.
 - The `kubenix` package is now built with `writeShellApplication`; `vals` and `kubectl` are runtime dependencies and are no longer exposed as standalone binaries in the package output (e.g. `${kubenix}/bin/kubectl` no longer exists).
 - The `customTypes.*.module` option type changed from `unspecified` to `deferredModule` (default is now a freeform attrs module). Configs that passed non-module values may need to adapt (`c4b461b`).
+- Modules evaluated through `kubenix.evalModules.<system>` no longer receive a `pkgs` carrying the kubenix overlay, so `pkgs.kubenix.evalModules` is not available inside a module body. Use the `kubenix` module argument instead, which has always exposed `evalModules` alongside `lib` and `modules`. Applying `kubenix.overlays.default` to your own nixpkgs is unaffected.
 
 ### Added
 

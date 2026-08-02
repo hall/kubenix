@@ -1,4 +1,4 @@
-{ inputs, self, config, ... }:
+{ inputs, config, ... }:
 let
   # evalModules with same interface as lib.evalModules and kubenix as special argument
   mkEvalModules = system:
@@ -19,11 +19,7 @@ let
               };
             }];
             specialArgs = {
-              pkgs = import inputs.nixpkgs {
-                inherit (pkgs.stdenv.hostPlatform) system;
-                overlays = [ self.overlays.default ];
-                config.allowUnsupportedSystem = true;
-              };
+              inherit pkgs;
 
               kubenix = {
                 lib = import ../lib { inherit pkgs; inherit (pkgs) lib; };
