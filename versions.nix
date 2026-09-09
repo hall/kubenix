@@ -20,6 +20,7 @@ let
     "1.34.3" = "sha256:0dqwfpm72x3815l2nrgxw9jdy4kwvicv8nnj0qr7ap51zp1cvc6k";
     "1.35.2" = "sha256:0ii4srjp8qm73ddw0b4hbr7vp1fr068n7xbm7msyab75kqa00da8";
     "1.36.1" = "sha256:0l04r7d93d5g900gm9w54fsx1avzdpdqmbxmxiiavmx17l3f5vfw";
+    "1.37.0" = "sha256:1awsm2zch4wj6fwggcvj9bzydjk1yc2p03pl8fp4svpyyys47d4a";
   };
 in
 {
