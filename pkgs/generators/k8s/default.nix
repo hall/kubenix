@@ -142,6 +142,11 @@ with lib; let
                         then {
                           type = requiredOrNot (types.listOf (mapType swagger.definitions.${refDefinition property.items}));
                         }
+                        # do not allow self-referential values
+                        else if (refDefinition property.items) == _name
+                        then {
+                          type = types.unspecified;
+                        }
                         # if a reference is to complex type
                         else
                         # make it an attribute set of submodules if only x-kubernetes-patch-merge-key is present, or
@@ -175,10 +180,7 @@ with lib; let
                                 apply = attrsToList;
                               }
                             else {
-                              type =
-                                if (refDefinition property.items) == _name
-                                then types.unspecified # do not allow self-referential values
-                                else requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
+                              type = requiredOrNot (types.listOf (submoduleOf definitions (refDefinition property.items)));
                             }
                       # in other case it only references a simple type
                       else {
