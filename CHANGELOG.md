@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `lib/eval-modules.nix`, the module evaluator as a plain function of `pkgs`, so consumers without flake machinery (nixpkgs, for one) can evaluate modules with `import <kubenix>/lib/eval-modules.nix { inherit pkgs; }`.
 - Image registry, name, and tag can now use `vals` syntax for dynamic/secret expansion at runtime.
 - Customizable registry protocol (`docker.registry.protocol` and `docker.images.*.registry.protocol`).
-- Support for Kubernetes 1.28 through 1.36.
+- Support for Kubernetes 1.28 through 1.37.
 - `kubernetes.addHashLabel` option to control whether the `kubenix/hash` label is added to every object (#76).
 - `kubernetes.customTypesModuleDefinesCRDSpec` option to control whether `customTypes.*.module` defines just the CRD spec or the whole module.
 - Submodule instances now get an automatic `kubenix/module-instance` label derived from the instance name.
@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The k8s generator no longer recurses forever on a definition whose list items reference the definition itself, as `CompositePodGroupTemplate` does in 1.37.
 - `overlays.default` now evaluates modules against the package set it extends. It previously returned the flake's own `evalModules.<system>`, which is pinned to kubenix's nixpkgs, so overlays and `config` applied by the consumer were discarded; it also only resolved for systems kubenix itself declares.
 - ConfigMap `data` and `binaryData` keys with a leading underscore are no longer stripped (#44).
 - Custom resources are no longer assumed to have a `spec` field.

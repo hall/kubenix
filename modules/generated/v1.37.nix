@@ -21083,8 +21083,7 @@ let
       options = {
         "compositePodGroupTemplates" = mkOption {
           description = "compositePodGroupTemplates is the list of templates for children CompositePodGroups. The maximum number of templates is 8. At least one entry in CompositePodGroupTemplates or PodGroupTemplates must be set.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.scheduling.v1alpha3.CompositePodGroupTemplate" "name" [ "name" ]));
-          apply = attrsToList;
+          type = types.unspecified;
         };
         "disruptionMode" = mkOption {
           description = "disruptionMode defines the mode in which a given CompositePodGroup can be disrupted. One of Single, All. This field is immutable.";
@@ -21747,8 +21746,7 @@ let
       options = {
         "compositePodGroupTemplates" = mkOption {
           description = "compositePodGroupTemplates is the list of templates for children CompositePodGroups. The maximum number of templates is 8. At least one entry in CompositePodGroupTemplates or PodGroupTemplates must be set.";
-          type = (types.nullOr (coerceAttrsOfSubmodulesToListByKey "io.k8s.api.scheduling.v1beta1.CompositePodGroupTemplate" "name" [ "name" ]));
-          apply = attrsToList;
+          type = types.unspecified;
         };
         "disruptionMode" = mkOption {
           description = "disruptionMode defines the mode in which a given CompositePodGroup can be disrupted. One of Single, All. This field is immutable.";
